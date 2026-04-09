@@ -2,12 +2,41 @@ mod commands;
 mod db;
 mod models;
 
+use std::path::PathBuf;
 use tauri::{
     Emitter, Manager,
     menu::{Menu, MenuItem, PredefinedMenuItem},
     tray::TrayIconBuilder,
 };
 use db::Database;
+
+fn resolve_db_dir(default_dir: PathBuf) -> PathBuf {
+    if let Ok(dir) = std::env::var("LAZY_TODO_DB_DIR") {
+        if !dir.is_empty() {
+            return PathBuf::from(dir);
+        }
+    }
+
+    if let Some(home) = dirs::home_dir() {
+        let config_file = home.join(".config").join("lazy-todo-app").join("config.json");
+        if config_file.exists() {
+            if let Ok(content) = std::fs::read_to_string(&config_file) {
+                if let Ok(json) = serde_json::from_str::<serde_json::Value>(&content) {
+                    if let Some(dir) = json.get("db_dir").and_then(|v| v.as_str()) {
+                        let expanded = if dir.starts_with('~') {
+                            home.join(dir.trim_start_matches("~/"))
+                        } else {
+                            PathBuf::from(dir)
+                        };
+                        return expanded;
+                    }
+                }
+            }
+        }
+    }
+
+    default_dir
+}
 
 fn setup_tray(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let show_hide = MenuItem::with_id(app, "show_hide", "Show/Hide", true, None::<&str>)?;
@@ -68,10 +97,8 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_notification::init())
         .setup(|app| {
-            let db_dir = match std::env::var("LAZY_TODO_DB_DIR") {
-                Ok(dir) if !dir.is_empty() => std::path::PathBuf::from(dir),
-                _ => app.path().app_data_dir().expect("failed to get app data dir"),
-            };
+            let default_dir = app.path().app_data_dir().expect("failed to get app data dir");
+            let db_dir = resolve_db_dir(default_dir);
             let database = Database::new(&db_dir).expect("failed to initialize database");
             app.manage(database);
             setup_tray(app).expect("failed to setup system tray");
