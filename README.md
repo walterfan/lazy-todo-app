@@ -56,6 +56,9 @@ lazy-todo-app/
 ├── README_zh.md
 ├── CLAUDE.md                         # AI agent architecture rules
 ├── package.json
+├── scripts/
+│   ├── check_pkb_staleness.py        # Advisory PKB freshness checker
+│   └── release_version.sh            # Bump versions, commit, and push release tag
 ├── src/                              # React frontend
 │   ├── App.tsx                       # Main shell: tabs, search, settings
 │   ├── main.tsx                      # Bootstrap: App vs NoteWindow
@@ -98,7 +101,8 @@ lazy-todo-app/
 ├── doc/                              # Bilingual PKB / Sphinx docs
 └── .github/workflows/
     ├── release.yml                   # Build native binaries on tag push
-    └── docs.yml                      # Publish bilingual docs to GitHub Pages
+    ├── docs.yml                      # Publish bilingual docs to GitHub Pages
+    └── pkb-check.yml                 # Advisory PKB freshness summary
 ```
 
 ## Quick Start
@@ -202,12 +206,28 @@ Enable this once in GitHub:
 
 The repo includes `/.github/workflows/release.yml`, which builds Tauri installers and publishes them to GitHub Releases when you push a `v*` tag.
 
+Recommended release helper:
+
+```bash
+./scripts/release_version.sh v0.1.1
+```
+
+Or:
+
+```bash
+npm run release:tag -- v0.1.1
+```
+
+This helper updates `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml`, creates a release commit, pushes the current branch, then creates and pushes the release tag.
+
 Example:
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.1.1
+git push origin v0.1.1
 ```
+
+For the full release checklist and bilingual docs publish steps, see `doc/08-build.md`.
 
 ## Harness Engineering Notes
 

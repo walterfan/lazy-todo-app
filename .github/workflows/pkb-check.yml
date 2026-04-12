@@ -1,0 +1,53 @@
+name: pkb-check
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "src-tauri/**"
+      - "doc/**"
+      - ".github/workflows/**"
+      - "package.json"
+      - "start.sh"
+      - "README.md"
+  push:
+    branches:
+      - master
+      - main
+    paths:
+      - "src/**"
+      - "src-tauri/**"
+      - "doc/**"
+      - ".github/workflows/**"
+      - "package.json"
+      - "start.sh"
+      - "README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pkb-advisory:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch PR base branch
+        if: github.event_name == 'pull_request'
+        run: git fetch origin "${{ github.base_ref }}:${{ github.base_ref }}"
+
+      - name: Run PKB staleness advisory check (pull request)
+        if: github.event_name == 'pull_request'
+        run: python3 scripts/check_pkb_staleness.py --base "${{ github.base_ref }}" --head "${{ github.sha }}"
+
+      - name: Run PKB staleness advisory check (push)
+        if: github.event_name == 'push'
+        run: python3 scripts/check_pkb_staleness.py --base "${{ github.event.before }}" --head "${{ github.sha }}"
+
+      - name: Run PKB staleness advisory check (manual)
+        if: github.event_name == 'workflow_dispatch'
+        run: python3 scripts/check_pkb_staleness.py

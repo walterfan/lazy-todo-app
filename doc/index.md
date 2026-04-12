@@ -27,6 +27,8 @@ The bilingual HTML output is written to `_build/en/html/` and `_build/zh_CN/html
 05-conventions
 06-runbook
 07-testing
+08-build
+09-document
 ai-guide
 adr/index
 changes/index
@@ -35,6 +37,6 @@ changes/index
 ---
 <!-- PKB-metadata
 last_updated: 2026-04-12
-commit: f9ba186
+commit: a34edf3
 updated_by: human+ai
 -->

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Lazy Todo App 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-12 20:24+0800\n"
-"PO-Revision-Date: 2026-04-12 21:10+0800\n"
+"PO-Revision-Date: 2026-04-12 23:10+0800\n"
 "Last-Translator: human+ai\n"
 "Language: zh_CN\n"
 "Language-Team: zh_CN\n"
@@ -89,13 +89,29 @@ msgstr "确保所有文件引用真实存在且保持最新。"
 msgid "Treat `doc/` as the PKB root; do not introduce `man/` for this repo."
 msgstr "将 `doc/` 视为 PKB 根目录，不要为这个仓库再引入 `man/`。"
 
-#: ../../ai-guide.md:25 c18a90bc7c8f451681e3ea4481215202
+#: ../../ai-guide.md:25
+msgid ""
+"Run `npm run pkb:check` after source, workflow, or build changes, or review "
+"the `pkb-check` GitHub Actions summary on PRs."
+msgstr ""
+"在源代码、工作流或构建相关内容变更后，请运行 `npm run pkb:check`，或者在 PR "
+"中查看 `pkb-check` GitHub Actions 摘要。"
+
+#: ../../ai-guide.md:26
+msgid ""
+"Treat the PKB checker as advisory: refresh the suggested English PKB pages "
+"first, then update the Chinese gettext catalogs."
+msgstr ""
+"请将 PKB 检查器视为告警辅助工具：先刷新建议更新的英文 PKB 页面，再更新中文 "
+"gettext catalog。"
+
+#: ../../ai-guide.md:27 c18a90bc7c8f451681e3ea4481215202
 msgid ""
 "Update the `<!-- PKB-metadata -->` footer whenever a doc changes "
 "meaningfully."
 msgstr "当文档发生实质性变化时，请同步更新 `<!-- PKB-metadata -->` 页脚。"
 
-#: ../../ai-guide.md:26 792ece14c50a486e8a8b3c699f94f2eb
+#: ../../ai-guide.md:28 792ece14c50a486e8a8b3c699f94f2eb
 msgid ""
 "Regenerate translation catalogs after English source changes: `poetry run"
 " make intl-update`."

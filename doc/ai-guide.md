@@ -22,12 +22,14 @@
 
 - Keep file references real and current.
 - Treat `doc/` as the PKB root; do not introduce `man/` for this repo.
+- Run `npm run pkb:check` after source, workflow, or build changes, or review the `pkb-check` GitHub Actions summary on PRs.
+- Treat the PKB checker as advisory: refresh the suggested English PKB pages first, then update the Chinese gettext catalogs.
 - Update the `<!-- PKB-metadata -->` footer whenever a doc changes meaningfully.
 - Regenerate translation catalogs after English source changes: `poetry run make intl-update`.
 
 ---
 <!-- PKB-metadata
 last_updated: 2026-04-12
-commit: f9ba186
+commit: a34edf3
 updated_by: human+ai
 -->

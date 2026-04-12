@@ -56,6 +56,9 @@ lazy-todo-app/
 ├── README_zh.md
 ├── CLAUDE.md                         # AI agent architecture rules
 ├── package.json
+├── scripts/
+│   ├── check_pkb_staleness.py        # PKB 新鲜度告警检查器
+│   └── release_version.sh            # 更新版本、提交并推送发布标签
 ├── src/                              # React frontend
 │   ├── App.tsx                       # Main shell: tabs, search, settings
 │   ├── main.tsx                      # Bootstrap: App vs NoteWindow
@@ -98,7 +101,8 @@ lazy-todo-app/
 ├── doc/                              # Bilingual PKB / Sphinx docs
 └── .github/workflows/
     ├── release.yml                   # Build native binaries on tag push
-    └── docs.yml                      # Publish bilingual docs to GitHub Pages
+    ├── docs.yml                      # Publish bilingual docs to GitHub Pages
+    └── pkb-check.yml                 # PKB 新鲜度告警摘要
 ```
 
 ## 快速开始
@@ -202,12 +206,28 @@ poetry run make pages
 
 仓库包含 `/.github/workflows/release.yml`，在推送 `v*` 标签时自动构建 Tauri 安装包并发布到 GitHub Releases。
 
+推荐使用发布辅助脚本：
+
+```bash
+./scripts/release_version.sh v0.1.1
+```
+
+或者：
+
+```bash
+npm run release:tag -- v0.1.1
+```
+
+这个脚本会更新 `package.json`、`src-tauri/tauri.conf.json` 和 `src-tauri/Cargo.toml` 中的版本号，创建发布提交，推送当前分支，然后创建并推送发布标签。
+
 示例：
 
 ```bash
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.1.1
+git push origin v0.1.1
 ```
+
+完整的发布检查清单和双语文档发布步骤请参见 `doc/08-build.md`。
 
 ## Harness Engineering 实践
 

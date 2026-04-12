@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "pkb:check": "python3 scripts/check_pkb_staleness.py",
+    "release:tag": "bash scripts/release_version.sh"
   },
   "dependencies": {
     "@tauri-apps/api": "^2",
