@@ -1,147 +1,165 @@
 # Lazy Todo App
 
-一个集 Todo 管理、桌面即时贴、番茄钟于一体的桌面效率应用，用 **Tauri v2 + Rust + React + TypeScript** 构建。
+[English Version](README.md) | [Chinese Version](README_zh.md)
 
-这个项目是 [Harness Engineering 博客文章](https://www.fanyamin.com/tech/harness-engineering.html) 的配套实战案例——一个不会 Rust 的老程序员，靠 Harness Engineering 的思路，让 AI Agent 按规则生成了整个项目的代码。
+A cross-platform desktop productivity app built with **Tauri v2 + Rust + React + TypeScript**, combining todo management, sticky notes, pomodoro focus tools, and app settings in one native shell.
 
-## 功能
+This project also serves as a practical [Harness Engineering](https://www.fanyamin.com/tech/harness-engineering.html) case study: AI agents contribute inside explicit architectural guardrails instead of writing code with no boundaries.
 
-### Todo 管理
-- **Todo CRUD**：添加、编辑、完成、删除任务
-- **三级优先级**：🔴 高 / 🟡 中 / 🟢 低，左边框颜色区分
-- **截止时间 + 实时倒计时**：每秒刷新，< 1 小时变橙色，过期变红色
-- **智能排序**：按优先级 → 截止时间排序，已完成的沉底
+## Features
 
-### 桌面即时贴
-- **Markdown 备忘录**：支持 GitHub Flavored Markdown 渲染
-- **多色便签**：黄、绿、蓝、粉、紫五种颜色
-- **内联编辑**：点击即可编辑标题和内容
-- **系统托盘集成**：收缩到任务栏，右键菜单快捷新建便签
+### Todo Management
 
-### 番茄钟
-- **可视化计时**：SVG 圆环进度条，实时倒计时
-- **可配置时长**：自定义工作、短休息、长休息时间和轮次
-- **每日统计**：当日完成番茄数 + 7 日柱状图
-- **到时提醒**：窗口弹出 + 音效提示，切换标签页不中断计时
-- **系统通知**：利用原生通知提醒工作/休息
+- **Todo CRUD**: add, edit, complete, and delete tasks.
+- **Priority and deadlines**: supports high/medium/low priority plus live countdowns.
+- **Search and display modes**: task search plus list/grid rendering modes.
 
-### 通用
-- **SQLite 持久化**：数据存在本地，重启不丢失
-- **可配置数据库路径**：通过环境变量 `LAZY_TODO_DB_DIR` 自定义存储位置
-- **暗色主题 UI**
-- **系统托盘**：关闭窗口时隐藏到托盘，左键点击显示/隐藏
+### Sticky Notes
 
-## 技术栈
+- **Markdown notes**: supports GitHub Flavored Markdown rendering.
+- **Multi-color cards**: supports multiple note colors and inline editing.
+- **Pop-out windows**: individual notes can open in dedicated windows while sharing the same data store.
+- **Tray shortcut creation**: quick note creation is available from the system tray.
 
-| 层 | 技术 | 职责 |
-|----|------|------|
-| 前端 | React 18 + TypeScript | UI 组件、倒计时/番茄钟 Hook |
-| 后端 | Rust + Tauri v2 | 命令处理、状态管理、系统托盘 |
-| 存储 | SQLite (rusqlite) | 本地持久化（todos、notes、pomodoro） |
-| 通知 | tauri-plugin-notification | 原生系统通知 |
-| Markdown | react-markdown + remark-gfm | 便签内容渲染 |
-| 构建 | Vite + Cargo | 前后端打包 |
+### Pomodoro
 
-## 项目结构
+- **Visual timer**: SVG ring progress and phase countdown.
+- **Configurable cycles**: supports work, short break, long break, and round settings.
+- **Milestones and stats**: supports milestone tracking, daily completions, and 7-day stats.
+- **Alerts**: supports window alerts, sound cues, and native notifications.
 
-```
+### Settings and Desktop Experience
+
+- **App settings**: supports page size, todo/note display modes, note templates, and note folder labels.
+- **SQLite persistence**: todos, notes, pomodoro data, and app settings are all stored locally in SQLite.
+- **Configurable DB path**: supports environment-variable and local-config overrides for the database directory.
+- **Tray behavior**: closing the main window hides it to the tray, with show/hide and quit actions.
+
+## Tech Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| Desktop shell | Tauri v2 | Native windows, tray integration, plugin wiring |
+| Frontend | React 18 + TypeScript | Main UI, search, settings, countdowns, pop-out note windows |
+| Backend | Rust | Tauri commands, window management, state, and DB access |
+| Storage | SQLite via `rusqlite` | Local persistence for todos, sticky notes, pomodoro, and settings |
+| Notifications | `tauri-plugin-notification` | Native system alerts |
+| External links | `@tauri-apps/plugin-shell` | Opens HTTP links outside the webview |
+| Markdown | `react-markdown` + `remark-gfm` | Note content rendering |
+| Build | Vite + Cargo | Frontend bundling and desktop packaging |
+
+## Project Structure
+
+```text
 lazy-todo-app/
-├── CLAUDE.md                    # Harness: AI Agent 的架构规则
+├── README.md
+├── README_zh.md
+├── CLAUDE.md                         # AI agent architecture rules
 ├── package.json
-├── src/                         # React 前端
-│   ├── App.tsx                  # 主组件（Tab 导航）
-│   ├── App.css                  # 暗色主题样式
-│   ├── types/
-│   │   ├── todo.ts              # Todo 类型定义
-│   │   ├── note.ts              # 便签类型定义
-│   │   └── pomodoro.ts          # 番茄钟类型定义
+├── src/                              # React frontend
+│   ├── App.tsx                       # Main shell: tabs, search, settings
+│   ├── main.tsx                      # Bootstrap: App vs NoteWindow
+│   ├── App.css
 │   ├── hooks/
-│   │   ├── useTodos.ts          # Todo CRUD Hook
-│   │   ├── useCountdown.ts      # 实时倒计时 Hook
-│   │   ├── useNotes.ts          # 便签 CRUD Hook
-│   │   ├── usePomodoro.ts       # 番茄钟计时逻辑 Hook
-│   │   └── usePomodoroStats.ts  # 番茄钟统计 Hook
-│   └── components/
-│       ├── AddTodo.tsx           # Todo 添加表单
-│       ├── TodoItem.tsx          # 单条任务（倒计时 + 内联编辑）
-│       ├── TodoList.tsx          # Todo 列表
-│       ├── NoteEditor.tsx        # 便签编辑器
-│       ├── NoteCard.tsx          # 便签卡片
-│       ├── NoteList.tsx          # 便签列表
-│       ├── MarkdownPreview.tsx   # Markdown 渲染
-│       ├── PomodoroPanel.tsx     # 番茄钟主面板
-│       ├── PomodoroRing.tsx      # SVG 圆环进度
-│       ├── PomodoroControls.tsx  # 开始/暂停/重置
-│       ├── PomodoroSettings.tsx  # 时长配置
-│       ├── PomodoroStats.tsx     # 每日/每周统计
-│       └── PomodoroAlert.tsx     # 到时弹窗 + 音效
-└── src-tauri/                   # Rust 后端
-    ├── Cargo.toml
-    ├── tauri.conf.json
-    ├── icons/                   # 应用图标（各尺寸）
-    └── src/
-        ├── main.rs
-        ├── lib.rs               # Tauri 启动 + 命令注册 + 系统托盘
-        ├── db.rs                # SQLite 数据库（4 张表）
-        ├── models/
-        │   ├── todo.rs          # Todo 数据模型
-        │   ├── note.rs          # 便签数据模型
-        │   └── pomodoro.rs      # 番茄钟数据模型
-        └── commands/
-            ├── todo.rs          # Todo 命令（5 个）
-            ├── note.rs          # 便签命令（4 个）
-            ├── pomodoro.rs      # 番茄钟命令（5 个）
-            └── app.rs           # 应用信息命令
+│   │   ├── useTodos.ts
+│   │   ├── useNotes.ts
+│   │   ├── usePomodoro.ts
+│   │   ├── usePomodoroStats.ts
+│   │   ├── useCountdown.ts
+│   │   └── useSettings.ts
+│   ├── components/
+│   │   ├── TodoList.tsx
+│   │   ├── NoteList.tsx
+│   │   ├── NoteWindow.tsx
+│   │   ├── PomodoroPanel.tsx
+│   │   ├── PomodoroMilestones.tsx
+│   │   └── SettingsPanel.tsx
+│   └── types/
+│       ├── todo.ts
+│       ├── note.ts
+│       ├── pomodoro.ts
+│       └── settings.ts
+├── src-tauri/                        # Rust backend
+│   ├── Cargo.toml
+│   ├── tauri.conf.json
+│   └── src/
+│       ├── lib.rs                    # Builder, tray, command registration
+│       ├── db.rs                     # SQLite schema and persistence
+│       ├── commands/
+│       │   ├── todo.rs
+│       │   ├── note.rs
+│       │   ├── pomodoro.rs
+│       │   └── app.rs
+│       └── models/
+│           ├── todo.rs
+│           ├── note.rs
+│           ├── pomodoro.rs
+│           └── settings.rs
+├── doc/                              # Bilingual PKB / Sphinx docs
+└── .github/workflows/
+    ├── release.yml                   # Build native binaries on tag push
+    └── docs.yml                      # Publish bilingual docs to GitHub Pages
 ```
 
-## 快速开始
+## Quick Start
 
-### 前置条件
+### Prerequisites
 
-- [Rust](https://www.rust-lang.org/tools/install) (1.70+)
-- [Node.js](https://nodejs.org/) (18+)
+- [Rust](https://www.rust-lang.org/tools/install) `1.70+`
+- [Node.js](https://nodejs.org/) `18+`
 - macOS / Linux / Windows
 
-### 安装 & 运行
+### Install and Run
 
 ```bash
-# 克隆项目
 git clone https://github.com/walterfan/lazy-todo-app.git
 cd lazy-todo-app
-
-# 安装前端依赖
 npm install
 
-# 开发模式（同时启动 Vite + Tauri）
+# Development mode
 npm run tauri dev
 
-# 构建生产版本
+# Production build
 npm run tauri build
 ```
 
-### 自定义数据库路径
+### Database Location
 
-默认情况下，数据库存储在系统应用数据目录：
+Default database path:
 
-| 平台 | 默认路径 |
-|------|----------|
+| Platform | Path |
+|---|---|
 | macOS | `~/Library/Application Support/com.fanyamin.lazytodoapp/todos.db` |
 | Linux | `~/.local/share/com.fanyamin.lazytodoapp/todos.db` |
 | Windows | `%APPDATA%\com.fanyamin.lazytodoapp\todos.db` |
 
-通过环境变量指定自定义位置：
+Override with an environment variable:
 
 ```bash
 LAZY_TODO_DB_DIR=/path/to/your/folder npm run tauri dev
 ```
 
-当前数据库路径会显示在应用底部的 footer 中。
+You can also persist the override via local config:
 
-## 项目文档 / Documentation
+```json
+{
+  "db_dir": "~/Documents/lazy-todo-db"
+}
+```
 
-项目知识库位于 `doc/`，采用 **Sphinx + MyST + sphinx-intl** 生成双语文档。
+Config file location:
 
-### 本地构建文档
+```text
+~/.config/lazy-todo-app/config.json
+```
+
+## Documentation
+
+The project knowledge base lives in `doc/` and uses **Sphinx + MyST + sphinx-intl** to generate bilingual documentation.
+
+Published site: [https://walterfan.github.io/lazy-todo-app](https://walterfan.github.io/lazy-todo-app)
+
+### Build Docs Locally
 
 ```bash
 cd doc
@@ -149,90 +167,102 @@ poetry install
 poetry run make html
 ```
 
-生成结果：
+Output directories:
 
-- 英文站点：`doc/_build/en/html/`
-- 中文站点：`doc/_build/zh_CN/html/`
+- English: `doc/_build/en/html/`
+- Chinese: `doc/_build/zh_CN/html/`
 
-如果要生成适合 GitHub Pages 发布的静态站点目录：
+### Build the GitHub Pages Site
 
 ```bash
 cd doc
 poetry run make pages
 ```
 
-该命令会生成：
+Generated output:
 
-- Pages 站点根目录：`doc/_build/site/`
-- 语言入口页：`doc/_build/site/index.html`
-- 英文内容：`doc/_build/site/en/`
-- 中文内容：`doc/_build/site/zh_CN/`
+- Site root: `doc/_build/site/`
+- Landing page: `doc/_build/site/index.html`
+- English site: `doc/_build/site/en/`
+- Chinese site: `doc/_build/site/zh_CN/`
 
-### 自动发布到 GitHub Pages
+### Automatic Docs Publishing
 
-仓库已经包含 `/.github/workflows/docs.yml` 工作流。它会在以下情况下自动构建并发布文档：
+The repo includes `/.github/workflows/docs.yml`, which publishes GitHub Pages when:
 
-- 推送到 `master` 或 `main`
-- 且变更涉及 `doc/**`、`README.md` 或文档工作流本身
-- 或手动触发 `workflow_dispatch`
+- Pushes land on `master` or `main` and change `doc/**`, `README.md`, or the docs workflow itself
+- The workflow is triggered manually via `workflow_dispatch`
 
-首次启用时，请在 GitHub 仓库设置中确认：
+Enable this once in GitHub:
 
-1. 打开 `Settings -> Pages`
-2. 将 Source 设置为 `GitHub Actions`
-3. 确认 Actions 具有发布 Pages 的权限
+1. Open `Settings -> Pages`
+2. Set `Source` to `GitHub Actions`
 
-## Harness Engineering 实践
+## Binary Releases
 
-这个项目是 Harness Engineering 的实战演示。核心思路：不是自己写 Rust 代码，而是给 AI Agent 搭一个"跑不偏"的环境。
+The repo includes `/.github/workflows/release.yml`, which builds Tauri installers and publishes them to GitHub Releases when you push a `v*` tag.
 
-### 缰绳：CLAUDE.md
-
-`CLAUDE.md` 定义了项目的架构规则、文件结构、编码规范和常见坑点。Agent 按照这份"操作手册"生成代码，不需要自由发挥。
-
-### 围栏：Pre-commit Hook
+Example:
 
 ```bash
-# 安装 pre-commit
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+## Harness Engineering Notes
+
+This project demonstrates how to guide AI coding with rules, constraints, and automation instead of asking a model to generate code with no boundaries.
+
+### `CLAUDE.md` as Architectural Guardrails
+
+`CLAUDE.md` defines where commands live, how frontend/backend boundaries work, how persistence is handled, and what Tauri commands must return.
+
+### Pre-commit Checks
+
+```bash
 pip install pre-commit
 pre-commit install
 ```
 
-每次提交前自动跑 `cargo clippy`、`cargo test`、`tsc --noEmit` 三道检查。
+Typical checks:
 
-### 马场：Tauri 的天然沙箱
+- `cargo clippy`
+- `cargo test`
+- `tsc --noEmit`
 
-Tauri 本身就是一个很好的 Harness：前端只能通过 `invoke()` 调用后端命令，不能直接访问文件系统；后端用 Rust 的类型系统和所有权机制约束内存安全。
+### Tauri as a Natural Sandbox
 
-## Tauri 命令一览
+The frontend can only reach the backend through `invoke()` and cannot directly touch the database or filesystem; the backend then relies on Rust's type system and ownership model to keep those boundaries safe.
 
-| 命令 | 功能 |
-|------|------|
-| **Todo** | |
-| `list_todos` | 查询所有 Todo，按优先级和截止时间排序 |
-| `add_todo` | 添加新 Todo（支持标题、描述、优先级、截止时间） |
-| `toggle_todo` | 切换完成状态 |
-| `update_todo` | 编辑 Todo（标题、描述、优先级、截止时间） |
-| `delete_todo` | 删除 Todo |
-| **便签** | |
-| `list_notes` | 查询所有便签，按更新时间倒序 |
-| `add_note` | 新建便签（标题、内容、颜色） |
-| `update_note` | 编辑便签 |
-| `delete_note` | 删除便签 |
-| **番茄钟** | |
-| `get_pomodoro_settings` | 获取番茄钟配置 |
-| `save_pomodoro_settings` | 保存番茄钟配置 |
-| `record_pomodoro_session` | 记录一次完成的番茄 |
-| `get_today_pomodoro_count` | 获取今日完成数 |
-| `get_weekly_pomodoro_stats` | 获取最近 7 天统计 |
-| `update_tray_tooltip` | 更新托盘提示文字 |
-| **应用** | |
-| `get_db_path` | 获取当前数据库文件路径 |
+## Tauri Commands
 
-## 相关文章
+| Area | Command | Description |
+|---|---|---|
+| Todo | `list_todos` | List todos |
+| Todo | `add_todo` | Add a todo |
+| Todo | `toggle_todo` | Toggle completion |
+| Todo | `update_todo` | Update a todo |
+| Todo | `delete_todo` | Delete a todo |
+| Notes | `list_notes` | List notes |
+| Notes | `add_note` | Add a note |
+| Notes | `update_note` | Update a note |
+| Notes | `delete_note` | Delete a note |
+| Pomodoro | `get_pomodoro_settings` | Get pomodoro settings |
+| Pomodoro | `save_pomodoro_settings` | Save pomodoro settings |
+| Pomodoro | `record_pomodoro_session` | Record a completed session |
+| Pomodoro | `get_today_pomodoro_count` | Get today's count |
+| Pomodoro | `get_weekly_pomodoro_stats` | Get weekly stats |
+| Pomodoro | `update_tray_tooltip` | Update tray tooltip |
+| App | `get_db_path` | Get DB path |
+| App | `get_app_settings` | Get app settings |
+| App | `save_app_settings` | Save app settings |
+| App | `quit_app` | Quit app |
+| App | `open_note_window` | Open a dedicated note window |
+
+## Related Links
 
 - [从 Prompt Engineering 到 Harness Engineering：AI 编程的四次进化](https://www.fanyamin.com/tech/harness-engineering.html)
-- [Harness Engineering: Leveraging Codex in an Agent-First World](https://openai.com/index/harness-engineering/) - OpenAI 原文
+- [Harness Engineering: Leveraging Codex in an Agent-First World](https://openai.com/index/harness-engineering/)
 - [Tauri v2 Documentation](https://v2.tauri.app/)
 
 ## License
