@@ -150,18 +150,18 @@ Two singleton-style tables hold configuration:
 
 ```mermaid
 sequenceDiagram
-    participant Card as NoteCard.tsx
-    participant IPC as invoke("open_note_window")
-    participant Cmd as commands/app.rs
-    participant Win as WebviewWindowBuilder
-    participant Bootstrap as src/main.tsx
-    participant View as NoteWindow.tsx
+    participant Card as "NoteCard.tsx"
+    participant IPC as "invoke(open_note_window)"
+    participant Cmd as "commands/app.rs"
+    participant Win as "WebviewWindowBuilder"
+    participant Bootstrap as "src/main.tsx"
+    participant View as "NoteWindow.tsx"
 
     Card->>IPC: noteId, title
     IPC->>Cmd: open_note_window(note_id, title)
-    Cmd->>Win: create or focus "note-{id}"
-    Win-->>Bootstrap: load index.html?note={id}
-    Bootstrap-->>View: render NoteWindow(noteId)
+    Cmd->>Win: create or focus note window
+    Win-->>Bootstrap: load note window route
+    Bootstrap-->>View: render note window
     View->>IPC: list_notes / update_note
 ```
 

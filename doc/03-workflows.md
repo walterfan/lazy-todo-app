@@ -29,13 +29,13 @@ stateDiagram-v2
 
 ```mermaid
 flowchart TD
-    A[NoteEditor.tsx] -->|add_note| B[SQLite sticky_notes row]
-    B --> C[NoteList.tsx renders card]
-    C -->|Open in window| D[invoke open_note_window]
-    D --> E[commands/app.rs]
-    E --> F[Create or focus note-{id} webview]
-    F --> G[index.html?note={id}]
-    G --> H[NoteWindow.tsx]
+    A["NoteEditor.tsx"] -->|add_note| B["SQLite sticky_notes row"]
+    B --> C["NoteList.tsx renders card"]
+    C -->|Open in window| D["invoke open_note_window"]
+    D --> E["commands/app.rs"]
+    E --> F["Create or focus note window"]
+    F --> G["Load note window route"]
+    G --> H["NoteWindow.tsx"]
 ```
 
 ### Notes
@@ -74,11 +74,11 @@ stateDiagram-v2
 
 ```mermaid
 sequenceDiagram
-    participant UI as SettingsPanel.tsx
-    participant Hook as useSettings.ts
-    participant IPC as invoke()
-    participant Cmd as commands/app.rs
-    participant DB as db.rs
+    participant UI as "SettingsPanel.tsx"
+    participant Hook as "useSettings.ts"
+    participant IPC as "invoke()"
+    participant Cmd as "commands/app.rs"
+    participant DB as "db.rs"
 
     UI->>Hook: onUpdate(partial settings)
     Hook->>Hook: merge with current state
@@ -104,34 +104,34 @@ These settings are loaded on app startup via `get_app_settings`.
 
 ```mermaid
 flowchart TD
-    A[User closes main window] --> B[CloseRequested intercepted]
-    B --> C[Window.hide()]
-    C --> D[Tray remains active]
-    D -->|Left click| E[Toggle main window visibility]
-    D -->|Menu: New Note| F[Show main window]
-    F --> G[Emit tray-new-note]
-    G --> H[App.tsx switches to Notes tab and autofocuses editor]
-    D -->|Menu: Quit| I[app.exit(0)]
+    A["User closes main window"] --> B["CloseRequested intercepted"]
+    B --> C["Hide main window"]
+    C --> D["Tray remains active"]
+    D -->|Left click| E["Toggle main window visibility"]
+    D -->|Menu: New Note| F["Show main window"]
+    F --> G["Emit tray-new-note"]
+    G --> H["App.tsx switches to Notes tab and autofocuses editor"]
+    D -->|Menu: Quit| I["Exit application"]
 ```
 
 ## Workflow 6: App Startup
 
 ```mermaid
 flowchart TD
-    A[main.rs] --> B[lib::run]
-    B --> C[Resolve DB directory]
-    C --> D{Env var set?}
-    D -->|Yes| E[Use LAZY_TODO_DB_DIR]
-    D -->|No| F{Config file exists?}
-    F -->|Yes| G[Use ~/.config/lazy-todo-app/config.json]
-    F -->|No| H[Use app_data_dir]
-    E --> I[Database::new]
+    A["main.rs"] --> B["Run application"]
+    B --> C["Resolve DB directory"]
+    C --> D{"Env var set?"}
+    D -->|Yes| E["Use LAZY_TODO_DB_DIR"]
+    D -->|No| F{"Config file exists?"}
+    F -->|Yes| G["Use config.json override"]
+    F -->|No| H["Use app_data_dir"]
+    E --> I["Initialize database"]
     G --> I
     H --> I
-    I --> J[setup_tray]
-    J --> K[register invoke commands]
-    K --> L[Frontend boot]
-    L --> M[get_db_path + get_app_settings]
+    I --> J["Setup tray"]
+    J --> K["register invoke commands"]
+    K --> L["Frontend boot"]
+    L --> M["Load startup settings"]
 ```
 
 ---
