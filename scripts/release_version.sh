@@ -40,9 +40,9 @@ fi
 VERSION="${INPUT_VERSION#v}"
 TAG="v${VERSION}"
 
-if [[ -n "$(git status --porcelain)" ]]; then
-  echo "Error: working tree must be clean before running the release script." >&2
-  echo "Commit or stash your current changes first." >&2
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+  echo "Error: tracked files must be clean before running the release script." >&2
+  echo "Commit or stash your tracked changes first. Untracked files are ignored." >&2
   exit 1
 fi
 
