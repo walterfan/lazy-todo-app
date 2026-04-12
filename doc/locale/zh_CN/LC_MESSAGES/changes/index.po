@@ -1,0 +1,35 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-12 20:24+0800\n"
+"PO-Revision-Date: 2026-04-12 21:10+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../changes/index.md:1 39c3a7f2ef8a483187675f6f3e1806f9
+msgid "Change Proposals"
+msgstr "变更提案"
+
+#: ../../changes/index.md:5 ae16168b62e942d6878cf4c255b55106
+msgid ""
+"This section is reserved for structured change proposals that connect "
+"product intent, design reasoning, and implementation tasks."
+msgstr "本节用于存放结构化的变更提案，把产品意图、设计推理与实现任务串联起来。"
+
+#: ../../changes/index.md:7 78cbb8ca8d8a477baad0f9d1deeb6683
+msgid "Link or add change proposals here as the project grows."
+msgstr "随着项目演进，可以在这里链接或新增变更提案。"
+

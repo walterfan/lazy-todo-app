@@ -1,0 +1,148 @@
+import type { PomodoroMilestone, PomodoroMilestoneStatus } from "../types/pomodoro";
+
+interface PomodoroMilestonesProps {
+  milestones: PomodoroMilestone[];
+  onToggleStatus: (index: number, status: PomodoroMilestoneStatus) => void | Promise<void>;
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M3.5 8.5 6.5 11.5 12.5 4.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CancelIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function RestoreIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M5 4H2v3M2.5 4.5A5.5 5.5 0 1 1 4.4 12.6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function formatRemainingDays(deadline: string): string {
+  const target = new Date(`${deadline}T00:00:00`);
+
+  if (Number.isNaN(target.getTime())) {
+    return "Invalid date";
+  }
+
+  const today = startOfDay(new Date());
+  const targetDay = startOfDay(target);
+  const diffDays = Math.round((targetDay.getTime() - today.getTime()) / DAY_MS);
+
+  if (diffDays > 0) {
+    return `${diffDays} day${diffDays === 1 ? "" : "s"} left`;
+  }
+
+  if (diffDays === 0) {
+    return "Due today";
+  }
+
+  const overdueDays = Math.abs(diffDays);
+  return `${overdueDays} day${overdueDays === 1 ? "" : "s"} overdue`;
+}
+
+export function PomodoroMilestones({ milestones, onToggleStatus }: PomodoroMilestonesProps) {
+  const visibleMilestones = milestones
+    .map((milestone, index) => ({ ...milestone, index }))
+    .filter((milestone) => milestone.name && milestone.deadline && milestone.status !== "completed")
+    .sort((a, b) => a.deadline.localeCompare(b.deadline))
+    .slice(0, 3);
+
+  return (
+    <div className="pomo-milestones">
+      <div className="pomo-milestones-title">Milestones</div>
+      {visibleMilestones.length > 0 ? (
+        <div className="pomo-milestones-list">
+          {visibleMilestones.map((milestone) => (
+            <div className={`pomo-milestone-card pomo-milestone-card-${milestone.status}`} key={`${milestone.name}-${milestone.deadline}-${milestone.index}`}>
+              <div className="pomo-milestone-line">
+                <div className="pomo-milestone-name">{milestone.name}</div>
+                <div className="pomo-milestone-days">{formatRemainingDays(milestone.deadline)}</div>
+                <div className="pomo-milestone-deadline">{milestone.deadline}</div>
+                <div className="pomo-milestone-actions">
+                  {milestone.status === "cancelled" ? (
+                    <button
+                      className="pomo-milestone-action pomo-milestone-action-restore"
+                      type="button"
+                      title="Restore milestone"
+                      aria-label="Restore milestone"
+                      onClick={() => {
+                        void onToggleStatus(milestone.index, "active");
+                      }}
+                    >
+                      <RestoreIcon />
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        className="pomo-milestone-action pomo-milestone-action-complete"
+                        type="button"
+                        title="Mark milestone as completed"
+                        aria-label="Mark milestone as completed"
+                        onClick={() => {
+                          void onToggleStatus(milestone.index, "completed");
+                        }}
+                      >
+                        <CheckIcon />
+                      </button>
+                      <button
+                        className="pomo-milestone-action pomo-milestone-action-cancel"
+                        type="button"
+                        title="Cancel milestone"
+                        aria-label="Cancel milestone"
+                        onClick={() => {
+                          void onToggleStatus(milestone.index, "cancelled");
+                        }}
+                      >
+                        <CancelIcon />
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="pomo-milestones-empty">No active milestones. Add or update them in settings.</div>
+      )}
+    </div>
+  );
+}

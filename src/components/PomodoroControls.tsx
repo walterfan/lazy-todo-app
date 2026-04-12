@@ -3,9 +3,10 @@ interface PomodoroControlsProps {
   onStart: () => void;
   onPause: () => void;
   onReset: () => void;
+  onSkip: () => void;
 }
 
-export function PomodoroControls({ running, onStart, onPause, onReset }: PomodoroControlsProps) {
+export function PomodoroControls({ running, onStart, onPause, onReset, onSkip }: PomodoroControlsProps) {
   return (
     <div className="pomodoro-controls">
       {running ? (
@@ -13,6 +14,7 @@ export function PomodoroControls({ running, onStart, onPause, onReset }: Pomodor
       ) : (
         <button className="pomo-btn pomo-btn-start" onClick={onStart}>Start</button>
       )}
+      <button className="pomo-btn pomo-btn-reset" onClick={onSkip}>Skip</button>
       <button className="pomo-btn pomo-btn-reset" onClick={onReset}>Reset</button>
     </div>
   );

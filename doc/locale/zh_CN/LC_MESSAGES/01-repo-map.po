@@ -1,0 +1,211 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-12 20:24+0800\n"
+"PO-Revision-Date: 2026-04-12 21:26+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../01-repo-map.md:1 75fa1c40654d4421896c8065280dd4ad
+msgid "Lazy Todo App — Repository Map"
+msgstr "Lazy Todo App — 仓库地图"
+
+#: ../../01-repo-map.md:5 9c1d94059c9b485c8deacb7c823d7014
+msgid "Directory Structure"
+msgstr "目录结构"
+
+#: ../../01-repo-map.md:96 9176501f4d5f42b78be8bf570b9705a2
+msgid "Entry Points"
+msgstr "入口点"
+
+#: ../../01-repo-map.md cbc595812a534a18b7ac5a6910cffb7f
+msgid "Context"
+msgstr "上下文"
+
+#: ../../01-repo-map.md 0ed53ad20dab4e4c91d1c330b9dd5c68
+#: e81ca2b126854f519bb134cacdfe140d
+msgid "File"
+msgstr "文件"
+
+#: ../../01-repo-map.md 3efbf024001548eda4cd68f425ce1fda
+#: 96dc513ade3c4de391521c2826019b42
+msgid "Purpose"
+msgstr "用途"
+
+#: ../../01-repo-map.md 8620087823584d98b3914e31f36cc571
+msgid "Rust binary"
+msgstr "Rust 二进制入口"
+
+#: ../../01-repo-map.md 2d4471eea7444288af9b10755ad46ea8
+msgid "`src-tauri/src/main.rs`"
+msgstr "`src-tauri/src/main.rs`"
+
+#: ../../01-repo-map.md ac299b8142154be68a195dfbe34562d4
+msgid "Calls `lazy_todo_app_lib::run()`"
+msgstr "调用 `lazy_todo_app_lib::run()`"
+
+#: ../../01-repo-map.md 337f694038124ac2b2a61d14780a4915
+msgid "Tauri setup"
+msgstr "Tauri 初始化"
+
+#: ../../01-repo-map.md e80ee65a948648b2b9b465f5bd6395bc
+msgid "`src-tauri/src/lib.rs`"
+msgstr "`src-tauri/src/lib.rs`"
+
+#: ../../01-repo-map.md 5f71c757fb0e4905ad32629e759e6b6a
+msgid "Resolves DB directory, initializes tray, registers commands"
+msgstr "解析数据库目录、初始化托盘并注册命令"
+
+#: ../../01-repo-map.md df5f09a075b341169b6504174821c1a3
+msgid "React bootstrap"
+msgstr "React 启动入口"
+
+#: ../../01-repo-map.md fc27dc0ddf22447e9844baa57f2e8e67
+msgid "`src/main.tsx`"
+msgstr "`src/main.tsx`"
+
+#: ../../01-repo-map.md 6d79c8294c584be19099c305efe7a741
+msgid "Routes between the main app and pop-out note windows"
+msgstr "在主应用与弹出式便签窗口之间做路由分发"
+
+#: ../../01-repo-map.md 7b308259a84e4cc88066770cdb54db6a
+msgid "Main shell"
+msgstr "主外壳"
+
+#: ../../01-repo-map.md 3b26dfe0be0a4a57a1bb67804afa6a38
+msgid "`src/App.tsx`"
+msgstr "`src/App.tsx`"
+
+#: ../../01-repo-map.md fd9fd7bc79b84b2fa6b7a3beb769237b
+msgid "Tabs, search, settings panel, tray event handling"
+msgstr "标签页、搜索、设置面板与托盘事件处理"
+
+#: ../../01-repo-map.md 5371079d1a2240738cd5edbee2aebb71
+msgid "Standalone note view"
+msgstr "独立便签视图"
+
+#: ../../01-repo-map.md 3013357cf1174bdc9ad1208ee10c3ba7
+msgid "`src/components/NoteWindow.tsx`"
+msgstr "`src/components/NoteWindow.tsx`"
+
+#: ../../01-repo-map.md 5961327b043a4fcaa0b049364d675071
+msgid "Focused single-note window UI"
+msgstr "聚焦单条便签的窗口 UI"
+
+#: ../../01-repo-map.md af68e2dadc4d4efd87aa07665974a006
+msgid "Vite entry"
+msgstr "Vite 入口"
+
+#: ../../01-repo-map.md 0e9c747440054e8c9d7603fdf5d4e490
+msgid "`index.html`"
+msgstr "`index.html`"
+
+#: ../../01-repo-map.md e07a8c4b3e704b33a8ae8e2379e9b9ce
+msgid "Loads `/src/main.tsx`"
+msgstr "加载 `/src/main.tsx`"
+
+#: ../../01-repo-map.md:107 f534210ec86e4b809e508a630e1fa1c6
+msgid "Key Configuration Files"
+msgstr "关键配置文件"
+
+#: ../../01-repo-map.md 244a9a80997d40148187bb591c430648
+msgid "`CLAUDE.md`"
+msgstr "`CLAUDE.md`"
+
+#: ../../01-repo-map.md 075b1b2fc03d421b842ccda34e363f23
+msgid "AI agent contribution constraints"
+msgstr "AI Agent 贡献约束"
+
+#: ../../01-repo-map.md 59493873467340d2b57e118a422fa3d8
+msgid "`package.json`"
+msgstr "`package.json`"
+
+#: ../../01-repo-map.md 41a3cb79b9ee4c06a5b428c7c75795cc
+msgid "npm scripts and frontend packages"
+msgstr "npm 脚本与前端依赖包"
+
+#: ../../01-repo-map.md 757a2b85d20c49598d8f99668a73cb3d
+msgid "`src-tauri/Cargo.toml`"
+msgstr "`src-tauri/Cargo.toml`"
+
+#: ../../01-repo-map.md 2dbd0c6bd0ed4b5cbb70e9adafff91b6
+msgid "Rust crate dependencies"
+msgstr "Rust crate 依赖"
+
+#: ../../01-repo-map.md be1ee17c747347f8ab7e67f6bf6afce0
+msgid "`src-tauri/tauri.conf.json`"
+msgstr "`src-tauri/tauri.conf.json`"
+
+#: ../../01-repo-map.md 4acfbb31a1bf4fb4bc70414226d396d9
+msgid "App identifier, bundle targets, build commands"
+msgstr "应用标识、打包目标与构建命令"
+
+#: ../../01-repo-map.md 7487c834b91042ddb94b64bbb60f9259
+msgid "`src-tauri/capabilities/default.json`"
+msgstr "`src-tauri/capabilities/default.json`"
+
+#: ../../01-repo-map.md 6c1c324231f44d6fadfa9a64ca0f7bb7
+msgid "Tauri permissions"
+msgstr "Tauri 权限"
+
+#: ../../01-repo-map.md 9a6af59835a846b0ac547a69057cfedf
+msgid "`.github/workflows/release.yml`"
+msgstr "`.github/workflows/release.yml`"
+
+#: ../../01-repo-map.md 4671b7c7458f45839119ab403b08aaad
+msgid "GitHub Release build automation"
+msgstr "GitHub Release 构建自动化"
+
+#: ../../01-repo-map.md cf8f74d129ba48b89ff07939eb054d77
+msgid "`doc/conf.py`"
+msgstr "`doc/conf.py`"
+
+#: ../../01-repo-map.md 2886c11635c74051bb3f04ff68337f37
+msgid "Sphinx, MyST, and i18n configuration"
+msgstr "Sphinx、MyST 与 i18n 配置"
+
+#: ../../01-repo-map.md 1f41e83707534710a84826cad1d4bb49
+msgid "`doc/Makefile`"
+msgstr "`doc/Makefile`"
+
+#: ../../01-repo-map.md 22a90fb1da574974bc647f11d4bdd3e1
+msgid "gettext and bilingual HTML build targets"
+msgstr "gettext 以及双语 HTML 构建目标"
+
+#: ../../01-repo-map.md:120 85e99de286704f398aca2c53770fd290
+msgid "Naming Conventions"
+msgstr "命名约定"
+
+#: ../../01-repo-map.md:122 ec47a606c7d244d29bf9956cf378ccb3
+msgid "**Rust files**: `snake_case.rs`"
+msgstr "**Rust 文件**：`snake_case.rs`"
+
+#: ../../01-repo-map.md:123 07143450542141bd9d1eec9f325f35c6
+msgid "**React components**: `PascalCase.tsx`"
+msgstr "**React 组件**：`PascalCase.tsx`"
+
+#: ../../01-repo-map.md:124 269de6d8282e47cb870fb5410739f957
+msgid "**React hooks**: `useCamelCase.ts`"
+msgstr "**React Hooks**：`useCamelCase.ts`"
+
+#: ../../01-repo-map.md:125 22b42d3dcf394ec6885fd1650d2976f6
+msgid "**Type files**: domain-oriented `.ts` files under `src/types/`"
+msgstr "**类型文件**：位于 `src/types/` 下、按领域划分的 `.ts` 文件"
+
+#: ../../01-repo-map.md:126 00f2aef9645f462a89fdb38e345318eb
+msgid "**Documentation**: numbered PKB files under `doc/` with metadata footers"
+msgstr "**文档**：位于 `doc/` 下、带元数据页脚的编号 PKB 文件"
+

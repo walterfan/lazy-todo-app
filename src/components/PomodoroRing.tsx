@@ -6,8 +6,8 @@ interface PomodoroRingProps {
   settings: { rounds_per_cycle: number };
 }
 
-const SIZE = 200;
-const STROKE = 8;
+const SIZE = 170;
+const STROKE = 7;
 const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 

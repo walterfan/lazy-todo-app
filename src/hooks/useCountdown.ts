@@ -21,7 +21,19 @@ export function useCountdown(deadline: string | null): CountdownResult | null {
   const diff = target - now;
 
   if (diff <= 0) {
-    return { label: "已过期", urgent: true, overdue: true };
+    const elapsed = -diff;
+    const days = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((elapsed % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
+    let overdueLabel: string;
+    if (days > 0) {
+      overdueLabel = `Overdue ${days}d ${hours}h`;
+    } else if (hours > 0) {
+      overdueLabel = `Overdue ${hours}h ${mins}m`;
+    } else {
+      overdueLabel = `Overdue ${mins}m`;
+    }
+    return { label: overdueLabel, urgent: true, overdue: true };
   }
 
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -31,11 +43,11 @@ export function useCountdown(deadline: string | null): CountdownResult | null {
 
   let label: string;
   if (days > 0) {
-    label = `${days}天 ${hours}时 ${minutes}分`;
+    label = `${days}d ${hours}h ${minutes}m left`;
   } else if (hours > 0) {
-    label = `${hours}时 ${minutes}分 ${seconds}秒`;
+    label = `${hours}h ${minutes}m ${seconds}s left`;
   } else {
-    label = `${minutes}分 ${seconds}秒`;
+    label = `${minutes}m ${seconds}s left`;
   }
 
   const urgent = diff < 1000 * 60 * 60; // less than 1 hour

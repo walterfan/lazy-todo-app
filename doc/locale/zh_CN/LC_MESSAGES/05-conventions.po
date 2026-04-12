@@ -1,0 +1,294 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-12 20:24+0800\n"
+"PO-Revision-Date: 2026-04-12 21:28+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../05-conventions.md:1 e176aac162204c06a3225c9cb339024d
+msgid "Lazy Todo App — Conventions"
+msgstr "Lazy Todo App — 约定"
+
+#: ../../05-conventions.md:5 8e898dc708df477a8c2418b1229dc4d2
+msgid "Code Style"
+msgstr "代码风格"
+
+#: ../../05-conventions.md:7 f30e0695542b4e7cb32248f03c5b71ff
+msgid "Rust"
+msgstr "Rust"
+
+#: ../../05-conventions.md:9 c2d18f4dd09f4c80aa08e18a8c367042
+msgid "**Edition**: 2021"
+msgstr "**Edition**：2021"
+
+#: ../../05-conventions.md:10 5eac3015cffd4a66a3133c7559f50eab
+msgid "**Formatting**: Standard `rustfmt` defaults"
+msgstr "**格式化**：使用标准 `rustfmt` 默认规则"
+
+#: ../../05-conventions.md:11 3461fd73ce154d9ba98d05e3e472d425
+msgid ""
+"**Naming**: `snake_case` for files, functions, variables; `PascalCase` "
+"for structs"
+msgstr "**命名**：文件、函数和变量使用 `snake_case`；结构体使用 `PascalCase`"
+
+#: ../../05-conventions.md:12 410c510e44ec4c2cbb7b4350110b6393
+msgid ""
+"**Error handling**: All Tauri commands return `Result<T, String>`, "
+"mapping internal errors via `.map_err(|e| e.to_string())`"
+msgstr ""
+"**错误处理**：所有 Tauri 命令都返回 `Result<T, String>`，并通过 "
+"`.map_err(|e| e.to_string())` 将内部错误映射为字符串"
+
+#: ../../05-conventions.md:13 5685b3f27a564434bec43f5048a65e32
+msgid ""
+"**Database access**: All SQL goes through `db.rs` methods; command "
+"handlers never construct SQL directly"
+msgstr "**数据库访问**：所有 SQL 都通过 `db.rs` 方法执行；命令处理器不直接拼写 SQL"
+
+#: ../../05-conventions.md:14 29678e99ef7b481c80522454c79807aa
+msgid ""
+"**State sharing**: `Database` struct wraps `Mutex<Connection>` and is "
+"injected via `app.manage()`; accessed in commands via `State<'_, "
+"Database>`"
+msgstr ""
+"**状态共享**：`Database` 结构体封装 `Mutex<Connection>`，通过 "
+"`app.manage()` 注入，并在命令中通过 `State<'_, Database>` 访问"
+
+#: ../../05-conventions.md:15 abbb7b16766947ce984fdfe4f4cb71fd
+msgid ""
+"**Serde**: All models derive `Serialize`/`Deserialize` for JSON IPC; "
+"input structs use `Option<T>` for partial updates"
+msgstr ""
+"**Serde**：所有模型都派生 `Serialize`/`Deserialize` 以支持 JSON IPC；"
+"输入结构体用 `Option<T>` 表示局部更新"
+
+#: ../../05-conventions.md:17 56d9e4f10d374ba78cddb69c24e676d3
+msgid "TypeScript / React"
+msgstr "TypeScript / React"
+
+#: ../../05-conventions.md:19 193feda80514439894515b2eb0896455
+msgid "**React version**: 18 with function components only (no class components)"
+msgstr "**React 版本**：18，仅使用函数组件（不使用类组件）"
+
+#: ../../05-conventions.md:20 ef6a18b8df0444ab93a27d726d7a7585
+msgid "**State**: `useState` and `useEffect` hooks; no external state library"
+msgstr "**状态管理**：使用 `useState` 与 `useEffect`，不引入外部状态库"
+
+#: ../../05-conventions.md:21 680d55ca181e4aed9295e4f246643676
+msgid ""
+"**Hooks**: Custom hooks prefixed with `use` encapsulate Tauri `invoke()` "
+"calls and local state"
+msgstr "**Hooks**：以 `use` 开头的自定义 hooks 封装 Tauri `invoke()` 调用与本地状态"
+
+#: ../../05-conventions.md:22 792cbf87b6e4481fb58c691d98ae0b93
+msgid "**Components**: One component per file, `PascalCase` filenames"
+msgstr "**组件**：一个文件一个组件，文件名采用 `PascalCase`"
+
+#: ../../05-conventions.md:23 a02030abe9df4628a89e6bdda5dfbd18
+msgid ""
+"**Types**: Separate `types/*.ts` files for domain types; interfaces "
+"preferred over type aliases for objects"
+msgstr "**类型**：领域类型放在独立的 `types/*.ts` 文件中；对象类型优先使用 interface"
+
+#: ../../05-conventions.md:24 2fc3faf9f8774d4a884182d44e0d0e2c
+msgid ""
+"**Imports**: Named imports from `@tauri-apps/api/core` (`invoke`) and "
+"`@tauri-apps/api/event` (`listen`)"
+msgstr ""
+"**导入**：从 `@tauri-apps/api/core`（`invoke`）和 "
+"`@tauri-apps/api/event`（`listen`）中使用具名导入"
+
+#: ../../05-conventions.md:25 67942e40f7e94cfa808f5be3e582e522
+msgid "**Strict mode**: TypeScript strict mode enabled via `tsconfig.json`"
+msgstr "**严格模式**：通过 `tsconfig.json` 启用 TypeScript strict mode"
+
+#: ../../05-conventions.md:27 a441841e04204706a3801f69ab28f857
+msgid "CSS"
+msgstr "CSS"
+
+#: ../../05-conventions.md:29 4efa1ab96a4c42239eb5e855349de31a
+msgid "**Single file**: All styles in `src/App.css`"
+msgstr "**单文件**：所有样式都放在 `src/App.css` 中"
+
+#: ../../05-conventions.md:30 6e8d4547520d4d188352e09fb62ac461
+msgid ""
+"**Theme**: Dark theme using CSS custom properties (`--bg-primary`, "
+"`--text-main`, etc.)"
+msgstr "**主题**：使用 CSS 自定义属性（如 `--bg-primary`、`--text-main`）构建暗色主题"
+
+#: ../../05-conventions.md:31 195541a29e21483ab5aa9e911c6434a6
+msgid ""
+"**Naming**: BEM-like flat classes (`.pomo-ring`, `.note-card`, `.tab-"
+"btn.active`)"
+msgstr "**命名**：采用类似 BEM 的扁平类名（如 `.pomo-ring`、`.note-card`、`.tab-btn.active`）"
+
+#: ../../05-conventions.md:32 09575acef8704f0ab992246ed8700f73
+msgid "**Layout**: Flexbox and CSS Grid; no CSS framework"
+msgstr "**布局**：使用 Flexbox 和 CSS Grid；不引入 CSS 框架"
+
+#: ../../05-conventions.md:33 83669768f1b1449189ca27550cac6d14
+msgid "**Animations**: CSS `@keyframes` for alerts and transitions"
+msgstr "**动画**：使用 CSS `@keyframes` 实现提醒与过渡动画"
+
+#: ../../05-conventions.md:35 8a3249d5137b4a3898e6ccba92721745
+msgid "File Organization Rules"
+msgstr "文件组织规则"
+
+#: ../../05-conventions.md:37 01f5bdc285864a658ca2db1308b7299c
+msgid "**Backend models** in `src-tauri/src/models/` — one file per domain entity"
+msgstr "**后端模型** 位于 `src-tauri/src/models/`，每个领域实体一个文件"
+
+#: ../../05-conventions.md:38 123b945dc2fd41268b5c251bd8ed77bb
+msgid ""
+"**Backend commands** in `src-tauri/src/commands/` — one file per feature "
+"area"
+msgstr "**后端命令** 位于 `src-tauri/src/commands/`，每个功能域一个文件"
+
+#: ../../05-conventions.md:39 c43064df5f524feba938f8ed67de6622
+msgid "**Frontend types** in `src/types/` — mirror backend models"
+msgstr "**前端类型** 位于 `src/types/`，与后端模型保持镜像对应"
+
+#: ../../05-conventions.md:40 662dd8a8b6534f9f84f69afe23bc5027
+msgid "**Frontend hooks** in `src/hooks/` — one per feature or concern"
+msgstr "**前端 hooks** 位于 `src/hooks/`，按功能或关注点划分"
+
+#: ../../05-conventions.md:41 c5a912394c6349228aec1dfeca361a07
+msgid "**Frontend components** in `src/components/` — one component per file"
+msgstr "**前端组件** 位于 `src/components/`，一个文件一个组件"
+
+#: ../../05-conventions.md:42 91ee44d7f1ee4802a7770626d16a6080
+msgid ""
+"**All DB queries** centralized in `db.rs` — command handlers are thin "
+"wrappers"
+msgstr "**所有数据库查询** 都集中在 `db.rs` 中，命令处理器只做薄封装"
+
+#: ../../05-conventions.md:44 6df4ae125a8f4edbb7a1c96f016d3ac6
+msgid "IPC Contract"
+msgstr "IPC 契约"
+
+#: ../../05-conventions.md:46 f3272e9b5e7745b5ac3bd172bd9d7220
+msgid "Frontend calls backend **only** via `invoke()` from `@tauri-apps/api/core`"
+msgstr "前端 **只能** 通过 `@tauri-apps/api/core` 中的 `invoke()` 调用后端"
+
+#: ../../05-conventions.md:47 37795894fcd148eebe2b499dd68f8630
+msgid ""
+"Backend sends events to frontend via `window.emit()` (Tauri `Emitter` "
+"trait)"
+msgstr "后端通过 `window.emit()`（Tauri `Emitter` trait）向前端发送事件"
+
+#: ../../05-conventions.md:48 36deee0568984759bbbb12812ac3eb0d
+msgid ""
+"All command return types must be JSON-serializable (`Serialize` in Rust, "
+"matching TypeScript interfaces)"
+msgstr "所有命令返回类型都必须可序列化为 JSON（Rust 中为 `Serialize`，并与 TypeScript 接口匹配）"
+
+#: ../../05-conventions.md:49 772ba92f398e4607beda0a3ad5d64907
+msgid "Errors are returned as plain strings (no structured error types currently)"
+msgstr "错误统一以普通字符串返回（当前没有结构化错误类型）"
+
+#: ../../05-conventions.md:51 af20260e3934448e83ddf7d10faefd1a
+msgid "Error Handling"
+msgstr "错误处理"
+
+#: ../../05-conventions.md 5db8ba02b90f47c3bb289598d6f7021a
+msgid "Layer"
+msgstr "层级"
+
+#: ../../05-conventions.md 74c5a726597a4270a644accc6e59f2ce
+msgid "Pattern"
+msgstr "模式"
+
+#: ../../05-conventions.md e4b6e8796b634e54996283a7b41d69db
+msgid "Rust DB"
+msgstr "Rust DB"
+
+#: ../../05-conventions.md 5dd5eb1587a74f83b98726fd482b16b0
+msgid "`rusqlite::Result<T>` propagated to commands"
+msgstr "`rusqlite::Result<T>` 向上传播到命令层"
+
+#: ../../05-conventions.md bf0ef617b2044d8a8aa18ec1916c4dca
+msgid "Rust commands"
+msgstr "Rust 命令"
+
+#: ../../05-conventions.md 7309c1f0b88747c8b12d431460910e74
+msgid "`.map_err(|e| e.to_string())` converts to `Result<T, String>`"
+msgstr "通过 `.map_err(|e| e.to_string())` 转为 `Result<T, String>`"
+
+#: ../../05-conventions.md 573f324f1add4b9e9d2571dac1c605da
+msgid "Frontend hooks"
+msgstr "前端 hooks"
+
+#: ../../05-conventions.md efd10fe96301489ca32910a597500b7e
+msgid "`.catch(console.error)` — errors logged, UI shows stale data"
+msgstr "`.catch(console.error)`：记录错误日志，UI 可能保留旧数据"
+
+#: ../../05-conventions.md b3334e7e2e6047458e6ebe0a488cb7ef
+msgid "Frontend UI"
+msgstr "前端 UI"
+
+#: ../../05-conventions.md efe33867558941ffada73a822d5893a0
+msgid "Loading states shown while data is fetched"
+msgstr "数据获取期间显示 loading 状态"
+
+#: ../../05-conventions.md:60 01624b8fe8e444a4a75b2181001153ef
+msgid "Git Conventions"
+msgstr "Git 约定"
+
+#: ../../05-conventions.md:62 2a7dfdd6fca44dba8547b5b5b1c2e01a
+msgid "**Branch**: `master` is the main branch"
+msgstr "**分支**：`master` 为主分支"
+
+#: ../../05-conventions.md:63 09e6c03e324340058f0b0f782d402095
+msgid ""
+"**Pre-commit**: `cargo clippy`, `cargo test`, `tsc --noEmit` (via `pre-"
+"commit` framework)"
+msgstr "**Pre-commit**：`cargo clippy`、`cargo test`、`tsc --noEmit`（通过 `pre-commit` 框架执行）"
+
+#: ../../05-conventions.md:64 39f5060901d240b9aff1c65ea5b1ae32
+msgid ""
+"**Commit style**: Conventional commits recommended (`feat:`, `fix:`, "
+"`docs:`, etc.)"
+msgstr "**提交风格**：推荐使用 Conventional Commits（如 `feat:`、`fix:`、`docs:` 等）"
+
+#: ../../05-conventions.md:66 ac652c9233c6412c94268b8179f4b87f
+msgid "Architectural Constraints (from CLAUDE.md)"
+msgstr "架构约束（来自 `CLAUDE.md`）"
+
+#: ../../05-conventions.md:68 78caf90586e1485dab602bdb65906059
+msgid "These rules are enforced for AI agents contributing to the project:"
+msgstr "以下规则会约束参与该项目的 AI Agent："
+
+#: ../../05-conventions.md:70 9c61f9eead0e4736b7d2baf8c4654d8f
+msgid "All Tauri commands defined in `src-tauri/src/commands/`"
+msgstr "所有 Tauri 命令都定义在 `src-tauri/src/commands/` 中"
+
+#: ../../05-conventions.md:71 aa3b35fb6a724c478366667435b94e36
+msgid "State management uses Tauri's managed state (`tauri::State`)"
+msgstr "状态管理使用 Tauri 的托管状态（`tauri::State`）"
+
+#: ../../05-conventions.md:72 6e1a85bb1b4c4124908188d293b50456
+msgid "Frontend calls backend ONLY through `@tauri-apps/api/core.invoke()`"
+msgstr "前端只能通过 `@tauri-apps/api/core.invoke()` 调用后端"
+
+#: ../../05-conventions.md:73 1367a47e1b7c4d27af2ad02f32cd4aef
+msgid "All data persistence goes through Rust/SQLite"
+msgstr "所有数据持久化都必须经过 Rust/SQLite"
+
+#: ../../05-conventions.md:74 00a4988889c14cb6a875f7016532f9a6
+msgid "All Tauri commands return `Result<T, String>`"
+msgstr "所有 Tauri 命令都返回 `Result<T, String>`"
+

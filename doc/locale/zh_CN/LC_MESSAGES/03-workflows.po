@@ -1,0 +1,164 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-12 20:24+0800\n"
+"PO-Revision-Date: 2026-04-12 21:22+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../03-workflows.md:1 d7212830a8914ad29148debe11885dd9
+msgid "Lazy Todo App — Workflows"
+msgstr "Lazy Todo App — 工作流"
+
+#: ../../03-workflows.md:5 2edf7d32875c4af7b4c4437d3b6135ba
+msgid "Workflow 1: Todo Lifecycle"
+msgstr "工作流 1：Todo 生命周期"
+
+#: ../../03-workflows.md:20 efedc9b413ac481db9bc1bd9c5fc86ec
+msgid "Code Path"
+msgstr "代码路径"
+
+#: ../../03-workflows.md:22 5ef2842562814e1c8971afd25a4ae030
+msgid "`AddTodo.tsx` submits to `useTodos.addTodo()`."
+msgstr "`AddTodo.tsx` 提交到 `useTodos.addTodo()`。"
+
+#: ../../03-workflows.md:23 719d55bc10b1417593d6f7706bf61d65
+#, python-brace-format
+msgid "`useTodos` calls `invoke(\"add_todo\", { input })`."
+msgstr "`useTodos` 调用 `invoke(\"add_todo\", { input })`。"
+
+#: ../../03-workflows.md:24 78f9537d0b644dbe86ed6c7b8640d0d0
+msgid "`commands/todo.rs` validates and forwards to `db.rs`."
+msgstr "`commands/todo.rs` 完成校验后转发到 `db.rs`。"
+
+#: ../../03-workflows.md:25 706d83a12732407f8728fb66f4040422
+msgid ""
+"`TodoList.tsx` renders active tasks in list or grid mode based on "
+"`settings.todo_display`."
+msgstr "`TodoList.tsx` 根据 `settings.todo_display` 以列表或网格方式渲染活动任务。"
+
+#: ../../03-workflows.md:26 460716599a284a3d887cf6b2725f6bac
+msgid ""
+"`TodoItem.tsx` uses `useCountdown.ts` to show deadline status in real "
+"time."
+msgstr "`TodoItem.tsx` 使用 `useCountdown.ts` 实时展示截止时间状态。"
+
+#: ../../03-workflows.md:28 16872bf5eb1b4f87a3c72ba67b9bc448
+msgid "Workflow 2: Sticky Note Creation and Pop-Out"
+msgstr "工作流 2：即时贴创建与弹出窗口"
+
+#: ../../03-workflows.md:41 a223137c7aac49ff8b52ce4555bf3228
+msgid "Notes"
+msgstr "说明"
+
+#: ../../03-workflows.md:43 8c41633221c24eeeb703b454623876ec
+msgid "`NoteCard.tsx` can still edit inline in the main window."
+msgstr "`NoteCard.tsx` 仍然可以在主窗口中进行内联编辑。"
+
+#: ../../03-workflows.md:44 a26d0e7c65504ea1886ea2b2ff975d7c
+msgid ""
+"`NoteWindow.tsx` loads the note by ID using `list_notes` and persists "
+"edits through `update_note`."
+msgstr "`NoteWindow.tsx` 通过 `list_notes` 按 ID 加载便签，并通过 `update_note` 持久化编辑。"
+
+#: ../../03-workflows.md:45 e2662144c38148c5bb7701183b8c4e64
+msgid "Markdown is rendered by `MarkdownPreview.tsx`."
+msgstr "Markdown 内容由 `MarkdownPreview.tsx` 渲染。"
+
+#: ../../03-workflows.md:46 3a232b8728404ddfaf9bb585db0f0c4e
+msgid ""
+"External links are intercepted in `src/main.tsx` and opened through "
+"`@tauri-apps/plugin-shell`."
+msgstr "外部链接会在 `src/main.tsx` 中被拦截，并通过 `@tauri-apps/plugin-shell` 打开。"
+
+#: ../../03-workflows.md:48 7f5bfde727924507b96df3bba8e34acb
+msgid "Workflow 3: Pomodoro Session and Milestones"
+msgstr "工作流 3：番茄钟会话与里程碑"
+
+#: ../../03-workflows.md:65 008eed9b3b9048eaa9b4aae534f92b89
+msgid "Phase Handling"
+msgstr "阶段处理"
+
+#: ../../03-workflows.md:67 e1e69f0259664f63ae5230c79dc5416c
+msgid ""
+"`usePomodoro.ts` keeps the timer alive even when the Pomodoro tab is "
+"hidden."
+msgstr "`usePomodoro.ts` 即使在番茄钟标签页被隐藏时也会保持计时器继续运行。"
+
+#: ../../03-workflows.md:68 7c9f75dd86d94702b6e6f57d63e0a6be
+msgid "Finishing a work phase records a session via `record_pomodoro_session`."
+msgstr "完成一个工作阶段后，会通过 `record_pomodoro_session` 记录一次会话。"
+
+#: ../../03-workflows.md:69 dd60e4451fa749068a92ac8060267df7
+msgid ""
+"`PomodoroMilestones.tsx` surfaces up to three active milestones and lets "
+"the user mark them as `completed`, `cancelled`, or restored to `active`."
+msgstr ""
+"`PomodoroMilestones.tsx` 最多展示三个活动里程碑，并允许用户将它们标记为 "
+"`completed`、`cancelled`，或恢复为 `active`。"
+
+#: ../../03-workflows.md:70 82ec7311ea524ed894667b38f97e5d50
+msgid ""
+"The backend stores milestone state inside "
+"`pomodoro_settings.milestones_json`."
+msgstr "后端将里程碑状态存储在 `pomodoro_settings.milestones_json` 中。"
+
+#: ../../03-workflows.md:71 e74ed33950bc45479a1df7f6c6aaf0fd
+msgid ""
+"`update_tray_tooltip` keeps the tray hover text synchronized with the "
+"timer."
+msgstr "`update_tray_tooltip` 使托盘悬停提示文字与计时器状态保持同步。"
+
+#: ../../03-workflows.md:73 64f81d7d591d44c498431dc29e995571
+msgid "Workflow 4: Settings Persistence"
+msgstr "工作流 4：设置持久化"
+
+#: ../../03-workflows.md:93 cb9355aac683427faf5d60ae2d4b30f9
+msgid "Stored Preferences"
+msgstr "已存储的偏好项"
+
+#: ../../03-workflows.md:95 9cbb36261d29423a8ab91a4a08490aff
+msgid "`page_size`"
+msgstr "`page_size`"
+
+#: ../../03-workflows.md:96 03f0e69894b54c3d87d61737a076e333
+msgid "`todo_display`"
+msgstr "`todo_display`"
+
+#: ../../03-workflows.md:97 223f461291c547bf88f8f783e3ef60e4
+msgid "`note_display`"
+msgstr "`note_display`"
+
+#: ../../03-workflows.md:98 6b6ac8fef100414a9a1250b42132e4e0
+msgid "`note_template`"
+msgstr "`note_template`"
+
+#: ../../03-workflows.md:99 c7ba06f695084e2cb0056ee5d202ce3f
+msgid "`note_folder`"
+msgstr "`note_folder`"
+
+#: ../../03-workflows.md:101 826dd5f5ccbd4bcd82fc57d25f64cb01
+msgid "These settings are loaded on app startup via `get_app_settings`."
+msgstr "这些设置会在应用启动时通过 `get_app_settings` 加载。"
+
+#: ../../03-workflows.md:103 a9155f0b7a3d4f268f033fe1e0f0dad4
+msgid "Workflow 5: System Tray and Window Lifecycle"
+msgstr "工作流 5：系统托盘与窗口生命周期"
+
+#: ../../03-workflows.md:117 6e89c957133143b1a8ae1432bd721d2b
+msgid "Workflow 6: App Startup"
+msgstr "工作流 6：应用启动"
+

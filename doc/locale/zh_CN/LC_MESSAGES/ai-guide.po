@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-12 20:24+0800\n"
+"PO-Revision-Date: 2026-04-12 21:10+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../ai-guide.md:1 efde6f6f3b4841e4a2094b4b3ca5d28b
+msgid "Lazy Todo App — AI Guide"
+msgstr "Lazy Todo App — AI 指南"
+
+#: ../../ai-guide.md:5 af689631a6444aa38939cb83b65687f3
+msgid "Recommended Reading Order"
+msgstr "建议阅读顺序"
+
+#: ../../ai-guide.md:7 6069416a66d64e2198c5c8e1a7e36938
+msgid "Start with `00-overview.md` for product scope and deployment model."
+msgstr "先阅读 `00-overview.md`，了解产品范围和部署模型。"
+
+#: ../../ai-guide.md:8 fad4558761cd4a6b9df8177336f73f1a
+msgid "Read `01-repo-map.md` to locate entry points and important directories."
+msgstr "接着阅读 `01-repo-map.md`，定位入口文件和关键目录。"
+
+#: ../../ai-guide.md:9 6bbfdb9fe336428289db08286d61a6ec
+msgid "Use `02-architecture.md` and `03-workflows.md` for cross-cutting behavior."
+msgstr "对于跨模块行为和整体运行机制，请阅读 `02-architecture.md` 与 `03-workflows.md`。"
+
+#: ../../ai-guide.md:10 d84b6df44d8f49f2b99402dedc85b9d7
+msgid ""
+"Check `04-data-and-api.md` before touching the database, Tauri commands, "
+"or shared types."
+msgstr "在修改数据库、Tauri 命令或共享类型之前，请先查看 `04-data-and-api.md`。"
+
+#: ../../ai-guide.md:11 3408dba5d6e5412d81943cf8bbe91af2
+msgid "Use `06-runbook.md` and `07-testing.md` before validating changes."
+msgstr "在验证变更之前，请阅读 `06-runbook.md` 与 `07-testing.md`。"
+
+#: ../../ai-guide.md:13 50475d4c00174336a86f2d714dced9f4
+msgid "Project Rules Worth Preserving"
+msgstr "值得保持的项目规则"
+
+#: ../../ai-guide.md:15 b65d7af9105b4c58b2c051a1463e3750
+msgid "Frontend-to-backend communication goes through Tauri `invoke()` only."
+msgstr "前端到后端的通信只能通过 Tauri 的 `invoke()` 进行。"
+
+#: ../../ai-guide.md:16 eb36ff95d4434f9290a9a1aeda01b52c
+msgid "Rust command handlers live in `src-tauri/src/commands/`."
+msgstr "Rust 命令处理器统一放在 `src-tauri/src/commands/`。"
+
+#: ../../ai-guide.md:17 2d4ad769c1c1435ab7d7702e4739bf10
+msgid "SQLite persistence is centralized in `src-tauri/src/db.rs`."
+msgstr "SQLite 持久化逻辑统一集中在 `src-tauri/src/db.rs`。"
+
+#: ../../ai-guide.md:18 0e89bdb1750248ef9e844c366d0c22fb
+msgid ""
+"Shared settings are persisted in SQLite and mirrored in TypeScript and "
+"Rust models."
+msgstr "共享设置保存在 SQLite 中，并在 TypeScript 与 Rust 模型中保持镜像一致。"
+
+#: ../../ai-guide.md:19 758272bfca0749248cdc1724b28a4f58
+msgid ""
+"Bilingual docs use English source Markdown plus gettext catalogs under "
+"`locale/`."
+msgstr "双语文档采用英文 Markdown 作为源文件，并通过 `locale/` 下的 gettext catalog 提供翻译。"
+
+#: ../../ai-guide.md:21 f2aefdb82d0947e29bf4548b0d0bf5e4
+msgid "When Updating Docs"
+msgstr "更新文档时"
+
+#: ../../ai-guide.md:23 e2eca2bdfee245108925a5e3afaa07c4
+msgid "Keep file references real and current."
+msgstr "确保所有文件引用真实存在且保持最新。"
+
+#: ../../ai-guide.md:24 4aa54552a7e44a6f9b2a3a12a22e8152
+msgid "Treat `doc/` as the PKB root; do not introduce `man/` for this repo."
+msgstr "将 `doc/` 视为 PKB 根目录，不要为这个仓库再引入 `man/`。"
+
+#: ../../ai-guide.md:25 c18a90bc7c8f451681e3ea4481215202
+msgid ""
+"Update the `<!-- PKB-metadata -->` footer whenever a doc changes "
+"meaningfully."
+msgstr "当文档发生实质性变化时，请同步更新 `<!-- PKB-metadata -->` 页脚。"
+
+#: ../../ai-guide.md:26 792ece14c50a486e8a8b3c699f94f2eb
+msgid ""
+"Regenerate translation catalogs after English source changes: `poetry run"
+" make intl-update`."
+msgstr "英文源文档变更后，请重新生成翻译 catalog：`poetry run make intl-update`。"
+

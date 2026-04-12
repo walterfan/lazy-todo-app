@@ -137,6 +137,51 @@ LAZY_TODO_DB_DIR=/path/to/your/folder npm run tauri dev
 
 当前数据库路径会显示在应用底部的 footer 中。
 
+## 项目文档 / Documentation
+
+项目知识库位于 `doc/`，采用 **Sphinx + MyST + sphinx-intl** 生成双语文档。
+
+### 本地构建文档
+
+```bash
+cd doc
+poetry install
+poetry run make html
+```
+
+生成结果：
+
+- 英文站点：`doc/_build/en/html/`
+- 中文站点：`doc/_build/zh_CN/html/`
+
+如果要生成适合 GitHub Pages 发布的静态站点目录：
+
+```bash
+cd doc
+poetry run make pages
+```
+
+该命令会生成：
+
+- Pages 站点根目录：`doc/_build/site/`
+- 语言入口页：`doc/_build/site/index.html`
+- 英文内容：`doc/_build/site/en/`
+- 中文内容：`doc/_build/site/zh_CN/`
+
+### 自动发布到 GitHub Pages
+
+仓库已经包含 `/.github/workflows/docs.yml` 工作流。它会在以下情况下自动构建并发布文档：
+
+- 推送到 `master` 或 `main`
+- 且变更涉及 `doc/**`、`README.md` 或文档工作流本身
+- 或手动触发 `workflow_dispatch`
+
+首次启用时，请在 GitHub 仓库设置中确认：
+
+1. 打开 `Settings -> Pages`
+2. 将 Source 设置为 `GitHub Actions`
+3. 确认 Actions 具有发布 Pages 的权限
+
 ## Harness Engineering 实践
 
 这个项目是 Harness Engineering 的实战演示。核心思路：不是自己写 Rust 代码，而是给 AI Agent 搭一个"跑不偏"的环境。

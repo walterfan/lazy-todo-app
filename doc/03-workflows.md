@@ -4,148 +4,139 @@
 
 ## Workflow 1: Todo Lifecycle
 
-A todo item flows through creation, optional editing, completion, and deletion.
-
 ```mermaid
 stateDiagram-v2
-    [*] --> Created: User fills AddTodo form
-    Created --> Active: Saved to SQLite
-    Active --> Editing: User clicks edit
-    Editing --> Active: Save changes
-    Active --> Completed: User toggles checkbox
-    Completed --> Active: User un-toggles
-    Active --> Deleted: User clicks delete
-    Completed --> Deleted: User clicks delete
+    [*] --> Draft
+    Draft --> Active: add_todo
+    Active --> Editing: inline edit
+    Editing --> Active: update_todo
+    Active --> Completed: toggle_todo
+    Completed --> Active: toggle_todo
+    Active --> Deleted: delete_todo
+    Completed --> Deleted: delete_todo
     Deleted --> [*]
 ```
 
 ### Code Path
 
-1. **Create**: `AddTodo.tsx` → `useTodos.addTodo()` → `invoke("add_todo", CreateTodo)` → `commands/todo.rs::add_todo` → `db.rs::add_todo`
-2. **List**: On mount, `useTodos` calls `invoke("list_todos")` → `db.rs::list_todos` (ordered by `completed ASC, priority ASC, deadline ASC NULLS LAST`)
-3. **Toggle**: `TodoItem.tsx` checkbox → `useTodos.toggleTodo(id)` → `invoke("toggle_todo")` → `db.rs::toggle_todo` (flips `completed` column)
-4. **Edit**: `TodoItem.tsx` inline fields → `useTodos.updateTodo(UpdateTodo)` → `invoke("update_todo")` → `db.rs::update_todo` (partial update)
-5. **Delete**: `TodoItem.tsx` delete button → `useTodos.deleteTodo(id)` → `invoke("delete_todo")` → `db.rs::delete_todo`
+1. `AddTodo.tsx` submits to `useTodos.addTodo()`.
+2. `useTodos` calls `invoke("add_todo", { input })`.
+3. `commands/todo.rs` validates and forwards to `db.rs`.
+4. `TodoList.tsx` renders active tasks in list or grid mode based on `settings.todo_display`.
+5. `TodoItem.tsx` uses `useCountdown.ts` to show deadline status in real time.
 
-### Countdown Timer
-
-`useCountdown.ts` runs a `setInterval(1000ms)` that recalculates remaining time for each todo with a `deadline`. Visual states:
-- **Normal**: white text
-- **< 1 hour**: orange text
-- **Overdue**: red text
-
-## Workflow 2: Sticky Note Lifecycle
-
-```mermaid
-stateDiagram-v2
-    [*] --> Draft: User opens NoteEditor
-    Draft --> Saved: Submit (title + content + color)
-    Saved --> Viewing: Displayed in NoteList grid
-    Viewing --> Expanded: User clicks card
-    Expanded --> Editing: User clicks edit in expanded view
-    Editing --> Saved: Save changes
-    Viewing --> Deleted: User clicks delete
-    Expanded --> Deleted: User clicks delete
-    Deleted --> [*]
-```
-
-### Code Path
-
-1. **Create**: `NoteEditor.tsx` → `useNotes.addNote(CreateNote)` → `invoke("add_note")` → `db.rs::insert_note`
-2. **List**: `useNotes` calls `invoke("list_notes")` → `db.rs::list_notes` (ordered by `updated_at DESC`)
-3. **Edit**: `NoteCard.tsx` inline editing → `useNotes.updateNote(UpdateNote)` → `invoke("update_note")` → `db.rs::update_note` (also updates `updated_at`)
-4. **Delete**: `NoteCard.tsx` → `useNotes.deleteNote(id)` → `invoke("delete_note")` → `db.rs::delete_note`
-5. **Tray shortcut**: System tray "New Note" menu → `lib.rs` emits `tray-new-note` event → `App.tsx` switches to Notes tab and focuses editor
-
-### Markdown Rendering
-
-`NoteCard.tsx` renders note content via `MarkdownPreview.tsx`, which uses `react-markdown` with `remark-gfm` for GitHub Flavored Markdown (tables, strikethrough, task lists, etc.).
-
-## Workflow 3: Pomodoro Cycle
-
-A Pomodoro session cycles through work and break phases automatically.
-
-```mermaid
-stateDiagram-v2
-    [*] --> Idle: App loaded
-    Idle --> Work: User clicks Start
-    Work --> WorkPaused: User clicks Pause
-    WorkPaused --> Work: User clicks Resume
-    Work --> ShortBreak: Timer reaches 0 (rounds < max)
-    Work --> LongBreak: Timer reaches 0 (rounds = max)
-    ShortBreak --> Work: Break timer reaches 0
-    LongBreak --> Idle: Long break timer reaches 0 (cycle reset)
-    Work --> Idle: User clicks Reset
-    ShortBreak --> Idle: User clicks Reset
-    LongBreak --> Idle: User clicks Reset
-```
-
-### Phase Transition Detail
-
-Managed by `usePomodoro.ts`:
-
-1. Timer runs via `setInterval(100ms)` for smooth countdown
-2. When `remainingMs <= 0`:
-   - Record the completed work session: `invoke("record_pomodoro_session")`
-   - Send system notification: `sendNotification()` via `@tauri-apps/plugin-notification`
-   - Set `alertPhase` state → triggers `PomodoroAlert.tsx` modal
-   - Call `getCurrentWindow().show()` + `setFocus()` to bring window to foreground
-   - Play Web Audio chime (ascending C-major arpeggio: C5→E5→G5→C6, twice)
-   - Auto-advance to next phase (work → short break → work → ... → long break → reset)
-3. Tray tooltip updated with current timer status: `invoke("update_tray_tooltip")`
-
-### Alert Dismissal
-
-User clicks "OK" on the `PomodoroAlert` overlay or clicks the overlay backdrop → `dismissAlert()` clears `alertPhase` → modal closes → next phase timer starts automatically.
-
-## Workflow 4: System Tray Interaction
+## Workflow 2: Sticky Note Creation and Pop-Out
 
 ```mermaid
 flowchart TD
-    A[User closes window] -->|CloseRequested event| B[Window hides instead of closing]
-    B --> C[App lives in system tray]
-    C -->|Left-click tray icon| D{Window visible?}
-    D -->|Yes| E[Hide window]
-    D -->|No| F[Show + focus window]
-    C -->|Right-click tray icon| G[Context menu]
-    G --> H[Show/Hide]
-    G --> I[New Note]
-    G --> J[Quit]
-    I --> K[Show window + switch to Notes tab + emit tray-new-note]
-    J --> L[app.exit 0]
+    A[NoteEditor.tsx] -->|add_note| B[SQLite sticky_notes row]
+    B --> C[NoteList.tsx renders card]
+    C -->|Open in window| D[invoke open_note_window]
+    D --> E[commands/app.rs]
+    E --> F[Create or focus note-{id} webview]
+    F --> G[index.html?note={id}]
+    G --> H[NoteWindow.tsx]
 ```
 
-### Code Path
+### Notes
 
-- Tray setup: `lib.rs::setup_tray()` builds `TrayIconBuilder` with menu items
-- Close intercept: `lib.rs` `.on_window_event` catches `CloseRequested`, calls `api.prevent_close()` + `window.hide()`
-- Menu handler: `lib.rs` `.on_menu_event` matches menu item IDs (`show_hide`, `new_note`, `quit`)
-- Left-click toggle: `lib.rs` `.on_tray_icon_event` checks `TrayIconEvent::Click`
+- `NoteCard.tsx` can still edit inline in the main window.
+- `NoteWindow.tsx` loads the note by ID using `list_notes` and persists edits through `update_note`.
+- Markdown is rendered by `MarkdownPreview.tsx`.
+- External links are intercepted in `src/main.tsx` and opened through `@tauri-apps/plugin-shell`.
 
-## Workflow 5: App Startup
+## Workflow 3: Pomodoro Session and Milestones
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Work: Start
+    Work --> Paused: Pause
+    Paused --> Work: Resume
+    Work --> ShortBreak: session complete
+    Work --> LongBreak: last round complete
+    ShortBreak --> Work: break complete
+    LongBreak --> Idle: cycle complete
+    Work --> Idle: Reset or Skip
+    ShortBreak --> Idle: Reset
+    LongBreak --> Idle: Reset
+```
+
+### Phase Handling
+
+- `usePomodoro.ts` keeps the timer alive even when the Pomodoro tab is hidden.
+- Finishing a work phase records a session via `record_pomodoro_session`.
+- `PomodoroMilestones.tsx` surfaces up to three active milestones and lets the user mark them as `completed`, `cancelled`, or restored to `active`.
+- The backend stores milestone state inside `pomodoro_settings.milestones_json`.
+- `update_tray_tooltip` keeps the tray hover text synchronized with the timer.
+
+## Workflow 4: Settings Persistence
+
+```mermaid
+sequenceDiagram
+    participant UI as SettingsPanel.tsx
+    participant Hook as useSettings.ts
+    participant IPC as invoke()
+    participant Cmd as commands/app.rs
+    participant DB as db.rs
+
+    UI->>Hook: onUpdate(partial settings)
+    Hook->>Hook: merge with current state
+    Hook->>IPC: save_app_settings
+    IPC->>Cmd: save_app_settings(settings)
+    Cmd->>DB: upsert app_settings row
+    DB-->>Cmd: OK
+    Cmd-->>Hook: OK
+    Hook-->>UI: optimistic state already visible
+```
+
+### Stored Preferences
+
+- `page_size`
+- `todo_display`
+- `note_display`
+- `note_template`
+- `note_folder`
+
+These settings are loaded on app startup via `get_app_settings`.
+
+## Workflow 5: System Tray and Window Lifecycle
+
+```mermaid
+flowchart TD
+    A[User closes main window] --> B[CloseRequested intercepted]
+    B --> C[Window.hide()]
+    C --> D[Tray remains active]
+    D -->|Left click| E[Toggle main window visibility]
+    D -->|Menu: New Note| F[Show main window]
+    F --> G[Emit tray-new-note]
+    G --> H[App.tsx switches to Notes tab and autofocuses editor]
+    D -->|Menu: Quit| I[app.exit(0)]
+```
+
+## Workflow 6: App Startup
 
 ```mermaid
 flowchart TD
     A[main.rs] --> B[lib::run]
-    B --> C[Tauri Builder]
-    C --> D[Init plugins: shell, notification]
-    C --> E[setup callback]
-    E --> F{LAZY_TODO_DB_DIR env var set?}
-    F -->|Yes| G[Use custom path]
+    B --> C[Resolve DB directory]
+    C --> D{Env var set?}
+    D -->|Yes| E[Use LAZY_TODO_DB_DIR]
+    D -->|No| F{Config file exists?}
+    F -->|Yes| G[Use ~/.config/lazy-todo-app/config.json]
     F -->|No| H[Use app_data_dir]
-    G --> I[Database::new — create dir + open SQLite + create tables]
+    E --> I[Database::new]
+    G --> I
     H --> I
-    I --> J[app.manage database — inject into Tauri state]
-    J --> K[setup_tray — icon, menu, event handlers]
-    K --> L[Register 16 invoke commands]
-    L --> M[Frontend loads in webview]
-    M --> N[App.tsx mounts — fetches db_path, listens for tray events]
-    N --> O[Default tab: Todos — useTodos fetches list]
+    I --> J[setup_tray]
+    J --> K[register invoke commands]
+    K --> L[Frontend boot]
+    L --> M[get_db_path + get_app_settings]
 ```
 
 ---
 <!-- PKB-metadata
-last_updated: 2026-04-07
-commit: 4c09050
+last_updated: 2026-04-12
+commit: f9ba186
 updated_by: human+ai
 -->

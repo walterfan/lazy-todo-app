@@ -1,0 +1,200 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-12 20:24+0800\n"
+"PO-Revision-Date: 2026-04-12 21:20+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../02-architecture.md:1 848f57fa480b413e9cf47ba029d1487f
+msgid "Lazy Todo App — Architecture"
+msgstr "Lazy Todo App — 架构"
+
+#: ../../02-architecture.md:5 0a4ed49106c340a2934cb8b9e34dc24d
+msgid "C4 Model"
+msgstr "C4 模型"
+
+#: ../../02-architecture.md:7 abaf8cf4d94b43fa958d63e788bd206b
+msgid "Level 1: System Context"
+msgstr "第 1 层：系统上下文"
+
+#: ../../02-architecture.md:9 b00b8f023da2477ab20a27b944580ae5
+msgid ""
+"Lazy Todo App is a local-first desktop productivity system. It does not "
+"depend on any hosted backend. Its only external integrations are "
+"operating-system capabilities such as windows, tray menus, notifications,"
+" and local file storage."
+msgstr ""
+"Lazy Todo App 是一个本地优先的桌面效率系统，不依赖任何托管式后端服务。"
+"它唯一的外部集成是操作系统能力，例如窗口、托盘菜单、通知以及本地文件存储。"
+
+#: ../../02-architecture.md:23 3a5a953574d746528bda3e8283ae887c
+msgid "Level 2: Container"
+msgstr "第 2 层：容器"
+
+#: ../../02-architecture.md:25 39d720ed041b42768aba4604e923422a
+msgid ""
+"The app is packaged as a single desktop binary but runs with multiple "
+"cooperating runtime containers inside the Tauri shell."
+msgstr "该应用被打包为单个桌面二进制，但在 Tauri 外壳内以多个协作的运行时容器共同工作。"
+
+#: ../../02-architecture.md:50 d48ed66b849e467fb9695901b483201b
+msgid ""
+"**Boundary rule**: the frontend never talks directly to SQLite or the "
+"filesystem. Every state mutation crosses the `invoke()` boundary into "
+"Rust first."
+msgstr ""
+"**边界规则**：前端绝不会直接访问 SQLite 或文件系统。所有状态变更都必须先跨过 "
+"`invoke()` 边界进入 Rust。"
+
+#: ../../02-architecture.md:52 383ecf8aba7243a9b6718c84ff11de2d
+msgid "Level 3: Component"
+msgstr "第 3 层：组件"
+
+#: ../../02-architecture.md:54 37270f27c3e14d08b6b3d12470479a57
+msgid "Rust Backend Components"
+msgstr "Rust 后端组件"
+
+#: ../../02-architecture.md:92 35aac7aa30da464eb893e514a7466872
+msgid "React Frontend Components"
+msgstr "React 前端组件"
+
+#: ../../02-architecture.md:132 c4b501115d0b400ab2d8fe113d60dfff
+msgid "Level 4: Code"
+msgstr "第 4 层：代码"
+
+#: ../../02-architecture.md:134 f0e740b6b681428a99de33bde42bea3c
+msgid "Persistence Model"
+msgstr "持久化模型"
+
+#: ../../02-architecture.md:136 ee3b0c4cd7ab4333b950152e8abff0b1
+msgid "The SQLite schema currently uses five tables:"
+msgstr "当前 SQLite 模式使用了五张表："
+
+#: ../../02-architecture.md:138 35f57d33756d44ed8b755cb6335bfaa0
+msgid "`todos`"
+msgstr "`todos`"
+
+#: ../../02-architecture.md:139 4ebf10d36b184d778cfffc123a04683b
+msgid "`sticky_notes`"
+msgstr "`sticky_notes`"
+
+#: ../../02-architecture.md:140 194d23404b0a47fd8e1f1803fa4c3c06
+msgid "`pomodoro_settings`"
+msgstr "`pomodoro_settings`"
+
+#: ../../02-architecture.md:141 ea0096b57a2e48f69f631191d3284ff9
+msgid "`pomodoro_sessions`"
+msgstr "`pomodoro_sessions`"
+
+#: ../../02-architecture.md:142 4b5c4057f6cf477985f6569093d55c16
+msgid "`app_settings`"
+msgstr "`app_settings`"
+
+#: ../../02-architecture.md:144 284a3a3a59664fa3a6315f534946efd0
+msgid "Two singleton-style tables hold configuration:"
+msgstr "其中有两张单例风格的表用于保存配置："
+
+#: ../../02-architecture.md:146 0d50b95949304f438e49a9a491a35e67
+msgid "`pomodoro_settings` stores timer lengths plus `milestones_json`"
+msgstr "`pomodoro_settings` 保存计时器时长以及 `milestones_json`"
+
+#: ../../02-architecture.md:147 b614c24f0b1242cc8945aceaf3c84b4d
+msgid ""
+"`app_settings` stores display preferences, note defaults, and storage-"
+"related UI hints"
+msgstr "`app_settings` 保存显示偏好、便签默认值以及与存储相关的 UI 提示"
+
+#: ../../02-architecture.md:149 48d446b6556549218a524da5c3172b2c
+msgid "Representative Flow: Open a Sticky Note in Its Own Window"
+msgstr "代表性流程：在独立窗口中打开一张即时贴"
+
+#: ../../02-architecture.md:168 ef8a21bfeb604a2bba3f1bd896576245
+msgid "Key Architectural Decisions"
+msgstr "关键架构决策"
+
+#: ../../02-architecture.md:151 f13c4f2e46d04c1387b52792d34ddcc6
+msgid "Decision"
+msgstr "决策"
+
+#: ../../02-architecture.md:151 1785c8a1857a43668d5f5d273033e8d4
+msgid "Rationale"
+msgstr "原因"
+
+#: ../../02-architecture.md:151 aee7ac1c5c7641c892b78af3b2a27642
+msgid "Keep all persistence in `db.rs`"
+msgstr "将所有持久化逻辑保留在 `db.rs` 中"
+
+#: ../../02-architecture.md:151 03c73c038ceb4cfeaab354f4fc561874
+msgid "Centralizes schema and SQL in one place for a small app"
+msgstr "对于体量较小的应用，将 schema 与 SQL 集中在一处更易维护"
+
+#: ../../02-architecture.md:151 42d05cb929f44fc8a9c89948d222985b
+msgid "Persist app settings in SQLite"
+msgstr "将应用设置持久化到 SQLite"
+
+#: ../../02-architecture.md:151 d2266318509246daa7d269b8a6c92d29
+msgid ""
+"Settings survive restarts and reuse the same backend contract pattern as "
+"other features"
+msgstr "这样设置在重启后仍然保留，并且可以复用与其他功能一致的后端契约模式"
+
+#: ../../02-architecture.md:151 19fc272ae8234299870311194b40d513
+msgid "Use a separate note window webview"
+msgstr "为便签使用独立的 note window webview"
+
+#: ../../02-architecture.md:151 6fc274eae1244f5e9577bc41336f5814
+msgid ""
+"Gives sticky notes a desktop-native feel without introducing a second "
+"frontend bundle"
+msgstr "在不引入第二套前端打包产物的前提下，提供更接近原生桌面的即时贴体验"
+
+#: ../../02-architecture.md:151 2e7eabc9a1e9436b88850f8b8b5fd2dc
+msgid "Hide the pomodoro tab instead of unmounting it"
+msgstr "隐藏番茄钟标签页，而不是卸载它"
+
+#: ../../02-architecture.md:151 a74ac1e3d0e04857889a7dbfc4683adb
+msgid "Prevents timer state from resetting when the user changes tabs"
+msgstr "防止用户切换标签页时计时器状态被重置"
+
+#: ../../02-architecture.md:151 6c620aca20774df1b53ec4a0e89cf179
+msgid "Store pomodoro milestones as JSON in `pomodoro_settings`"
+msgstr "将番茄钟里程碑以 JSON 形式存储在 `pomodoro_settings` 中"
+
+#: ../../02-architecture.md:151 28f8c82002904fb293db5c0e5b1fc4c5
+msgid ""
+"Keeps milestone data attached to the singleton timer config without "
+"another relational table"
+msgstr "无需增加新的关系表，就能让里程碑数据与单例计时器配置保持绑定"
+
+#: ../../02-architecture.md:151 c8d5459e728a476eb974198bd2546b92
+msgid "Resolve DB location from env, then config file, then app data"
+msgstr "数据库路径按 env、配置文件、应用数据目录的顺序解析"
+
+#: ../../02-architecture.md:151 eb8a4912f1934340a4478072b475294c
+msgid "Supports both ad hoc overrides and persistent local configuration"
+msgstr "同时支持临时覆盖和持久化本地配置"
+
+#: ../../02-architecture.md:151 9ed47732826940549802ff9a58df6863
+msgid "Open external links with the shell plugin"
+msgstr "使用 shell 插件打开外部链接"
+
+#: ../../02-architecture.md:151 112e4618c1894be0924ab95781368deb
+msgid ""
+"Avoids in-webview navigation and keeps Markdown note links safe and "
+"predictable"
+msgstr "避免在 webview 内部跳转，使 Markdown 便签中的链接行为更安全、可预期"
+

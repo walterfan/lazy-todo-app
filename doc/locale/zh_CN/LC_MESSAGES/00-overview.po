@@ -1,0 +1,290 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-12 20:24+0800\n"
+"PO-Revision-Date: 2026-04-12 21:18+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../00-overview.md:1 3bd81c95bd884382824af3aea3830f61
+msgid "Lazy Todo App — Project Overview"
+msgstr "Lazy Todo App — 项目概览"
+
+#: ../../00-overview.md:5 833562008a354b7091e2d96809c0553f
+msgid "Purpose"
+msgstr "目标"
+
+#: ../../00-overview.md:7 5678a181d12c48148935c1e362108dd0
+msgid ""
+"Lazy Todo App is a cross-platform desktop productivity app that combines "
+"four closely related capabilities in a single Tauri desktop experience:"
+msgstr "Lazy Todo App 是一个跨平台桌面效率应用，在一个 Tauri 桌面体验中整合了四项紧密相关的能力："
+
+#: ../../00-overview.md:9 9cbdb506619240c4a93a6d5d7288413b
+msgid ""
+"**Todo management** with priorities, deadlines, countdowns, search, and "
+"list/grid display options"
+msgstr "**Todo 管理**：支持优先级、截止时间、倒计时、搜索以及列表/网格显示模式"
+
+#: ../../00-overview.md:10 bafd1df9e50344d8a01a43d8732748a1
+msgid ""
+"**Sticky notes** with Markdown rendering, color themes, inline editing, "
+"and dedicated pop-out note windows"
+msgstr "**即时贴**：支持 Markdown 渲染、颜色主题、内联编辑以及独立弹出便签窗口"
+
+#: ../../00-overview.md:11 a016a03cf76f485288e89f3f31cb8c73
+msgid ""
+"**Pomodoro focus timer** with configurable work/break cycles, milestone "
+"tracking, notifications, and weekly stats"
+msgstr "**番茄钟专注计时器**：支持可配置的工作/休息周期、里程碑跟踪、通知提醒与每周统计"
+
+#: ../../00-overview.md:12 6a11e35c5cc1412887ee4369b54997f1
+msgid ""
+"**Application settings** for display preferences, note templates, storage"
+" hints, and persistence behavior"
+msgstr "**应用设置**：用于配置显示偏好、便签模板、存储提示与持久化行为"
+
+#: ../../00-overview.md:14 eba48ce195aa4ea88e8a902694bc6c5c
+msgid ""
+"The project is also a practical [Harness "
+"Engineering](https://www.fanyamin.com/tech/harness-engineering.html) case"
+" study: the codebase is intentionally structured so AI agents can "
+"contribute safely by following explicit architecture rules."
+msgstr ""
+"该项目也是一个实用的 [Harness Engineering](https://www.fanyamin.com/tech/harness-engineering.html) "
+"案例：代码库被刻意组织成一种结构，使 AI Agent 可以在明确架构规则的约束下安全参与贡献。"
+
+#: ../../00-overview.md:16 5b116240eb084e46909f457ff40e4fea
+msgid "Tech Stack"
+msgstr "技术栈"
+
+#: ../../00-overview.md 582f6c7db81441a39847dd3acc1564cf
+msgid "Layer"
+msgstr "层级"
+
+#: ../../00-overview.md 84d31aa399264b738d1fc12479feace9
+msgid "Technology"
+msgstr "技术"
+
+#: ../../00-overview.md 6f22f1c80dbb4002a60454489c2b58e8
+msgid "Role"
+msgstr "职责"
+
+#: ../../00-overview.md 620bd0efe500497eaceac6937cc67365
+msgid "Desktop shell"
+msgstr "桌面外壳"
+
+#: ../../00-overview.md be930239f6b842719ae3fae1ca0fafa2
+msgid "Tauri v2"
+msgstr "Tauri v2"
+
+#: ../../00-overview.md 115b9e3c19e5442bb6b6fa4675032414
+msgid "Native windowing, tray integration, plugin wiring"
+msgstr "原生窗口能力、系统托盘集成、插件接线"
+
+#: ../../00-overview.md 4b4f78398da3494dbc736a33bcd02970
+msgid "Frontend"
+msgstr "前端"
+
+#: ../../00-overview.md bd4ff305cfc74047940fa70d3e40a893
+msgid "React 18 + TypeScript"
+msgstr "React 18 + TypeScript"
+
+#: ../../00-overview.md 21d9c200df724e118990b9f166abdc09
+msgid "Main UI, pop-out note view, local state, timer rendering"
+msgstr "主界面、弹出式便签视图、本地状态管理、计时器渲染"
+
+#: ../../00-overview.md 8f6c558544a44a3b9c25f97a22994f67
+msgid "Backend"
+msgstr "后端"
+
+#: ../../00-overview.md c66e57cc1b044057bc24b72a9c040f70
+msgid "Rust"
+msgstr "Rust"
+
+#: ../../00-overview.md f8d14a11b2454e998a750b278d0e790f
+msgid "Tauri commands, database access, multi-window orchestration"
+msgstr "Tauri 命令、数据库访问、多窗口编排"
+
+#: ../../00-overview.md acffda1aeb74490d9141997c8858820f
+msgid "Storage"
+msgstr "存储"
+
+#: ../../00-overview.md 305f40e2eda64e1f84f6c7cf6d2a0f32
+msgid "SQLite via `rusqlite`"
+msgstr "通过 `rusqlite` 使用 SQLite"
+
+#: ../../00-overview.md 320eab7d47c04225aa4baff7a8f5ecec
+msgid "Todos, sticky notes, pomodoro state, app settings"
+msgstr "Todos、即时贴、番茄钟状态、应用设置"
+
+#: ../../00-overview.md 6e4624a3b1f84fbc9407b25163633eeb
+msgid "Notifications"
+msgstr "通知"
+
+#: ../../00-overview.md 6bb6d9ed720b486c9af1863aa789a394
+msgid "`tauri-plugin-notification`"
+msgstr "`tauri-plugin-notification`"
+
+#: ../../00-overview.md bf63ea1a9c75436cb62811bd73be73de
+msgid "Native work/break reminders"
+msgstr "原生工作/休息提醒"
+
+#: ../../00-overview.md b31818e8ce024f26b14cfb4318c6c580
+msgid "External link handling"
+msgstr "外链处理"
+
+#: ../../00-overview.md bce3cbf4e1e04602a8165da3eec283c0
+msgid "`@tauri-apps/plugin-shell`"
+msgstr "`@tauri-apps/plugin-shell`"
+
+#: ../../00-overview.md 97c16fc42c4b449aa55217f10cc28af5
+msgid "Open HTTP links outside the webview"
+msgstr "在 webview 外部打开 HTTP 链接"
+
+#: ../../00-overview.md 4cba1fd7905447ba9959bf9dc7b4cf85
+msgid "Markdown"
+msgstr "Markdown"
+
+#: ../../00-overview.md b259629dbdbc4766bc343ea4d96eb2ad
+msgid "`react-markdown` + `remark-gfm`"
+msgstr "`react-markdown` + `remark-gfm`"
+
+#: ../../00-overview.md fab9d882201749fdb9110d4f6348499b
+msgid "Rich note rendering"
+msgstr "富文本便签渲染"
+
+#: ../../00-overview.md d4b1ca824482455e8c7d33feabfb31a4
+msgid "Build"
+msgstr "构建"
+
+#: ../../00-overview.md 3012a5fe217f4e9faea048118f8b15c2
+msgid "Vite + Cargo"
+msgstr "Vite + Cargo"
+
+#: ../../00-overview.md fbe4820045c04fb5bd0b107ab0558346
+msgid "Frontend bundling and native packaging"
+msgstr "前端打包与原生应用封装"
+
+#: ../../00-overview.md:29 b73e61a48be24f98947fe9bbc74eca18
+msgid "Key Characteristics"
+msgstr "关键特性"
+
+#: ../../00-overview.md:31 b897e9c25d024d839d01287facec6741
+msgid ""
+"**Single-binary desktop app**: the main window and note windows are "
+"packaged together with Tauri."
+msgstr "**单二进制桌面应用**：主窗口与便签窗口一并由 Tauri 打包发布。"
+
+#: ../../00-overview.md:32 3a59540adb0b4e2d820b943a8fdf6bea
+msgid ""
+"**Offline-first**: the app has no backend service dependency; all data is"
+" local."
+msgstr "**离线优先**：应用不依赖后端服务，所有数据都保存在本地。"
+
+#: ../../00-overview.md:33 389cff77a37243f1817bfab09ac64125
+msgid ""
+"**Multi-window note experience**: a note can be opened into its own "
+"focused window while still sharing the same SQLite store."
+msgstr "**多窗口便签体验**：单条便签可以在独立窗口中打开，同时继续共享同一个 SQLite 存储。"
+
+#: ../../00-overview.md:34 96156bfa6b114ca8a2e52cc272c29c92
+msgid ""
+"**Configurable persistence**: database location is resolved from "
+"`LAZY_TODO_DB_DIR`, then `~/.config/lazy-todo-app/config.json`, then the "
+"platform app-data directory."
+msgstr ""
+"**可配置持久化**：数据库路径解析顺序为 `LAZY_TODO_DB_DIR`、`~/.config/lazy-todo-app/config.json`，"
+"最后才是平台默认应用数据目录。"
+
+#: ../../00-overview.md:35 85f0ff67792c4280ae1901abc481632e
+msgid ""
+"**Tray-centric UX**: the main window hides on close, can be toggled from "
+"the tray, and exposes a quick \"New Note\" action."
+msgstr "**以托盘为中心的交互体验**：主窗口关闭时会隐藏，可从托盘切换显示，并提供快速“新建便签”操作。"
+
+#: ../../00-overview.md:37 7e196550c9a5435e83facf12506db95b
+msgid "Deployment"
+msgstr "部署"
+
+#: ../../00-overview.md:39 88c0de4f05d64de7832f5c2f16614672
+msgid ""
+"The app targets macOS, Linux, and Windows. Production bundles are created"
+" with `npm run tauri build`, and the repo now includes a GitHub Actions "
+"release workflow in `.github/workflows/release.yml` so tagged builds can "
+"publish downloadable installers on GitHub Releases."
+msgstr ""
+"该应用面向 macOS、Linux 和 Windows。生产构建通过 `npm run tauri build` 生成，"
+"仓库中还包含 `.github/workflows/release.yml` GitHub Actions 发布流程，使带标签的构建可以自动把可下载安装包发布到 GitHub Releases。"
+
+#: ../../00-overview.md 817c3ba2969549adb44393e30ea26e12
+msgid "Platform"
+msgstr "平台"
+
+#: ../../00-overview.md 16e8b2eba66243e78e9d721dfa952b26
+msgid "Default Data Directory"
+msgstr "默认数据目录"
+
+#: ../../00-overview.md 40ba83853bdb428ebc497538d464f5f4
+msgid "macOS"
+msgstr "macOS"
+
+#: ../../00-overview.md ac5423ab01e14cd5a93868fb7c5d2896
+msgid "`~/Library/Application Support/com.fanyamin.lazytodoapp/`"
+msgstr "`~/Library/Application Support/com.fanyamin.lazytodoapp/`"
+
+#: ../../00-overview.md b45a99f52d004e2d802aa0ea11e5626f
+msgid "Linux"
+msgstr "Linux"
+
+#: ../../00-overview.md 0233c50c4c0e4f1f993e9712af045f25
+msgid "`~/.local/share/com.fanyamin.lazytodoapp/`"
+msgstr "`~/.local/share/com.fanyamin.lazytodoapp/`"
+
+#: ../../00-overview.md d2ce94fba7f242d89b6f95d12381fe87
+msgid "Windows"
+msgstr "Windows"
+
+#: ../../00-overview.md 48146d22e8fb45ffb2212decb2b0bdef
+msgid "`%APPDATA%\\com.fanyamin.lazytodoapp\\`"
+msgstr "`%APPDATA%\\com.fanyamin.lazytodoapp\\`"
+
+#: ../../00-overview.md:47 9f768733c6864b0bb151abe6f466ca57
+msgid "Project Status"
+msgstr "项目状态"
+
+#: ../../00-overview.md:49 77f29b7522624d9297543ac52c3f6a0e
+msgid "**Version**: 0.1.0"
+msgstr "**版本**：0.1.0"
+
+#: ../../00-overview.md:50 801069a0c654457bb9e29266161e2d01
+msgid "**Identifier**: `com.fanyamin.lazytodoapp`"
+msgstr "**标识符**：`com.fanyamin.lazytodoapp`"
+
+#: ../../00-overview.md:51 841620f204104f3c8687ae08b8dc1b96
+msgid "**License**: Apache-2.0"
+msgstr "**许可证**：Apache-2.0"
+
+#: ../../00-overview.md:52 5573752fc5e44d38984abb380bddb862
+msgid "**Repository**: <https://github.com/walterfan/lazy-todo-app>"
+msgstr "**仓库**：<https://github.com/walterfan/lazy-todo-app>"
+
+#: ../../00-overview.md:53 2994ed92f36f4077916011c5974f99de
+msgid ""
+"**Documentation root**: `doc/` with bilingual `Sphinx + MyST + sphinx-"
+"intl` output"
+msgstr "**文档根目录**：`doc/`，采用双语 `Sphinx + MyST + sphinx-intl` 输出"
+

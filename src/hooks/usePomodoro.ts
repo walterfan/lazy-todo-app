@@ -2,14 +2,39 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { sendNotification, isPermissionGranted, requestPermission } from "@tauri-apps/plugin-notification";
-import type { PomodoroSettings, TimerPhase, TimerState } from "../types/pomodoro";
+import type {
+  PomodoroMilestone,
+  PomodoroMilestoneStatus,
+  PomodoroSettings,
+  TimerPhase,
+  TimerState,
+} from "../types/pomodoro";
 
 const DEFAULT_SETTINGS: PomodoroSettings = {
   work_minutes: 25,
   short_break_min: 5,
   long_break_min: 15,
   rounds_per_cycle: 4,
+  milestones: [],
 };
+
+function normalizeMilestones(milestones: PomodoroMilestone[]): PomodoroMilestone[] {
+  return milestones
+    .map((milestone) => ({
+      name: milestone.name.trim(),
+      deadline: milestone.deadline,
+      status: milestone.status ?? "active",
+    }))
+    .filter((milestone) => milestone.name && milestone.deadline)
+    .slice(0, 3);
+}
+
+function normalizeSettings(settings: PomodoroSettings): PomodoroSettings {
+  return {
+    ...settings,
+    milestones: normalizeMilestones(settings.milestones ?? []),
+  };
+}
 
 function phaseMs(phase: TimerPhase, settings: PomodoroSettings): number {
   switch (phase) {
@@ -25,6 +50,12 @@ function phaseLabel(phase: TimerPhase): string {
     case "short_break": return "Short Break";
     case "long_break": return "Long Break";
   }
+}
+
+interface TransitionOptions {
+  recordSession?: boolean;
+  notifyUser?: boolean;
+  showAlert?: boolean;
 }
 
 export function usePomodoro() {
@@ -44,10 +75,11 @@ export function usePomodoro() {
 
   useEffect(() => {
     invoke<PomodoroSettings>("get_pomodoro_settings").then((s) => {
-      setSettings(s);
+      const normalized = normalizeSettings(s);
+      setSettings(normalized);
       setTimer((prev) => {
         if (!prev.running) {
-          const ms = phaseMs(prev.phase, s);
+          const ms = phaseMs(prev.phase, normalized);
           return { ...prev, remainingMs: ms, totalMs: ms };
         }
         return prev;
@@ -91,19 +123,35 @@ export function usePomodoro() {
     }
   }, []);
 
-  const transitionToNext = useCallback((currentPhase: TimerPhase, currentRound: number, settingsRef: PomodoroSettings) => {
+  const transitionToNext = useCallback((
+    currentPhase: TimerPhase,
+    currentRound: number,
+    settingsRef: PomodoroSettings,
+    options: TransitionOptions = {},
+  ) => {
+    const {
+      recordSession = true,
+      notifyUser = true,
+      showAlert = true,
+    } = options;
     let nextPhase: TimerPhase;
     let nextRound = currentRound;
 
     if (currentPhase === "work") {
-      invoke("record_pomodoro_session", { durationMin: settingsRef.work_minutes }).catch(console.error);
+      if (recordSession) {
+        invoke("record_pomodoro_session", { durationMin: settingsRef.work_minutes }).catch(console.error);
+      }
       if (currentRound >= settingsRef.rounds_per_cycle) {
         nextPhase = "long_break";
         nextRound = 1;
-        notify("Great job!", "Time for a long break.");
+        if (notifyUser) {
+          notify("Great job!", "Time for a long break.");
+        }
       } else {
         nextPhase = "short_break";
-        notify("Pomodoro Complete", "Time for a short break!");
+        if (notifyUser) {
+          notify("Pomodoro Complete", "Time for a short break!");
+        }
       }
     } else {
       nextPhase = "work";
@@ -112,11 +160,17 @@ export function usePomodoro() {
       } else {
         nextRound = currentRound + 1;
       }
-      notify("Break Over", "Ready to focus!");
+      if (notifyUser) {
+        notify("Break Over", "Ready to focus!");
+      }
     }
 
-    setAlertPhase(currentPhase);
-    showWindow();
+    if (showAlert) {
+      setAlertPhase(currentPhase);
+      showWindow();
+    } else {
+      setAlertPhase(null);
+    }
 
     const ms = phaseMs(nextPhase, settingsRef);
     setTimer({ phase: nextPhase, remainingMs: ms, totalMs: ms, running: false, currentRound: nextRound });
@@ -167,17 +221,37 @@ export function usePomodoro() {
     });
   }, [settings, updateTrayTooltip]);
 
+  const skip = useCallback(() => {
+    transitionToNext(timer.phase, timer.currentRound, settings, {
+      recordSession: false,
+      notifyUser: false,
+      showAlert: false,
+    });
+  }, [settings, timer.currentRound, timer.phase, transitionToNext]);
+
   const saveSettings = useCallback(async (newSettings: PomodoroSettings) => {
-    await invoke("save_pomodoro_settings", { settings: newSettings });
-    setSettings(newSettings);
+    const normalized = normalizeSettings(newSettings);
+    await invoke("save_pomodoro_settings", { settings: normalized });
+    setSettings(normalized);
     setTimer((prev) => {
       if (!prev.running) {
-        const ms = phaseMs(prev.phase, newSettings);
+        const ms = phaseMs(prev.phase, normalized);
         return { ...prev, remainingMs: ms, totalMs: ms };
       }
       return prev;
     });
   }, []);
+
+  const updateMilestoneStatus = useCallback(async (index: number, status: PomodoroMilestoneStatus) => {
+    const nextMilestones = settings.milestones.map((milestone, milestoneIndex) =>
+      milestoneIndex === index ? { ...milestone, status } : milestone,
+    );
+
+    await saveSettings({
+      ...settings,
+      milestones: nextMilestones,
+    });
+  }, [saveSettings, settings]);
 
   useEffect(() => {
     return () => {
@@ -187,5 +261,17 @@ export function usePomodoro() {
 
   const dismissAlert = useCallback(() => setAlertPhase(null), []);
 
-  return { timer, settings, start, pause, reset, saveSettings, phaseLabel: phaseLabel(timer.phase), alertPhase, dismissAlert };
+  return {
+    timer,
+    settings,
+    start,
+    pause,
+    reset,
+    skip,
+    saveSettings,
+    updateMilestoneStatus,
+    phaseLabel: phaseLabel(timer.phase),
+    alertPhase,
+    dismissAlert,
+  };
 }

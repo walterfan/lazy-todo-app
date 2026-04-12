@@ -10,9 +10,9 @@ interface Props {
 }
 
 const PRIORITY_LABELS: Record<number, { emoji: string; text: string }> = {
-  1: { emoji: "🔴", text: "高" },
-  2: { emoji: "🟡", text: "中" },
-  3: { emoji: "🟢", text: "低" },
+  1: { emoji: "🔴", text: "High" },
+  2: { emoji: "🟡", text: "Medium" },
+  3: { emoji: "🟢", text: "Low" },
 };
 
 function formatDeadline(deadline: string): string {
@@ -22,6 +22,21 @@ function formatDeadline(deadline: string): string {
   const hour = d.getHours().toString().padStart(2, "0");
   const min = d.getMinutes().toString().padStart(2, "0");
   return `${month}/${day} ${hour}:${min}`;
+}
+
+function CompleteIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path
+        d="M3.5 8.5 6.5 11.5 12.5 4.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }
 
 export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
@@ -61,7 +76,7 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
             className="edit-input"
-            placeholder="任务名称"
+            placeholder="Task title"
             autoFocus
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSave();
@@ -73,19 +88,19 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
             value={editDesc}
             onChange={(e) => setEditDesc(e.target.value)}
             className="edit-input edit-input-desc"
-            placeholder="描述（可选）"
+            placeholder="Description (optional)"
           />
           <div className="edit-options">
             <label>
-              优先级：
+              Priority:
               <select value={editPriority} onChange={(e) => setEditPriority(Number(e.target.value))}>
-                <option value={1}>🔴 高</option>
-                <option value={2}>🟡 中</option>
-                <option value={3}>🟢 低</option>
+                <option value={1}>🔴 High</option>
+                <option value={2}>🟡 Medium</option>
+                <option value={3}>🟢 Low</option>
               </select>
             </label>
             <label>
-              截止时间：
+              Deadline:
               <input
                 type="datetime-local"
                 value={editDeadline}
@@ -94,8 +109,8 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
             </label>
           </div>
           <div className="edit-actions">
-            <button onClick={handleSave} className="btn-save">保存</button>
-            <button onClick={handleCancel} className="btn-cancel">取消</button>
+            <button onClick={handleSave} className="btn-save">Save</button>
+            <button onClick={handleCancel} className="btn-cancel">Cancel</button>
           </div>
         </div>
       </div>
@@ -105,18 +120,12 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
   return (
     <div className={`todo-item ${todo.completed ? "completed" : ""} priority-${todo.priority}`}>
       <div className="todo-left">
-        <input
-          type="checkbox"
-          checked={todo.completed}
-          onChange={() => onToggle(todo.id)}
-          className="todo-checkbox"
-        />
         <div className="todo-content">
           <div className="todo-title">
             <span className="priority-badge" title={`优先级: ${pri.text}`}>
               {pri.emoji}
             </span>
-            <span className={todo.completed ? "line-through" : ""}>{todo.title}</span>
+            <span>{todo.title}</span>
           </div>
           {todo.description && (
             <div className="todo-desc">{todo.description}</div>
@@ -126,7 +135,7 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
               <span className="todo-deadline-date">
                 📅 {formatDeadline(todo.deadline)}
               </span>
-              {countdown && !todo.completed && (
+              {countdown && (
                 <span className={`todo-countdown ${countdown.overdue ? "overdue" : ""} ${countdown.urgent ? "urgent" : ""}`}>
                   ⏱ {countdown.label}
                 </span>
@@ -136,10 +145,13 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
         </div>
       </div>
       <div className="todo-actions">
-        <button onClick={() => setEditing(true)} className="btn-edit" title="编辑">
+        <button onClick={() => onToggle(todo.id)} className="btn-complete" title="Complete" aria-label="Complete task">
+          <CompleteIcon />
+        </button>
+        <button onClick={() => setEditing(true)} className="btn-edit" title="Edit">
           ✎
         </button>
-        <button onClick={() => onDelete(todo.id)} className="btn-delete" title="删除">
+        <button onClick={() => onDelete(todo.id)} className="btn-delete" title="Delete">
           ✕
         </button>
       </div>

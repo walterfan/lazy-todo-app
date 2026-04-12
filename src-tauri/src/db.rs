@@ -3,7 +3,8 @@ use std::sync::Mutex;
 
 use crate::models::todo::Todo;
 use crate::models::note::StickyNote;
-use crate::models::pomodoro::{PomodoroSettings, DayStat};
+use crate::models::pomodoro::{PomodoroMilestone, PomodoroSettings, DayStat};
+use crate::models::settings::AppSettings;
 
 pub struct Database {
     conn: Mutex<Connection>,
@@ -11,6 +12,22 @@ pub struct Database {
 }
 
 impl Database {
+    fn ensure_pomodoro_settings_schema(conn: &Connection) -> Result<()> {
+        let mut stmt = conn.prepare("PRAGMA table_info(pomodoro_settings)")?;
+        let column_names = stmt
+            .query_map([], |row| row.get::<_, String>(1))?
+            .collect::<Result<Vec<_>>>()?;
+
+        if !column_names.iter().any(|name| name == "milestones_json") {
+            conn.execute(
+                "ALTER TABLE pomodoro_settings ADD COLUMN milestones_json TEXT NOT NULL DEFAULT '[]'",
+                [],
+            )?;
+        }
+
+        Ok(())
+    }
+
     pub fn new(app_dir: &std::path::Path) -> Result<Self> {
         std::fs::create_dir_all(app_dir).ok();
         let db_path = app_dir.join("todos.db");
@@ -39,14 +56,25 @@ impl Database {
                 work_minutes     INTEGER NOT NULL DEFAULT 25,
                 short_break_min  INTEGER NOT NULL DEFAULT 5,
                 long_break_min   INTEGER NOT NULL DEFAULT 15,
-                rounds_per_cycle INTEGER NOT NULL DEFAULT 4
+                rounds_per_cycle INTEGER NOT NULL DEFAULT 4,
+                milestones_json  TEXT NOT NULL DEFAULT '[]'
             );
             CREATE TABLE IF NOT EXISTS pomodoro_sessions (
                 id           INTEGER PRIMARY KEY AUTOINCREMENT,
                 completed_at TEXT NOT NULL DEFAULT (datetime('now')),
                 duration_min INTEGER NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS app_settings (
+                id              INTEGER PRIMARY KEY CHECK (id = 1),
+                page_size       INTEGER NOT NULL DEFAULT 50,
+                todo_display    TEXT NOT NULL DEFAULT 'list',
+                note_display    TEXT NOT NULL DEFAULT 'grid',
+                note_template   TEXT NOT NULL DEFAULT '',
+                note_folder     TEXT NOT NULL DEFAULT ''
             );"
         )?;
+
+        Self::ensure_pomodoro_settings_schema(&conn)?;
 
         Ok(Self { conn: Mutex::new(conn), db_path })
     }
@@ -251,29 +279,66 @@ impl Database {
             [],
         )?;
         let mut stmt = conn.prepare(
-            "SELECT work_minutes, short_break_min, long_break_min, rounds_per_cycle FROM pomodoro_settings WHERE id = 1"
+            "SELECT work_minutes, short_break_min, long_break_min, rounds_per_cycle, milestones_json
+             FROM pomodoro_settings WHERE id = 1"
         )?;
         stmt.query_row([], |row| {
+            let milestones_json: String = row.get(4)?;
+            let milestones = serde_json::from_str::<Vec<PomodoroMilestone>>(&milestones_json)
+                .unwrap_or_default();
             Ok(PomodoroSettings {
                 work_minutes: row.get(0)?,
                 short_break_min: row.get(1)?,
                 long_break_min: row.get(2)?,
                 rounds_per_cycle: row.get(3)?,
+                milestones,
             })
         })
     }
 
     pub fn save_pomodoro_settings(&self, settings: &PomodoroSettings) -> Result<()> {
         let conn = self.conn.lock().expect("db lock poisoned");
+        let milestones = settings
+            .milestones
+            .iter()
+            .filter_map(|milestone| {
+                let name = milestone.name.trim();
+                let deadline = milestone.deadline.trim();
+                if name.is_empty() || deadline.is_empty() {
+                    return None;
+                }
+
+                Some(PomodoroMilestone {
+                    name: name.to_string(),
+                    deadline: deadline.to_string(),
+                    status: match milestone.status.as_str() {
+                        "completed" => "completed".to_string(),
+                        "cancelled" => "cancelled".to_string(),
+                        _ => "active".to_string(),
+                    },
+                })
+            })
+            .take(3)
+            .collect::<Vec<_>>();
+        let milestones_json =
+            serde_json::to_string(&milestones).map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
+
         conn.execute(
-            "INSERT INTO pomodoro_settings (id, work_minutes, short_break_min, long_break_min, rounds_per_cycle)
-             VALUES (1, ?1, ?2, ?3, ?4)
+            "INSERT INTO pomodoro_settings (id, work_minutes, short_break_min, long_break_min, rounds_per_cycle, milestones_json)
+             VALUES (1, ?1, ?2, ?3, ?4, ?5)
              ON CONFLICT(id) DO UPDATE SET
                work_minutes = excluded.work_minutes,
                short_break_min = excluded.short_break_min,
                long_break_min = excluded.long_break_min,
-               rounds_per_cycle = excluded.rounds_per_cycle",
-            params![settings.work_minutes, settings.short_break_min, settings.long_break_min, settings.rounds_per_cycle],
+               rounds_per_cycle = excluded.rounds_per_cycle,
+               milestones_json = excluded.milestones_json",
+            params![
+                settings.work_minutes,
+                settings.short_break_min,
+                settings.long_break_min,
+                settings.rounds_per_cycle,
+                milestones_json
+            ],
         )?;
         Ok(())
     }
@@ -312,5 +377,44 @@ impl Database {
             stats.push(DayStat { date: date_str, count });
         }
         Ok(stats)
+    }
+
+    // --- App Settings ---
+
+    pub fn get_app_settings(&self) -> Result<AppSettings> {
+        let conn = self.conn.lock().expect("db lock poisoned");
+        conn.execute(
+            "INSERT OR IGNORE INTO app_settings (id) VALUES (1)",
+            [],
+        )?;
+        let mut stmt = conn.prepare(
+            "SELECT page_size, todo_display, note_display, note_template, note_folder
+             FROM app_settings WHERE id = 1"
+        )?;
+        stmt.query_row([], |row| {
+            Ok(AppSettings {
+                page_size: row.get(0)?,
+                todo_display: row.get(1)?,
+                note_display: row.get(2)?,
+                note_template: row.get(3)?,
+                note_folder: row.get(4)?,
+            })
+        })
+    }
+
+    pub fn save_app_settings(&self, s: &AppSettings) -> Result<()> {
+        let conn = self.conn.lock().expect("db lock poisoned");
+        conn.execute(
+            "INSERT INTO app_settings (id, page_size, todo_display, note_display, note_template, note_folder)
+             VALUES (1, ?1, ?2, ?3, ?4, ?5)
+             ON CONFLICT(id) DO UPDATE SET
+               page_size = excluded.page_size,
+               todo_display = excluded.todo_display,
+               note_display = excluded.note_display,
+               note_template = excluded.note_template,
+               note_folder = excluded.note_folder",
+            params![s.page_size, s.todo_display, s.note_display, s.note_template, s.note_folder],
+        )?;
+        Ok(())
     }
 }

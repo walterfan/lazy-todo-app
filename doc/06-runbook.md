@@ -5,183 +5,171 @@
 ## Prerequisites
 
 | Tool | Minimum Version | Check Command |
-|------|----------------|---------------|
+|------|-----------------|---------------|
 | Rust | 1.70+ | `rustc --version` |
 | Node.js | 18+ | `node --version` |
 | npm | 9+ | `npm --version` |
+| Python | 3.12+ | `python3 --version` |
+| Poetry | 2.x | `poetry --version` |
 | Tauri CLI | 2.x | `npx tauri --version` |
 
 ### Platform-Specific Dependencies
 
-**macOS**: Xcode Command Line Tools (`xcode-select --install`)
+**macOS**
 
-**Linux**: System libraries required by Tauri:
+```bash
+xcode-select --install
+```
+
+**Linux**
+
 ```bash
 sudo apt install libwebkit2gtk-4.1-dev build-essential curl wget file \
   libssl-dev libayatana-appindicator3-dev librsvg2-dev
 ```
 
-**Windows**: [Microsoft C++ Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) + WebView2 runtime
+**Windows**
+
+- Microsoft C++ Build Tools
+- WebView2 runtime
 
 ## Setup
 
 ```bash
-# Clone
 git clone https://github.com/walterfan/lazy-todo-app.git
 cd lazy-todo-app
-
-# Install frontend dependencies
 npm install
+```
 
-# (Optional) Install pre-commit hooks
+Optional developer checks:
+
+```bash
 pip install pre-commit
 pre-commit install
 ```
 
-## Development
+## Run the App
 
 ```bash
-# Start dev mode (Vite dev server + Tauri with hot reload)
 npm run tauri dev
-
-# Start with custom DB location
-LAZY_TODO_DB_DIR=/tmp/test-db npm run tauri dev
 ```
 
-This will:
-1. Start Vite dev server on `http://localhost:1420`
-2. Compile the Rust backend (first run takes ~60s for dependency compilation)
-3. Open the Tauri window with hot-reload enabled
-
-### Frontend Only (no Tauri)
+Use a custom DB directory:
 
 ```bash
-npm run dev        # Vite dev server at http://localhost:1420
-npm run build      # Production build → dist/
-npm run preview    # Preview production build
+LAZY_TODO_DB_DIR=/tmp/lazy-todo-db npm run tauri dev
 ```
 
-### Backend Only (type-check)
+You can also persist a preferred DB directory in `~/.config/lazy-todo-app/config.json`:
 
-```bash
-cd src-tauri
-cargo check        # Type-check without building
-cargo clippy       # Lint check
-cargo test         # Run tests (if any)
+```json
+{
+  "db_dir": "~/Documents/lazy-todo-db"
+}
 ```
 
-## Building for Production
+## Build Production Bundles
 
 ```bash
-# Build distributable app bundle
 npm run tauri build
 ```
 
-Output locations:
-- **macOS**: `src-tauri/target/release/bundle/dmg/` (`.dmg` installer)
-- **Linux**: `src-tauri/target/release/bundle/deb/` and `appimage/`
-- **Windows**: `src-tauri/target/release/bundle/msi/` and `nsis/`
+Bundle output:
 
-## Database Management
+- macOS: `src-tauri/target/release/bundle/dmg/`
+- Linux: `src-tauri/target/release/bundle/deb/` and `src-tauri/target/release/bundle/appimage/`
+- Windows: `src-tauri/target/release/bundle/msi/` and `src-tauri/target/release/bundle/nsis/`
 
-### Location
+Public GitHub release binaries are published by `.github/workflows/release.yml` when a version tag is pushed.
+
+## Build the Documentation Site
+
+```bash
+cd doc
+poetry install
+poetry run make gettext
+poetry run make intl-update
+poetry run make html
+```
+
+Generated outputs:
+
+- English: `doc/_build/en/html/`
+- Chinese: `doc/_build/zh_CN/html/`
+
+For a local preview server:
+
+```bash
+cd doc
+poetry run make serve
+```
+
+## Inspect and Manage the Database
 
 | Platform | Default Path |
-|----------|-------------|
+|----------|--------------|
 | macOS | `~/Library/Application Support/com.fanyamin.lazytodoapp/todos.db` |
 | Linux | `~/.local/share/com.fanyamin.lazytodoapp/todos.db` |
 | Windows | `%APPDATA%\com.fanyamin.lazytodoapp\todos.db` |
 
-Override with: `LAZY_TODO_DB_DIR=/custom/path`
-
-### Inspect Database
+Inspect the DB:
 
 ```bash
-# macOS example
 sqlite3 ~/Library/Application\ Support/com.fanyamin.lazytodoapp/todos.db
-
-# List tables
 .tables
-
-# View todos
-SELECT * FROM todos ORDER BY priority;
-
-# View today's Pomodoro sessions
-SELECT * FROM pomodoro_sessions WHERE date(completed_at) = date('now');
-
-# Check settings
+SELECT * FROM app_settings;
 SELECT * FROM pomodoro_settings;
+SELECT * FROM sticky_notes ORDER BY updated_at DESC;
 ```
 
-### Backup
+Back up the DB:
 
 ```bash
 cp ~/Library/Application\ Support/com.fanyamin.lazytodoapp/todos.db ~/Desktop/todos-backup.db
 ```
 
-### Reset (delete all data)
+Reset the DB:
 
 ```bash
 rm ~/Library/Application\ Support/com.fanyamin.lazytodoapp/todos.db
-# Tables are auto-recreated on next app launch
 ```
 
-## Type-Checking
+## Verification Commands
 
 ```bash
-# Frontend TypeScript check
 npx tsc --noEmit
-
-# Backend Rust check
 cd src-tauri && cargo check
-
-# Both (as pre-commit does)
-npx tsc --noEmit && cd src-tauri && cargo clippy
+cd src-tauri && cargo clippy
+cd src-tauri && cargo test
 ```
 
-## Debugging
+## Debugging Notes
 
 ### Frontend
 
-- Open browser DevTools in the Tauri window: right-click → "Inspect Element" (available in dev mode)
-- Console logs from React hooks appear in DevTools console
-- Network tab won't show IPC calls (they're not HTTP); use `console.log` in hooks
+- Use Tauri devtools to inspect React state and console logs.
+- Search/display issues usually involve `App.tsx`, `TodoList.tsx`, `NoteList.tsx`, or `SettingsPanel.tsx`.
+- Pop-out note issues usually involve `src/main.tsx`, `NoteCard.tsx`, and `NoteWindow.tsx`.
 
 ### Backend
 
-- Rust `println!` and `eprintln!` output appears in the terminal running `npm run tauri dev`
-- For detailed logging, add `env_logger` or `tracing` crate (not currently included)
+- Tray/startup behavior lives in `src-tauri/src/lib.rs`.
+- Persistence behavior lives in `src-tauri/src/db.rs`.
+- Settings and note-window commands live in `src-tauri/src/commands/app.rs`.
 
 ### Common Issues
 
 | Symptom | Cause | Fix |
 |---------|-------|-----|
-| `libsqlite3-sys` build fails | Sandboxed environment blocking build script | Run with full permissions or ensure C compiler is available |
-| Window doesn't appear | Window was hidden to tray | Click tray icon or check tray menu → "Show/Hide" |
-| Pomodoro timer resets when switching tabs | Component was conditionally rendered (unmounted) | Already fixed: uses CSS `display: none` instead of conditional render |
-| `Permission denied` on DB path | Custom `LAZY_TODO_DB_DIR` directory doesn't exist or lacks write permission | Create the directory manually: `mkdir -p $LAZY_TODO_DB_DIR` |
-| Tray icon looks blurry | Missing `@2x` icon variant | Ensure `icons/128x128@2x.png` exists as 256x256 |
-| Notifications don't appear | OS notification permissions not granted | Check system notification settings for the app |
-
-## Pre-Commit Hooks
-
-```bash
-# Install
-pip install pre-commit
-pre-commit install
-
-# Manual run
-pre-commit run --all-files
-```
-
-Checks performed:
-1. `cargo clippy` — Rust linting
-2. `cargo test` — Rust unit tests
-3. `tsc --noEmit` — TypeScript type checking
+| Main window seems gone | It was hidden to tray on close | Use the tray icon or tray menu to show it |
+| Note window opens blank | Missing `noteId` or deleted note | Check the `open_note_window` payload and note existence |
+| DB path is unexpected | Env or config override took precedence | Check `LAZY_TODO_DB_DIR` and `~/.config/lazy-todo-app/config.json` |
+| Chinese docs do not change | Gettext catalogs were not refreshed | Run `poetry run make intl-update` before `poetry run make html` |
+| Sphinx build fails on Mermaid | Missing docs dependencies | Re-run `poetry install` in `doc/` |
 
 ---
 <!-- PKB-metadata
-last_updated: 2026-04-07
-commit: 4c09050
+last_updated: 2026-04-12
+commit: f9ba186
 updated_by: human+ai
 -->

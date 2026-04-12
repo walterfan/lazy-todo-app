@@ -1,4 +1,5 @@
 import type { Todo, UpdateTodo } from "../types/todo";
+import type { DisplayStyle } from "../types/settings";
 import { TodoItem } from "./TodoItem";
 
 interface Props {
@@ -6,33 +7,27 @@ interface Props {
   onToggle: (id: number) => Promise<void>;
   onUpdate: (input: UpdateTodo) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
+  displayStyle?: DisplayStyle;
 }
 
-export function TodoList({ todos, onToggle, onUpdate, onDelete }: Props) {
+export function TodoList({ todos, onToggle, onUpdate, onDelete, displayStyle = "list" }: Props) {
   const pending = todos.filter((t) => !t.completed);
-  const done = todos.filter((t) => t.completed);
+  const isGrid = displayStyle === "grid";
 
   return (
     <div className="todo-list">
-      {pending.length === 0 && done.length === 0 && (
-        <div className="empty-state">暂无任务，添加一个吧 👆</div>
+      {pending.length === 0 && (
+        <div className="empty-state">No active tasks. Add one above!</div>
       )}
 
       {pending.length > 0 && (
         <div className="todo-section">
-          <h3 className="section-title">待完成 ({pending.length})</h3>
-          {pending.map((todo) => (
-            <TodoItem key={todo.id} todo={todo} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />
-          ))}
-        </div>
-      )}
-
-      {done.length > 0 && (
-        <div className="todo-section">
-          <h3 className="section-title">已完成 ({done.length})</h3>
-          {done.map((todo) => (
-            <TodoItem key={todo.id} todo={todo} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />
-          ))}
+          <h3 className="section-title">Pending ({pending.length})</h3>
+          <div className={isGrid ? "todo-grid" : ""}>
+            {pending.map((todo) => (
+              <TodoItem key={todo.id} todo={todo} onToggle={onToggle} onUpdate={onUpdate} onDelete={onDelete} />
+            ))}
+          </div>
         </div>
       )}
     </div>

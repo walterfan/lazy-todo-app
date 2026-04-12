@@ -1,13 +1,15 @@
 import type { StickyNote, UpdateNote } from "../types/note";
+import type { DisplayStyle } from "../types/settings";
 import { NoteCard } from "./NoteCard";
 
 interface NoteListProps {
   notes: StickyNote[];
   onUpdate: (input: UpdateNote) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
+  displayStyle?: DisplayStyle;
 }
 
-export function NoteList({ notes, onUpdate, onDelete }: NoteListProps) {
+export function NoteList({ notes, onUpdate, onDelete, displayStyle = "grid" }: NoteListProps) {
   if (notes.length === 0) {
     return (
       <div className="empty-state">
@@ -17,7 +19,7 @@ export function NoteList({ notes, onUpdate, onDelete }: NoteListProps) {
   }
 
   return (
-    <div className="note-grid">
+    <div className={displayStyle === "list" ? "note-list-view" : "note-grid"}>
       {notes.map((note) => (
         <NoteCard
           key={note.id}

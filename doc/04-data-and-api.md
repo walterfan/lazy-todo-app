@@ -4,166 +4,135 @@
 
 ## Database
 
-- **Engine**: SQLite (bundled via `rusqlite` with `bundled` feature)
-- **File**: `todos.db` in the app data directory (or `LAZY_TODO_DB_DIR`)
-- **Schema creation**: `db.rs::Database::new()` runs `CREATE TABLE IF NOT EXISTS` for all 4 tables on startup
+- **Engine**: SQLite via `rusqlite` with the `bundled` feature
+- **File**: `todos.db`
+- **Schema creation**: `db.rs::Database::new()` initializes all tables on startup
+- **Configuration precedence**: `LAZY_TODO_DB_DIR` -> `~/.config/lazy-todo-app/config.json` -> Tauri app data dir
 
 ### Table: `todos`
 
 | Column | Type | Default | Notes |
 |--------|------|---------|-------|
 | `id` | INTEGER | AUTOINCREMENT | Primary key |
-| `title` | TEXT | (required) | NOT NULL |
-| `description` | TEXT | `''` | NOT NULL |
-| `priority` | INTEGER | `2` | 1=High, 2=Medium, 3=Low |
-| `completed` | INTEGER | `0` | Boolean (0/1) |
-| `deadline` | TEXT | NULL | ISO 8601 datetime string |
+| `title` | TEXT | — | Required |
+| `description` | TEXT | `''` | Required |
+| `priority` | INTEGER | `2` | `1=high`, `2=medium`, `3=low` |
+| `completed` | INTEGER | `0` | Boolean flag |
+| `deadline` | TEXT | NULL | ISO 8601 datetime |
 | `created_at` | TEXT | `datetime('now')` | UTC timestamp |
-
-**Query order**: `completed ASC, priority ASC, deadline ASC NULLS LAST`
 
 ### Table: `sticky_notes`
 
 | Column | Type | Default | Notes |
 |--------|------|---------|-------|
 | `id` | INTEGER | AUTOINCREMENT | Primary key |
-| `title` | TEXT | `''` | NOT NULL |
-| `content` | TEXT | `''` | Markdown content, NOT NULL |
-| `color` | TEXT | `'yellow'` | One of: yellow, green, blue, pink, purple, orange |
+| `title` | TEXT | `''` | Required |
+| `content` | TEXT | `''` | Markdown body |
+| `color` | TEXT | `'yellow'` | One of the supported note colors |
 | `created_at` | TEXT | `datetime('now')` | UTC timestamp |
-| `updated_at` | TEXT | `datetime('now')` | Updated on every edit |
-
-**Query order**: `updated_at DESC`
+| `updated_at` | TEXT | `datetime('now')` | Updated on each edit |
 
 ### Table: `pomodoro_settings`
 
-Singleton table — always exactly one row with `id = 1`.
+Singleton row (`id = 1`) for timer configuration.
 
 | Column | Type | Default | Notes |
 |--------|------|---------|-------|
 | `id` | INTEGER | 1 | `CHECK (id = 1)` |
-| `work_minutes` | INTEGER | `25` | Work phase duration |
+| `work_minutes` | INTEGER | `25` | Focus duration |
 | `short_break_min` | INTEGER | `5` | Short break duration |
 | `long_break_min` | INTEGER | `15` | Long break duration |
 | `rounds_per_cycle` | INTEGER | `4` | Work rounds before long break |
-
-**Upsert strategy**: `INSERT ... ON CONFLICT(id) DO UPDATE SET ...`
+| `milestones_json` | TEXT | `'[]'` | Serialized `PomodoroMilestone[]` |
 
 ### Table: `pomodoro_sessions`
 
 | Column | Type | Default | Notes |
 |--------|------|---------|-------|
 | `id` | INTEGER | AUTOINCREMENT | Primary key |
-| `completed_at` | TEXT | `datetime('now')` | When the session finished |
-| `duration_min` | INTEGER | (required) | Duration of the work session |
+| `completed_at` | TEXT | `datetime('now')` | Completion time |
+| `duration_min` | INTEGER | — | Completed work-session length |
 
-**Stats queries**: Filter by `date(completed_at)` for daily/weekly aggregation.
+### Table: `app_settings`
+
+Singleton row (`id = 1`) for UI preferences.
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| `id` | INTEGER | 1 | `CHECK (id = 1)` |
+| `page_size` | INTEGER | `50` | Shared list size preference |
+| `todo_display` | TEXT | `'list'` | `list` or `grid` |
+| `note_display` | TEXT | `'grid'` | `list` or `grid` |
+| `note_template` | TEXT | `''` | Default Markdown template |
+| `note_folder` | TEXT | `''` | Label/category hint for notes |
 
 ## Tauri Commands (IPC API)
 
-All commands are invoked from the frontend via `invoke("command_name", args)` and return `Result<T, String>`.
+All commands are called from the frontend through `invoke()` and return `Result<T, String>` on the Rust side.
 
-### Todo Commands (`commands/todo.rs`)
-
-| Command | Input | Output | Description |
-|---------|-------|--------|-------------|
-| `list_todos` | — | `Vec<Todo>` | All todos, sorted by priority and deadline |
-| `add_todo` | `CreateTodo { title, description?, priority?, deadline? }` | `Todo` | Insert new todo, returns the created row |
-| `toggle_todo` | `id: i64` | `Todo` | Flip `completed` flag, returns updated row |
-| `update_todo` | `UpdateTodo { id, title?, description?, priority?, deadline? }` | `Todo` | Partial update, returns updated row |
-| `delete_todo` | `id: i64` | `()` | Remove todo by ID |
-
-### Note Commands (`commands/note.rs`)
+### Todo Commands
 
 | Command | Input | Output | Description |
 |---------|-------|--------|-------------|
-| `list_notes` | — | `Vec<StickyNote>` | All notes, most recently updated first |
-| `add_note` | `CreateNote { title?, content?, color? }` | `StickyNote` | Insert new note (defaults: empty title/content, yellow) |
-| `update_note` | `UpdateNote { id, title?, content?, color? }` | `StickyNote` | Partial update, also bumps `updated_at` |
-| `delete_note` | `id: i64` | `()` | Remove note by ID |
+| `list_todos` | — | `Todo[]` | Returns todos ordered by completion, priority, then deadline |
+| `add_todo` | `CreateTodo` | `Todo` | Inserts a new todo |
+| `toggle_todo` | `id` | `Todo` | Flips the completed flag |
+| `update_todo` | `UpdateTodo` | `Todo` | Applies partial updates |
+| `delete_todo` | `id` | `()` | Deletes the row |
 
-### Pomodoro Commands (`commands/pomodoro.rs`)
-
-| Command | Input | Output | Description |
-|---------|-------|--------|-------------|
-| `get_pomodoro_settings` | — | `PomodoroSettings` | Get current settings (auto-creates row if missing) |
-| `save_pomodoro_settings` | `PomodoroSettings` | `()` | Upsert settings |
-| `record_pomodoro_session` | `duration_min: i64` | `()` | Log a completed work session |
-| `get_today_pomodoro_count` | — | `i64` | Count sessions where `date(completed_at) = date('now')` |
-| `get_weekly_pomodoro_stats` | — | `Vec<DayStat>` | Last 7 days: `[{ date, count }]` |
-| `update_tray_tooltip` | `text: String` | `()` | Set system tray hover text |
-
-### App Commands (`commands/app.rs`)
+### Note Commands
 
 | Command | Input | Output | Description |
 |---------|-------|--------|-------------|
-| `get_db_path` | — | `String` | Full filesystem path to the SQLite database file |
+| `list_notes` | — | `StickyNote[]` | Returns notes ordered by `updated_at DESC` |
+| `add_note` | `CreateNote` | `StickyNote` | Inserts a note |
+| `update_note` | `UpdateNote` | `StickyNote` | Persists inline or window edits |
+| `delete_note` | `id` | `()` | Deletes a note |
 
-## TypeScript Types
+### Pomodoro Commands
 
-### Todo (`src/types/todo.ts`)
+| Command | Input | Output | Description |
+|---------|-------|--------|-------------|
+| `get_pomodoro_settings` | — | `PomodoroSettings` | Loads timer settings and milestones |
+| `save_pomodoro_settings` | `PomodoroSettings` | `()` | Upserts the singleton settings row |
+| `record_pomodoro_session` | `duration_min` | `()` | Records a completed work interval |
+| `get_today_pomodoro_count` | — | `i64` | Counts sessions completed today |
+| `get_weekly_pomodoro_stats` | — | `DayStat[]` | Seven-day rolling stats |
+| `update_tray_tooltip` | `text` | `()` | Updates the tray tooltip |
+
+### App Commands
+
+| Command | Input | Output | Description |
+|---------|-------|--------|-------------|
+| `get_db_path` | — | `String` | Returns the active SQLite path |
+| `get_app_settings` | — | `AppSettings` | Loads persisted UI preferences |
+| `save_app_settings` | `AppSettings` | `()` | Persists preferences |
+| `quit_app` | — | `()` | Exits the application |
+| `open_note_window` | `note_id`, `title` | `()` | Creates or focuses a note-specific webview |
+
+## Shared Types
+
+### TypeScript: App Settings
 
 ```typescript
-interface Todo {
-  id: number;
-  title: string;
-  description: string;
-  priority: number;      // 1=High, 2=Medium, 3=Low
-  completed: boolean;
-  deadline: string | null; // ISO 8601
-  created_at: string;
-}
+export type DisplayStyle = "list" | "grid";
 
-interface CreateTodo {
-  title: string;
-  description?: string;
-  priority?: number;
-  deadline?: string;
-}
-
-interface UpdateTodo {
-  id: number;
-  title?: string;
-  description?: string;
-  priority?: number;
-  deadline?: string;
+export interface AppSettings {
+  page_size: number;
+  todo_display: DisplayStyle;
+  note_display: DisplayStyle;
+  note_template: string;
+  note_folder: string;
 }
 ```
 
-### Note (`src/types/note.ts`)
+### Rust: Pomodoro Milestone
 
-```typescript
-type NoteColor = 'yellow' | 'green' | 'blue' | 'pink' | 'purple' | 'orange';
-
-interface StickyNote {
-  id: number;
-  title: string;
-  content: string;
-  color: NoteColor;
-  created_at: string;
-  updated_at: string;
-}
-```
-
-### Pomodoro (`src/types/pomodoro.ts`)
-
-```typescript
-interface PomodoroSettings {
-  work_minutes: number;
-  short_break_min: number;
-  long_break_min: number;
-  rounds_per_cycle: number;
-}
-
-interface DayStat { date: string; count: number; }
-type TimerPhase = "work" | "short_break" | "long_break";
-
-interface TimerState {
-  phase: TimerPhase;
-  remainingMs: number;
-  totalMs: number;
-  running: boolean;
-  currentRound: number;
+```rust
+pub struct PomodoroMilestone {
+    pub name: String,
+    pub deadline: String,
+    pub status: String, // active | completed | cancelled
 }
 ```
 
@@ -171,11 +140,11 @@ interface TimerState {
 
 | Event | Direction | Payload | Purpose |
 |-------|-----------|---------|---------|
-| `tray-new-note` | Rust → Frontend | `()` | System tray "New Note" menu clicked |
+| `tray-new-note` | Rust -> Frontend | `()` | Tells the main window to switch to the Notes tab and focus the editor |
 
 ---
 <!-- PKB-metadata
-last_updated: 2026-04-07
-commit: 4c09050
+last_updated: 2026-04-12
+commit: f9ba186
 updated_by: human+ai
 -->

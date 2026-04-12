@@ -1,0 +1,33 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-12 20:24+0800\n"
+"PO-Revision-Date: 2026-04-12 21:10+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../adr/index.md:1 6b650dcdc0784df69995630e1e39a829
+msgid "Architecture Decision Records"
+msgstr "架构决策记录"
+
+#: ../../adr/index.md:5 ea12f43edaf24813a8826cf6941a7f85
+msgid ""
+"Use ADRs to capture the reasoning behind meaningful architectural "
+"choices, especially when the trade-offs are not obvious from the code "
+"alone."
+msgstr ""
+"使用 ADR 来记录重要架构选择背后的原因，尤其是在仅从代码本身无法直接看出权衡取舍时。"
+

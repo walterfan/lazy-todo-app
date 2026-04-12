@@ -127,6 +127,10 @@ pub fn run() {
             commands::pomodoro::get_weekly_pomodoro_stats,
             commands::pomodoro::update_tray_tooltip,
             commands::app::get_db_path,
+            commands::app::get_app_settings,
+            commands::app::save_app_settings,
+            commands::app::quit_app,
+            commands::app::open_note_window,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

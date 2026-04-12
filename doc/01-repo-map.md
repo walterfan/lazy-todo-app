@@ -4,75 +4,93 @@
 
 ## Directory Structure
 
-```
+```text
 lazy-todo-app/
-├── CLAUDE.md                        # AI Agent architectural rules (Harness Engineering)
-├── README.md                        # Project documentation
-├── package.json                     # Node.js dependencies & scripts
-├── tsconfig.json                    # TypeScript configuration
+├── .github/
+│   └── workflows/
+│       └── release.yml              # GitHub Actions release pipeline for Tauri bundles
+├── CLAUDE.md                        # AI agent architectural rules
+├── README.md                        # End-user and project overview
+├── package.json                     # Node.js dependencies and frontend scripts
+├── tsconfig.json                    # TypeScript compiler configuration
 ├── vite.config.ts                   # Vite bundler configuration
 ├── index.html                       # Vite entry HTML
 │
-├── src/                             # ── React Frontend ──
-│   ├── main.tsx                     # React DOM entry point
-│   ├── App.tsx                      # Root component — tab navigation, tray events
-│   ├── App.css                      # Global styles (dark theme, all features)
-│   ├── types/                       # TypeScript type definitions
-│   │   ├── todo.ts                  # Todo, CreateTodo, UpdateTodo
-│   │   ├── note.ts                  # StickyNote, CreateNote, UpdateNote, NoteColor
-│   │   └── pomodoro.ts              # PomodoroSettings, DayStat, TimerPhase, TimerState
-│   ├── hooks/                       # React hooks (Tauri IPC + logic)
-│   │   ├── useTodos.ts              # CRUD operations for todos
-│   │   ├── useCountdown.ts          # Real-time deadline countdown
-│   │   ├── useNotes.ts              # CRUD operations for sticky notes
-│   │   ├── usePomodoro.ts           # Timer logic, phase transitions, alerts
-│   │   └── usePomodoroStats.ts      # Daily/weekly Pomodoro statistics
-│   └── components/                  # React UI components
-│       ├── AddTodo.tsx              # New todo form (priority + deadline picker)
-│       ├── TodoItem.tsx             # Single todo row (countdown, inline edit)
-│       ├── TodoList.tsx             # Todo list with pending/completed grouping
-│       ├── NoteEditor.tsx           # New note form (title, content, color)
-│       ├── NoteCard.tsx             # Individual sticky note (expand, edit, delete)
-│       ├── NoteList.tsx             # Grid layout of NoteCards
-│       ├── MarkdownPreview.tsx      # Markdown renderer (react-markdown)
-│       ├── PomodoroPanel.tsx        # Pomodoro tab layout container
-│       ├── PomodoroRing.tsx         # SVG circular progress indicator
-│       ├── PomodoroControls.tsx     # Start / Pause / Reset buttons
-│       ├── PomodoroSettings.tsx     # Duration & cycle configuration form
-│       ├── PomodoroStats.tsx        # Today count + 7-day bar chart (SVG)
-│       └── PomodoroAlert.tsx        # Modal dialog with Web Audio chime
+├── src/                             # React frontend
+│   ├── main.tsx                     # Chooses App or NoteWindow based on URL query
+│   ├── App.tsx                      # Main shell: navigation, search, tabs, settings
+│   ├── App.css                      # Shared dark theme styles
+│   ├── types/
+│   │   ├── todo.ts
+│   │   ├── note.ts
+│   │   ├── pomodoro.ts
+│   │   └── settings.ts             # AppSettings and display-mode types
+│   ├── hooks/
+│   │   ├── useTodos.ts
+│   │   ├── useCountdown.ts
+│   │   ├── useNotes.ts
+│   │   ├── usePomodoro.ts
+│   │   ├── usePomodoroStats.ts
+│   │   └── useSettings.ts          # Loads and persists app settings
+│   └── components/
+│       ├── AddTodo.tsx
+│       ├── TodoItem.tsx
+│       ├── TodoList.tsx
+│       ├── NoteEditor.tsx
+│       ├── NoteCard.tsx
+│       ├── NoteList.tsx
+│       ├── NoteWindow.tsx          # Dedicated window for a single sticky note
+│       ├── MarkdownPreview.tsx
+│       ├── PomodoroPanel.tsx
+│       ├── PomodoroRing.tsx
+│       ├── PomodoroControls.tsx
+│       ├── PomodoroSettings.tsx
+│       ├── PomodoroMilestones.tsx  # Milestone cards and status actions
+│       ├── PomodoroStats.tsx
+│       ├── PomodoroAlert.tsx
+│       └── SettingsPanel.tsx       # Display, notes, and storage preferences
 │
-├── src-tauri/                       # ── Rust Backend ──
-│   ├── Cargo.toml                   # Rust dependencies
-│   ├── tauri.conf.json              # Tauri app config (window, bundle, build)
+├── src-tauri/                       # Rust backend
+│   ├── Cargo.toml
+│   ├── tauri.conf.json
 │   ├── capabilities/
-│   │   └── default.json             # Tauri permissions (tray, menu, event, notification)
-│   ├── icons/                       # App icons (32, 128, 256, 512, ICO)
+│   │   └── default.json
+│   ├── icons/
+│   ├── gen/
+│   │   └── schemas/                # Generated Tauri capability schemas
 │   └── src/
-│       ├── main.rs                  # Rust binary entry (calls lib::run)
-│       ├── lib.rs                   # Tauri builder setup, tray, command registration
-│       ├── db.rs                    # SQLite database (schema creation + all queries)
+│       ├── main.rs                 # Rust binary entry
+│       ├── lib.rs                  # App builder, tray wiring, command registration
+│       ├── db.rs                   # SQLite schema creation and all persistence queries
 │       ├── models/
-│       │   ├── mod.rs               # Module declarations
-│       │   ├── todo.rs              # Todo, CreateTodo, UpdateTodo structs
-│       │   ├── note.rs              # StickyNote, CreateNote, UpdateNote structs
-│       │   └── pomodoro.rs          # PomodoroSettings, DayStat structs
+│       │   ├── mod.rs
+│       │   ├── todo.rs
+│       │   ├── note.rs
+│       │   ├── pomodoro.rs         # Pomodoro settings, milestones, stats
+│       │   └── settings.rs         # AppSettings persistence model
 │       └── commands/
-│           ├── mod.rs               # Module declarations
-│           ├── todo.rs              # 5 Tauri commands for todo CRUD
-│           ├── note.rs              # 4 Tauri commands for note CRUD
-│           ├── pomodoro.rs          # 5 Tauri commands for pomodoro
-│           └── app.rs               # 1 Tauri command (get_db_path)
+│           ├── mod.rs
+│           ├── todo.rs
+│           ├── note.rs
+│           ├── pomodoro.rs
+│           └── app.rs              # DB path, settings, quit, note window commands
 │
-├── openspec/                        # OpenSpec change proposals & specs
-│   ├── changes/
-│   │   ├── desktop-sticky-notes/    # Sticky notes feature proposal + specs
-│   │   └── pomodoro-timer/          # Pomodoro feature proposal + specs
-│   └── specs/
+├── doc/                             # Project Knowledge Base and Sphinx source
+│   ├── index.md
+│   ├── 00-overview.md ... 07-testing.md
+│   ├── ai-guide.md
+│   ├── conf.py
+│   ├── Makefile
+│   ├── pyproject.toml
+│   ├── requirements.txt
+│   ├── _static/
+│   ├── _templates/
+│   ├── locale/
+│   ├── adr/
+│   └── changes/
 │
-├── man/                             # Project Knowledge Base (this directory)
-│
-└── dist/                            # Vite build output (gitignored)
+├── openspec/                        # OpenSpec proposals and design artifacts
+└── dist/                            # Frontend build output
 ```
 
 ## Entry Points
@@ -80,34 +98,36 @@ lazy-todo-app/
 | Context | File | Purpose |
 |---------|------|---------|
 | Rust binary | `src-tauri/src/main.rs` | Calls `lazy_todo_app_lib::run()` |
-| Tauri setup | `src-tauri/src/lib.rs` | Builder config, tray, DB init, command registration |
-| React app | `src/main.tsx` | `ReactDOM.createRoot` renders `<App />` |
-| Root component | `src/App.tsx` | Tab navigation, event listeners |
+| Tauri setup | `src-tauri/src/lib.rs` | Resolves DB directory, initializes tray, registers commands |
+| React bootstrap | `src/main.tsx` | Routes between the main app and pop-out note windows |
+| Main shell | `src/App.tsx` | Tabs, search, settings panel, tray event handling |
+| Standalone note view | `src/components/NoteWindow.tsx` | Focused single-note window UI |
 | Vite entry | `index.html` | Loads `/src/main.tsx` |
 
 ## Key Configuration Files
 
 | File | Purpose |
 |------|---------|
-| `CLAUDE.md` | AI agent architectural constraints |
-| `package.json` | npm scripts: `dev`, `build`, `preview`, `tauri` |
-| `src-tauri/Cargo.toml` | Rust crate definition + dependencies |
-| `src-tauri/tauri.conf.json` | Window dimensions, bundle settings, build commands |
-| `src-tauri/capabilities/default.json` | Tauri capability permissions |
-| `tsconfig.json` | TypeScript compiler options |
-| `vite.config.ts` | Vite plugins and dev server config |
+| `CLAUDE.md` | AI agent contribution constraints |
+| `package.json` | npm scripts and frontend packages |
+| `src-tauri/Cargo.toml` | Rust crate dependencies |
+| `src-tauri/tauri.conf.json` | App identifier, bundle targets, build commands |
+| `src-tauri/capabilities/default.json` | Tauri permissions |
+| `.github/workflows/release.yml` | GitHub Release build automation |
+| `doc/conf.py` | Sphinx, MyST, and i18n configuration |
+| `doc/Makefile` | gettext and bilingual HTML build targets |
 
 ## Naming Conventions
 
-- **Rust files**: `snake_case.rs` (modules, models, commands)
-- **React components**: `PascalCase.tsx` (one component per file)
-- **React hooks**: `useCamelCase.ts` (prefixed with `use`)
-- **Type files**: `camelCase.ts` (match domain entity names)
-- **CSS**: single `App.css` file with BEM-like class naming (`.pomo-ring`, `.note-card`, `.tab-btn`)
+- **Rust files**: `snake_case.rs`
+- **React components**: `PascalCase.tsx`
+- **React hooks**: `useCamelCase.ts`
+- **Type files**: domain-oriented `.ts` files under `src/types/`
+- **Documentation**: numbered PKB files under `doc/` with metadata footers
 
 ---
 <!-- PKB-metadata
-last_updated: 2026-04-07
-commit: 4c09050
+last_updated: 2026-04-12
+commit: f9ba186
 updated_by: human+ai
 -->

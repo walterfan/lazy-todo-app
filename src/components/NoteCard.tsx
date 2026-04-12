@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import type { StickyNote, UpdateNote, NoteColor } from "../types/note";
 import { MarkdownPreview } from "./MarkdownPreview";
 
@@ -89,6 +90,13 @@ export function NoteCard({ note, onUpdate, onDelete }: NoteCardProps) {
       <div className="note-card-header">
         {note.title && <h3 className="note-card-title">{note.title}</h3>}
         <div className="note-card-actions" onClick={(e) => e.stopPropagation()}>
+          <button
+            className="btn-popout"
+            onClick={() => invoke("open_note_window", { noteId: note.id, title: note.title || "Sticky Note" })}
+            title="Open in window"
+          >
+            ↗️
+          </button>
           <button className="btn-edit" onClick={() => setEditing(true)} title="Edit">✏️</button>
           <button className="btn-delete" onClick={handleDelete} title="Delete">🗑️</button>
         </div>

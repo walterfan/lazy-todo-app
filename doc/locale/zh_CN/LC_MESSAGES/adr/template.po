@@ -1,0 +1,71 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-12 20:24+0800\n"
+"PO-Revision-Date: 2026-04-12 21:10+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../adr/template.md:1 f7978b0286ab49ccbf7f3f3239cadb72
+msgid "ADR Template"
+msgstr "ADR 模板"
+
+#: ../../adr/template.md:5 3cc57716167d463e835ab6ab907dd8b6
+msgid "Context"
+msgstr "背景"
+
+#: ../../adr/template.md:7 c9b863cc184a4f599c851e3e9501516a
+msgid ""
+"Describe the forces, constraints, and pain points that made this decision"
+" necessary."
+msgstr "描述促成该决策的驱动因素、约束条件以及痛点。"
+
+#: ../../adr/template.md:11 bdb2cc3130e24d4bab097fb6c19c1ccc
+msgid "Decision"
+msgstr "决策"
+
+#: ../../adr/template.md:13 8f9df5d2378c4b3abc6ce84c0924b454
+msgid "State the chosen approach clearly."
+msgstr "清晰说明最终选择的方案。"
+
+#: ../../adr/template.md:15 fdf2a90e89ae4d3c94cf854978d03fb0
+msgid "Alternatives Considered"
+msgstr "考虑过的备选方案"
+
+#: ../../adr/template.md:17 b97a1801d9944d629d645fc14025b2a3
+msgid "Alternative 1:"
+msgstr "备选方案 1："
+
+#: ../../adr/template.md:18 3477d96faa3947f4972f4298dd0f70d5
+msgid "Alternative 2:"
+msgstr "备选方案 2："
+
+#: ../../adr/template.md:20 08dc31cd51f148c286579728eac905d4
+msgid "Consequences"
+msgstr "影响"
+
+#: ../../adr/template.md:22 225f9d92dbe94a93854e500620c7d540
+msgid "Positive:"
+msgstr "正面影响："
+
+#: ../../adr/template.md:23 8e19d5a050c344f7a644ba95549bf4ec
+msgid "Negative:"
+msgstr "负面影响："
+
+#: ../../adr/template.md:24 5f23283bb35a4b4e8a07da58c58d7922
+msgid "Follow-up work:"
+msgstr "后续工作："
+

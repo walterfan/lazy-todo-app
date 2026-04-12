@@ -6,9 +6,10 @@ const COLORS: NoteColor[] = ["yellow", "green", "blue", "pink", "purple", "orang
 interface NoteEditorProps {
   onAdd: (input: CreateNote) => Promise<void>;
   autoFocus?: boolean;
+  template?: string;
 }
 
-export function NoteEditor({ onAdd, autoFocus }: NoteEditorProps) {
+export function NoteEditor({ onAdd, autoFocus, template = "" }: NoteEditorProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [color, setColor] = useState<NoteColor>("yellow");
@@ -22,6 +23,13 @@ export function NoteEditor({ onAdd, autoFocus }: NoteEditorProps) {
     }
   }, [autoFocus]);
 
+  const handleExpand = () => {
+    setExpanded(true);
+    if (template && !content) {
+      setContent(template);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!content.trim() && !title.trim()) return;
     await onAdd({ title: title || undefined, content: content || undefined, color });
@@ -33,7 +41,7 @@ export function NoteEditor({ onAdd, autoFocus }: NoteEditorProps) {
 
   if (!expanded) {
     return (
-      <div className="note-editor-collapsed" onClick={() => setExpanded(true)}>
+      <div className="note-editor-collapsed" onClick={handleExpand}>
         <span className="note-editor-placeholder">+ New sticky note...</span>
       </div>
     );

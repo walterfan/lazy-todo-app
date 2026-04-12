@@ -1,0 +1,43 @@
+{% extends "!layout.html" %}
+
+{% block footer %}
+  <div class="pkb-language-switcher" data-current-language="{{ language or 'en' }}">
+    <span class="pkb-language-switcher-label">Language:</span>
+    {% for item in available_languages | default([], true) %}
+      <a
+        class="pkb-language-link"
+        data-target-language="{{ item.code }}"
+        href="#"
+      >
+        {{ item.label }}
+      </a>
+    {% endfor %}
+  </div>
+  <script>
+    (function () {
+      const current = document.querySelector(".pkb-language-switcher")?.dataset.currentLanguage || "en";
+      const pathname = window.location.pathname;
+      document.querySelectorAll(".pkb-language-link").forEach((link) => {
+        const target = link.dataset.targetLanguage;
+        if (!target) {
+          return;
+        }
+        if (target === current) {
+          link.setAttribute("aria-current", "page");
+        }
+
+        let nextPath = pathname;
+        if (pathname.includes("/en/html/")) {
+          nextPath = pathname.replace("/en/html/", `/${target}/html/`);
+        } else if (pathname.includes("/zh_CN/html/")) {
+          nextPath = pathname.replace("/zh_CN/html/", `/${target}/html/`);
+        } else {
+          nextPath = `/${target}/html/index.html`;
+        }
+
+        link.setAttribute("href", `${nextPath}${window.location.hash}`);
+      });
+    })();
+  </script>
+  {{ super() }}
+{% endblock %}
