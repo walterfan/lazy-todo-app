@@ -1,0 +1,368 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../appendix-01-faq.md:1 0e4e5ca0489a49e89e67f909a274fb18
+msgid "Appendix A — Frequently Asked Questions (FAQ)"
+msgstr ""
+
+#: ../../appendix-01-faq.md:5 647c9f4d75634fcfb7f8607d7ab9bab6
+msgid "General"
+msgstr ""
+
+#: ../../appendix-01-faq.md:7 4183cd5d4ed74875b00679e8519d7e0d
+msgid "Q: What is Lazy Todo App?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:9 0e14e7d3c112412292446e59f30e42d9
+msgid ""
+"A desktop to-do / task management application built with **Tauri 2 + "
+"React + TypeScript**. It runs natively on macOS, Windows, and Linux with "
+"a small footprint and offline-first SQLite storage."
+msgstr ""
+
+#: ../../appendix-01-faq.md:11 a8e9124b6b5c4961a2531ad7a05b58a6
+msgid "Q: Why \"Lazy\"?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:13 8e29ba26f6fb48b595f468436cf98f53
+msgid ""
+"The app is designed to reduce friction — quick capture, minimal clicks, "
+"smart defaults. The goal is to let you manage tasks *lazily* "
+"(effortlessly), not to encourage laziness."
+msgstr ""
+
+#: ../../appendix-01-faq.md:15 5f1ef0527a734efca9ceb56c03b2e6ac
+msgid "Q: Is it free / open-source?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:17 6e27cd1d11b246b98503c90014853555
+msgid ""
+"Yes. The project is hosted on GitHub under an open-source license. See "
+"the repository root for the exact license file."
+msgstr ""
+
+#: ../../appendix-01-faq.md:21 e3168826295c42a89948aff1a3d96a07
+msgid "Installation & Setup"
+msgstr ""
+
+#: ../../appendix-01-faq.md:23 4cd77b4463ba46398b866608a27882a4
+msgid "Q: What are the minimum system requirements?"
+msgstr ""
+
+#: ../../appendix-01-faq.md 61326c6423d643faba418e881e787d1a
+#: 8a6ffcbcfa564d10b62b17acdb8d3d95
+msgid "Platform"
+msgstr ""
+
+#: ../../appendix-01-faq.md 1e9509f51d2749c4abaf1f2ff883eef3
+msgid "Requirement"
+msgstr ""
+
+#: ../../appendix-01-faq.md 3c0c62d25fd8440a884d3c4e3652159a
+#: 53a79090c84d4046878389f91ec02dee
+msgid "macOS"
+msgstr ""
+
+#: ../../appendix-01-faq.md 3f174a30c4de4466bf29e85dc3d33dba
+msgid "10.15 (Catalina) or later, Apple Silicon or Intel"
+msgstr ""
+
+#: ../../appendix-01-faq.md 3e63a2ba996242fb96a80630cf33f4d3
+#: b3a83268db74409d9532d86b897edc60
+msgid "Windows"
+msgstr ""
+
+#: ../../appendix-01-faq.md 58cd36b202264b8eb81c84784547dfa7
+msgid "Windows 10 (1803+) or later"
+msgstr ""
+
+#: ../../appendix-01-faq.md 59cafeb9cc7c4657abb7f5a17f1d0672
+#: 5b1744fde75f44cd8b9c41c0ed9c382a
+msgid "Linux"
+msgstr ""
+
+#: ../../appendix-01-faq.md 5b1edd392ec8461ab139184e7b683743
+msgid "Ubuntu 20.04+ / Fedora 36+ or equivalent with WebKitGTK 4.1"
+msgstr ""
+
+#: ../../appendix-01-faq.md:31 a9cd05dfa4c54cb0b1f4b7e35cba8f7d
+msgid "Q: How do I install the app?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:33 d7e944a2ed8745bbb11403161c9abd9a
+msgid "Download the latest release from the GitHub Releases page:"
+msgstr ""
+
+#: ../../appendix-01-faq.md:35 fb9ad441e4304f01a03c6c73ef49ed82
+msgid "**macOS**: `.dmg` file — open and drag to Applications"
+msgstr ""
+
+#: ../../appendix-01-faq.md:36 313b114118b7410aa2928a7a773d7d20
+msgid "**Windows**: `.msi` or `.exe` (NSIS) installer"
+msgstr ""
+
+#: ../../appendix-01-faq.md:37 650554bc0cef43e1804ab36758cba29b
+msgid "**Linux**: `.deb` or `.AppImage`"
+msgstr ""
+
+#: ../../appendix-01-faq.md:39 ba80627aaa094d1b80e01ab9e06f2264
+msgid "Q: How do I set up the development environment?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:41 f990ffdaacdb4dad952d50b3c0cfe773
+msgid "See [01-quick-start.md](01-quick-start.md) for a step-by-step guide."
+msgstr ""
+
+#: ../../appendix-01-faq.md:43 986ba19782314af7938915f9f9a48a0e
+msgid "Q: `npm run tauri dev` fails with missing system dependencies on Linux"
+msgstr ""
+
+#: ../../appendix-01-faq.md:45 f5b3746def3b495c8d28ab0c18393f28
+msgid "Install the required WebKitGTK and other system libraries:"
+msgstr ""
+
+#: ../../appendix-01-faq.md:52 44a8533e38a04831ae841b5b41bd678b
+msgid ""
+"See the [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) "
+"for the full list."
+msgstr ""
+
+#: ../../appendix-01-faq.md:54 a3e6cc42e7894317b1f30375512b8ee2
+msgid "Q: Rust compilation is very slow on the first build"
+msgstr ""
+
+#: ../../appendix-01-faq.md:56 db3fa69990e24f478c4d4957b71492e9
+msgid ""
+"This is expected. The first `cargo build` downloads and compiles all "
+"crate dependencies. Subsequent builds use the cache and are much faster. "
+"You can also use `sccache` to speed up repeated clean builds."
+msgstr ""
+
+#: ../../appendix-01-faq.md:60 f7405391695446ffbbdb741a1884e982
+msgid "Development"
+msgstr ""
+
+#: ../../appendix-01-faq.md:62 c22ae08d40a74234bf6fb0b048e170c9
+msgid "Q: Which package manager should I use?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:64 79b8b7f655c34ddab2248215f761718f
+msgid ""
+"**pnpm** is the project standard. The lock file (`pnpm-lock.yaml`) is "
+"committed to the repo. Do not mix with `npm` or `yarn` to avoid lock file"
+" conflicts."
+msgstr ""
+
+#: ../../appendix-01-faq.md:66 afbe015a48b04b22a0f0af6a0969096f
+msgid "Q: How do I add a new frontend dependency?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:72 db7398156a1943dfa770b544cbbc2f40
+msgid "For dev-only dependencies:"
+msgstr ""
+
+#: ../../appendix-01-faq.md:78 df0cce855332444aa79b8d24a7293661
+msgid "Q: How do I add a Rust (backend) dependency?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:80 7cc75b2f6af2440ca7530c2832691a64
+msgid "Edit `src-tauri/Cargo.toml` or use:"
+msgstr ""
+
+#: ../../appendix-01-faq.md:87 a3cca32f9c5e49028013c7163c39a8f2
+msgid "Q: How do I create a new Tauri command?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:89 2fcd0a62b9044438827751c12ccd5e65
+msgid ""
+"Define the Rust function in `src-tauri/src/` with the `#[tauri::command]`"
+" attribute"
+msgstr ""
+
+#: ../../appendix-01-faq.md:90 e25c23f9f9d34cf9b7585e0582d1d6d9
+msgid "Register it in the Tauri builder (usually in `main.rs` or `lib.rs`)"
+msgstr ""
+
+#: ../../appendix-01-faq.md:91 f1834e439177409f98b43e682ed769b2
+#, python-brace-format
+msgid ""
+"Call it from the frontend via `import { invoke } from '@tauri-"
+"apps/api/core'`"
+msgstr ""
+
+#: ../../appendix-01-faq.md:93 ff90c67e416644fe957b17223efdb092
+msgid "Q: Hot-reload is not working"
+msgstr ""
+
+#: ../../appendix-01-faq.md:95 05c1b225d6c542ec95da926ced38bf5a
+msgid ""
+"Make sure you are running `pnpm tauri dev` (not `pnpm dev` alone — that "
+"only starts Vite without the Tauri shell)"
+msgstr ""
+
+#: ../../appendix-01-faq.md:96 da9c7435485847f2bb4890ff1265d9e9
+msgid "Frontend (React) changes hot-reload automatically via Vite HMR"
+msgstr ""
+
+#: ../../appendix-01-faq.md:97 c1b83093bec84368861025e755a33c90
+msgid ""
+"Rust changes require a recompile; Tauri CLI handles this but it takes a "
+"few seconds"
+msgstr ""
+
+#: ../../appendix-01-faq.md:101 6a24f36ad02946e5bfb87e3317572438
+msgid "Data & Storage"
+msgstr ""
+
+#: ../../appendix-01-faq.md:103 219f41afacdd441db23df92a27d186b3
+msgid "Q: Where is my data stored?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:105 d60754fde49845b8be41786309f99bc7
+msgid ""
+"The app uses SQLite. The database file is stored in the platform-specific"
+" app data directory:"
+msgstr ""
+
+#: ../../appendix-01-faq.md 567d02fcc6874b078c65ddc228bd29e8
+msgid "Path"
+msgstr ""
+
+#: ../../appendix-01-faq.md 53b1d3d36a934c5283f5d67077c348a9
+msgid "`~/Library/Application Support/com.lazy-todo-app/`"
+msgstr ""
+
+#: ../../appendix-01-faq.md 2e58d0a47fee4eb38ff50e129f55eb40
+msgid "`%APPDATA%\\com.lazy-todo-app\\`"
+msgstr ""
+
+#: ../../appendix-01-faq.md f27161825df44ca7b0231bb2c0f68ecf
+msgid "`~/.local/share/com.lazy-todo-app/`"
+msgstr ""
+
+#: ../../appendix-01-faq.md:113 c67e44485ec245fc9dc08071d483a591
+msgid "Q: Can I back up my data?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:115 d387e891230a4bbc93f5556f37d7cfce
+msgid ""
+"Yes. Simply copy the SQLite database file from the path above. You can "
+"also export tasks via the app's export feature (if available)."
+msgstr ""
+
+#: ../../appendix-01-faq.md:117 4a0c82097fca4879888b1f55cd991456
+msgid "Q: Is my data synced to the cloud?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:119 0c8f123e55634012a21e788a71a43ee3
+msgid ""
+"No. All data is stored locally. This is by design for privacy and "
+"offline-first usage."
+msgstr ""
+
+#: ../../appendix-01-faq.md:123 2661d362835d496c9a0a32643360cf8e
+msgid "Build & Release"
+msgstr ""
+
+#: ../../appendix-01-faq.md:125 d8ca699f898848a88c0e9b9907baea5a
+msgid "Q: How do I create a release?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:127 f2a8a80e8cab4212be24c8993c51ce25
+msgid ""
+"See the **Release Process** section in [08-build.md](08-build.md). In "
+"short:"
+msgstr ""
+
+#: ../../appendix-01-faq.md:133 4ba8f2334847486294ba1e4ec4211db3
+msgid "Q: The CI build failed — do I need a new tag?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:135 8897ad461a1b4d0f953cf30ee24c106d
+msgid ""
+"Not necessarily. If the code is correct and it was a transient CI "
+"failure, you can re-run the failed jobs from the GitHub Actions UI. See "
+"[08-build.md](08-build.md) for details."
+msgstr ""
+
+#: ../../appendix-01-faq.md:137 582501d0f8434e60b78d736e5fc4b141
+msgid "Q: How do I build for a different platform?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:139 a9388064f9dc4268ab0fe725d6af1be3
+msgid ""
+"Cross-compilation for Tauri desktop apps is not straightforward. The "
+"recommended approach is to build on the target platform (or use CI with a"
+" build matrix). The GitHub Actions release workflow already covers macOS "
+"(ARM + Intel), Linux, and Windows."
+msgstr ""
+
+#: ../../appendix-01-faq.md:143 cb3a50de225b4b539908b6de6fc0f7ec
+msgid "Troubleshooting"
+msgstr ""
+
+#: ../../appendix-01-faq.md:145 5f608a0361164cdc8dec84fb6893472b
+msgid "Q: The app window is blank after launch"
+msgstr ""
+
+#: ../../appendix-01-faq.md:147 b9d75f1857584e69b9dbd1a4cb0c23fa
+msgid "Check the WebView console (right-click → Inspect in dev mode)"
+msgstr ""
+
+#: ../../appendix-01-faq.md:148 7a8ad6b9f4224b8b87177139816a084c
+msgid "Ensure the frontend was built: `pnpm build`"
+msgstr ""
+
+#: ../../appendix-01-faq.md:149 0534c5bf2ff44087b98b49ee0c1dccff
+msgid "On Linux, verify WebKitGTK is installed"
+msgstr ""
+
+#: ../../appendix-01-faq.md:151 97a15beb4b9f4c0a93977d5a4b572cf1
+msgid "Q: Database migration errors on app update"
+msgstr ""
+
+#: ../../appendix-01-faq.md:153 2d3096218d9c4d118000cf5578103626
+msgid "The app runs migrations automatically on startup. If a migration fails:"
+msgstr ""
+
+#: ../../appendix-01-faq.md:155 89d8bd1c838b4506b9b0a84d3c69541f
+msgid "Check the app logs (see [11-observability.md](11-observability.md))"
+msgstr ""
+
+#: ../../appendix-01-faq.md:156 1c60e3dbc944498dabdd0ad207357cbf
+msgid "Back up your database file"
+msgstr ""
+
+#: ../../appendix-01-faq.md:157 815acb8da68e4d069ce3ae4ec872eae6
+msgid "Report the issue on GitHub with the error message"
+msgstr ""
+
+#: ../../appendix-01-faq.md:159 8fd66563806c48059295eb4de93f82de
+msgid "Q: How do I reset the app to a clean state?"
+msgstr ""
+
+#: ../../appendix-01-faq.md:161 2ae1066c8beb4658bbe9428ccdb065e0
+msgid ""
+"Delete the app data directory (see \"Where is my data stored?\" above). "
+"**Warning**: this removes all your tasks."
+msgstr ""
+

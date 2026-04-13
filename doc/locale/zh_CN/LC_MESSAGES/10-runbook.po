@@ -1,0 +1,375 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../10-runbook.md:1 b8eaad26fbfe4ef18316fab660987473
+msgid "Lazy Todo App — Runbook"
+msgstr ""
+
+#: ../../10-runbook.md:5 fb9e9c7f81474cf488e7c84f7935f78a
+msgid "Prerequisites"
+msgstr ""
+
+#: ../../10-runbook.md 75eb6afd676444d6930acf79dbb4ea03
+msgid "Tool"
+msgstr ""
+
+#: ../../10-runbook.md e3bb49c152ba4076804f019d9f5dab44
+msgid "Minimum Version"
+msgstr ""
+
+#: ../../10-runbook.md 14316ea70cfc4c5286a780afa141ae3e
+msgid "Check Command"
+msgstr ""
+
+#: ../../10-runbook.md 0b8e0faa7c1f4c2cbe95c917447b7654
+msgid "Rust"
+msgstr ""
+
+#: ../../10-runbook.md 17ab1ac2bb4e4b43af3999e0cc62f2dd
+msgid "1.70+"
+msgstr ""
+
+#: ../../10-runbook.md bb1a1610e2524efa89169fdf0c0f654c
+msgid "`rustc --version`"
+msgstr ""
+
+#: ../../10-runbook.md 08a019589e1d49039e3c88e272dc8c25
+msgid "Node.js"
+msgstr ""
+
+#: ../../10-runbook.md 09981e679b92484e95a3c0684f0e9e60
+msgid "18+"
+msgstr ""
+
+#: ../../10-runbook.md 9f99914ff2b74e7fa3ec5a3453fc0cf5
+msgid "`node --version`"
+msgstr ""
+
+#: ../../10-runbook.md 708ca8bd993e4bea87abdd87d8b5b711
+msgid "npm"
+msgstr ""
+
+#: ../../10-runbook.md f976c15b5ad249c4900f69aedea17eb3
+msgid "9+"
+msgstr ""
+
+#: ../../10-runbook.md 049f67e0655149e39f2fed569f4b8ff3
+msgid "`npm --version`"
+msgstr ""
+
+#: ../../10-runbook.md c89a482ac2d2430491a84aae15848d34
+msgid "Python"
+msgstr ""
+
+#: ../../10-runbook.md 970b67e8f60844b2835fcb8ed255f3fb
+msgid "3.12+"
+msgstr ""
+
+#: ../../10-runbook.md 01e9f79547904a8ebd645f348a630c4a
+msgid "`python3 --version`"
+msgstr ""
+
+#: ../../10-runbook.md c0faa961eb214639827e13e5b63137f4
+msgid "Poetry"
+msgstr ""
+
+#: ../../10-runbook.md 823781c8b1df46bea3c6be56cd0274b5
+#: ec221c2787a14222ba2ce176eefe7ca6
+msgid "2.x"
+msgstr ""
+
+#: ../../10-runbook.md 3ca8db18c53b4ef790c2d21a5c47c824
+msgid "`poetry --version`"
+msgstr ""
+
+#: ../../10-runbook.md a4a44172caf24f1dbab8224072255361
+msgid "Tauri CLI"
+msgstr ""
+
+#: ../../10-runbook.md 5dbabc83b9cd4dbe9dea3e467f5fa49c
+msgid "`npx tauri --version`"
+msgstr ""
+
+#: ../../10-runbook.md:16 5bf79c852a704e88a9e5be7fccbe1f93
+msgid "Platform-Specific Dependencies"
+msgstr ""
+
+#: ../../10-runbook.md:18 8af28332a2ac415f9534b33db5c80555
+msgid "**macOS**"
+msgstr ""
+
+#: ../../10-runbook.md:24 3f29a1ba8cab4262b4a53ccab31c846d
+msgid "**Linux**"
+msgstr ""
+
+#: ../../10-runbook.md:31 d5d7527ebb5544e0bd4f155b0d2d4018
+msgid "**Windows**"
+msgstr ""
+
+#: ../../10-runbook.md:33 9a72e2ba84b74a378f0d3377909310f9
+msgid "Microsoft C++ Build Tools"
+msgstr ""
+
+#: ../../10-runbook.md:34 a4960442fe5c4d42a8a1d2b3d57d4de2
+msgid "WebView2 runtime"
+msgstr ""
+
+#: ../../10-runbook.md:36 2fcf038b54e44628bc8d8cdc99427a90
+msgid "Setup"
+msgstr ""
+
+#: ../../10-runbook.md:44 4da10662be184c23b25f9cf43c10fabd
+msgid "Optional developer checks:"
+msgstr ""
+
+#: ../../10-runbook.md:51 270fa993f5bd4d4786d15088eab415e3
+msgid "Run the App"
+msgstr ""
+
+#: ../../10-runbook.md:57 314c9415b6c24818bd57bc3cb211875e
+msgid "Use a custom DB directory:"
+msgstr ""
+
+#: ../../10-runbook.md:63 ccf983e5ec094992ae597b3ea5906592
+msgid ""
+"You can also persist a preferred DB directory in `~/.config/lazy-todo-"
+"app/config.json`:"
+msgstr ""
+
+#: ../../10-runbook.md:71 681fd25f5c5746f683063d8d78f64f93
+msgid "Build Production Bundles"
+msgstr ""
+
+#: ../../10-runbook.md:77 aff3cf67f312454db86843f9d6806a36
+msgid "Bundle output:"
+msgstr ""
+
+#: ../../10-runbook.md:79 470b3762637f4c7bad86a3f87f56203a
+msgid "macOS: `src-tauri/target/release/bundle/dmg/`"
+msgstr ""
+
+#: ../../10-runbook.md:80 d683eb8a037a47b5bb43892ed99cf468
+msgid ""
+"Linux: `src-tauri/target/release/bundle/deb/` and `src-"
+"tauri/target/release/bundle/appimage/`"
+msgstr ""
+
+#: ../../10-runbook.md:81 814e2e104a1341aebb91f9cfc088cd15
+msgid ""
+"Windows: `src-tauri/target/release/bundle/msi/` and `src-"
+"tauri/target/release/bundle/nsis/`"
+msgstr ""
+
+#: ../../10-runbook.md:83 fcffc235687d4d3aa56a71346c2f9abe
+msgid ""
+"Public GitHub release binaries are published by "
+"`.github/workflows/release.yml` when a version tag is pushed."
+msgstr ""
+
+#: ../../10-runbook.md:85 6f3fffdd82974187b1d979d41086cb0a
+msgid "Build the Documentation Site"
+msgstr ""
+
+#: ../../10-runbook.md:95 7ac1a888eded424cb530ee77c84cd12b
+msgid "Generated outputs:"
+msgstr ""
+
+#: ../../10-runbook.md:97 dd74bbf123c84ec9973cbaa067996923
+msgid "English: `doc/_build/en/html/`"
+msgstr ""
+
+#: ../../10-runbook.md:98 c934a06ae2f74da4b68da71baafac76b
+msgid "Chinese: `doc/_build/zh_CN/html/`"
+msgstr ""
+
+#: ../../10-runbook.md:100 ac0360212f8047e4a95e43d23e0a0225
+msgid "For a local preview server:"
+msgstr ""
+
+#: ../../10-runbook.md:107 c783f9a489704a0a8dd34ff1f072c616
+msgid "Inspect and Manage the Database"
+msgstr ""
+
+#: ../../10-runbook.md 926918f8d0174547b79fcb329db6cfe5
+msgid "Platform"
+msgstr ""
+
+#: ../../10-runbook.md 607ee9af89bf40ec9644221fc8495c7e
+msgid "Default Path"
+msgstr ""
+
+#: ../../10-runbook.md ebde289286e6462d930b811d7841658f
+msgid "macOS"
+msgstr ""
+
+#: ../../10-runbook.md ce15dff71b3a46c8bc4985e1b9be000e
+msgid "`~/Library/Application Support/com.fanyamin.lazytodoapp/todos.db`"
+msgstr ""
+
+#: ../../10-runbook.md 703b3487e10e4186bc3d705e4393738b
+msgid "Linux"
+msgstr ""
+
+#: ../../10-runbook.md efb157f33cc74c85a1aeb8b276184f31
+msgid "`~/.local/share/com.fanyamin.lazytodoapp/todos.db`"
+msgstr ""
+
+#: ../../10-runbook.md a131924764dd4073b47edd4908a45355
+msgid "Windows"
+msgstr ""
+
+#: ../../10-runbook.md fca5955614cb4e7ea2e7208712abc082
+msgid "`%APPDATA%\\com.fanyamin.lazytodoapp\\todos.db`"
+msgstr ""
+
+#: ../../10-runbook.md:115 4c20ee1ec06b42d49461a045e195e634
+msgid "Inspect the DB:"
+msgstr ""
+
+#: ../../10-runbook.md:125 ed28ee7eed5f4664bcb7b8880394deec
+msgid "Back up the DB:"
+msgstr ""
+
+#: ../../10-runbook.md:131 1916f5f469034780a01203a16d5b9372
+msgid "Reset the DB:"
+msgstr ""
+
+#: ../../10-runbook.md:137 3019234914e54198a636b0b34f439854
+msgid "Verification Commands"
+msgstr ""
+
+#: ../../10-runbook.md:146 b9f79f1a11f04d71b2afeadc2219ae77
+msgid "Debugging Notes"
+msgstr ""
+
+#: ../../10-runbook.md:148 31fd31d9154e4ba3a02cd3b188f42293
+msgid "Frontend"
+msgstr ""
+
+#: ../../10-runbook.md:150 ec7ff149d1dc461f80de997369102066
+msgid "Use Tauri devtools to inspect React state and console logs."
+msgstr ""
+
+#: ../../10-runbook.md:151 b3da5015edef45e6b55b4fb9e75ae0ca
+msgid ""
+"Search/display issues usually involve `App.tsx`, `TodoList.tsx`, "
+"`NoteList.tsx`, or `SettingsPanel.tsx`."
+msgstr ""
+
+#: ../../10-runbook.md:152 97947087d52f4e0f8c65277010db7c14
+msgid ""
+"Pop-out note issues usually involve `src/main.tsx`, `NoteCard.tsx`, and "
+"`NoteWindow.tsx`."
+msgstr ""
+
+#: ../../10-runbook.md:154 71bfa184d51745348e12823414a87268
+msgid "Backend"
+msgstr ""
+
+#: ../../10-runbook.md:156 bb3c15023d5e4f8aa9f097845133954f
+msgid "Tray/startup behavior lives in `src-tauri/src/lib.rs`."
+msgstr ""
+
+#: ../../10-runbook.md:157 1ea669409d284be58f65e9c51344829f
+msgid "Persistence behavior lives in `src-tauri/src/db.rs`."
+msgstr ""
+
+#: ../../10-runbook.md:158 a72f6e24fcc9484380994f3440abc108
+msgid "Settings and note-window commands live in `src-tauri/src/commands/app.rs`."
+msgstr ""
+
+#: ../../10-runbook.md:160 8a1dda7b280b4f80b0caf13c373f9fa8
+msgid "Common Issues"
+msgstr ""
+
+#: ../../10-runbook.md 5d2279a6304d4803a38e0cfcf83ff1d0
+msgid "Symptom"
+msgstr ""
+
+#: ../../10-runbook.md 17c49357a4fc44abb79a20467cefa576
+msgid "Cause"
+msgstr ""
+
+#: ../../10-runbook.md f8a6a518aca14993918e4d5136e99bfe
+msgid "Fix"
+msgstr ""
+
+#: ../../10-runbook.md c4479f9f232840b4866988b24af79bbe
+msgid "Main window seems gone"
+msgstr ""
+
+#: ../../10-runbook.md 5e85ebce8fd94ddea0115ad5c72b68ef
+msgid "It was hidden to tray on close"
+msgstr ""
+
+#: ../../10-runbook.md 3af0b63b48694b569b60fb7d6df99cfe
+msgid "Use the tray icon or tray menu to show it"
+msgstr ""
+
+#: ../../10-runbook.md 00de3aade6624ad5b487dc8fe4fb624b
+msgid "Note window opens blank"
+msgstr ""
+
+#: ../../10-runbook.md 3691e8a208d647a9aa672e785b2b9c5c
+msgid "Missing `noteId` or deleted note"
+msgstr ""
+
+#: ../../10-runbook.md 040a7a5776c845ddac6eb6a5b37038f3
+msgid "Check the `open_note_window` payload and note existence"
+msgstr ""
+
+#: ../../10-runbook.md 594b842c4ed74693a8f69c223f31879d
+msgid "DB path is unexpected"
+msgstr ""
+
+#: ../../10-runbook.md 63db5934ba6740e387bc674b87459737
+msgid "Env or config override took precedence"
+msgstr ""
+
+#: ../../10-runbook.md a69f2418fdf54ec7bd212fc95d7c22a4
+msgid "Check `LAZY_TODO_DB_DIR` and `~/.config/lazy-todo-app/config.json`"
+msgstr ""
+
+#: ../../10-runbook.md 44a40c86008844f2abf516b38e7bc0aa
+msgid "Chinese docs do not change"
+msgstr ""
+
+#: ../../10-runbook.md 68ac0e7b528244e198c35cb3071e26a1
+msgid "Gettext catalogs were not refreshed"
+msgstr ""
+
+#: ../../10-runbook.md bfad7a0b0335484d96029108010a9357
+msgid "Run `poetry run make intl-update` before `poetry run make html`"
+msgstr ""
+
+#: ../../10-runbook.md e7bdefb77cfd40509d27d30ae1f54ee9
+msgid "Sphinx build fails on Mermaid"
+msgstr ""
+
+#: ../../10-runbook.md 85ee8367f191497798849e4d8b15f166
+msgid "Missing docs dependencies"
+msgstr ""
+
+#: ../../10-runbook.md 6fcb0cb7389a4f1cb5e52879ddc4bdeb
+msgid "Re-run `poetry install` in `doc/`"
+msgstr ""
+

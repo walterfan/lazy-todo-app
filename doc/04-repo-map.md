@@ -77,7 +77,7 @@ lazy-todo-app/
 │
 ├── doc/                             # Project Knowledge Base and Sphinx source
 │   ├── index.md
-│   ├── 00-overview.md ... 07-testing.md
+│   ├── 00-overview.md ... 12-document.md
 │   ├── ai-guide.md
 │   ├── conf.py
 │   ├── Makefile

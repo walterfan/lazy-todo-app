@@ -1,0 +1,163 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../06-workflows.md:1 bf940da02f7641d3b8ec267593ad9806
+msgid "Lazy Todo App — Workflows"
+msgstr ""
+
+#: ../../06-workflows.md:5 b84f7a95f45a4219b3d3dd81493fe8ea
+msgid "Workflow 1: Todo Lifecycle"
+msgstr ""
+
+#: ../../06-workflows.md:20 4a191bc1995c4b3c823baf83b4ef622b
+msgid "Code Path"
+msgstr ""
+
+#: ../../06-workflows.md:22 cfaa7b8693df4a189b9c86e615142709
+msgid "`AddTodo.tsx` submits to `useTodos.addTodo()`."
+msgstr ""
+
+#: ../../06-workflows.md:23 cf16a9734f884657a825d0aa32d3923d
+#, python-brace-format
+msgid "`useTodos` calls `invoke(\"add_todo\", { input })`."
+msgstr ""
+
+#: ../../06-workflows.md:24 cb5bcfaa7b84468e9f6bfc907c5292ad
+msgid "`commands/todo.rs` validates and forwards to `db.rs`."
+msgstr ""
+
+#: ../../06-workflows.md:25 18fffe78c83b4c948e200f50bea9ccb0
+msgid ""
+"`TodoList.tsx` renders active tasks in list or grid mode based on "
+"`settings.todo_display`."
+msgstr ""
+
+#: ../../06-workflows.md:26 5ef8aca3f0eb4f0896c027800b168035
+msgid ""
+"`TodoItem.tsx` uses `useCountdown.ts` to show deadline status in real "
+"time."
+msgstr ""
+
+#: ../../06-workflows.md:28 2945f4762d344fb98c3330cd2b7d5c71
+msgid "Workflow 2: Sticky Note Creation and Pop-Out"
+msgstr ""
+
+#: ../../06-workflows.md:41 cde7395397804870b320aeae3fa337da
+msgid "Notes"
+msgstr ""
+
+#: ../../06-workflows.md:43 c514ed0161c748b687918fed4d708070
+msgid "`NoteCard.tsx` can still edit inline in the main window."
+msgstr ""
+
+#: ../../06-workflows.md:44 f329bc2bfc9b45f2b486d2c94eeee3af
+msgid ""
+"`NoteWindow.tsx` loads the note by ID using `list_notes` and persists "
+"edits through `update_note`."
+msgstr ""
+
+#: ../../06-workflows.md:45 251d33bde9db43ba9f46597a115c7384
+msgid "Markdown is rendered by `MarkdownPreview.tsx`."
+msgstr ""
+
+#: ../../06-workflows.md:46 0ede499c6a954d31a0e6743fc8f15165
+msgid ""
+"External links are intercepted in `src/main.tsx` and opened through "
+"`@tauri-apps/plugin-shell`."
+msgstr ""
+
+#: ../../06-workflows.md:48 3d5096dada6a4cc49dbfcb9f6579fc13
+msgid "Workflow 3: Pomodoro Session and Milestones"
+msgstr ""
+
+#: ../../06-workflows.md:65 84c56015c8d7427fa9d9f2dbc4084fb0
+msgid "Phase Handling"
+msgstr ""
+
+#: ../../06-workflows.md:67 8f4a36d896d249bf91b9d02803f885c5
+msgid ""
+"`usePomodoro.ts` keeps the timer alive even when the Pomodoro tab is "
+"hidden."
+msgstr ""
+
+#: ../../06-workflows.md:68 6cceb4d8eff34f29a3927583fedf89d2
+msgid "Finishing a work phase records a session via `record_pomodoro_session`."
+msgstr ""
+
+#: ../../06-workflows.md:69 8771518d1e3042b38ba0f124313aaedc
+msgid ""
+"`PomodoroMilestones.tsx` surfaces up to three active milestones and lets "
+"the user mark them as `completed`, `cancelled`, or restored to `active`."
+msgstr ""
+
+#: ../../06-workflows.md:70 0418b0c222e44339b72d7f347ba91608
+msgid ""
+"The backend stores milestone state inside "
+"`pomodoro_settings.milestones_json`."
+msgstr ""
+
+#: ../../06-workflows.md:71 a56abd3ea8ce45ea9cbd6f6ce9163b3f
+msgid ""
+"`update_tray_tooltip` keeps the tray hover text synchronized with the "
+"timer."
+msgstr ""
+
+#: ../../06-workflows.md:73 fb9272f6a8144d3bbdb98f9286933df3
+msgid "Workflow 4: Settings Persistence"
+msgstr ""
+
+#: ../../06-workflows.md:93 7dd983aecb984b62a662800893c6f540
+msgid "Stored Preferences"
+msgstr ""
+
+#: ../../06-workflows.md:95 a0b521030c1446bb918f6443542572a6
+msgid "`page_size`"
+msgstr ""
+
+#: ../../06-workflows.md:96 008ae7af0f37414cad97d2b5308a5604
+msgid "`todo_display`"
+msgstr ""
+
+#: ../../06-workflows.md:97 bec04b948d1440329d4b1176d4e4b6a0
+msgid "`note_display`"
+msgstr ""
+
+#: ../../06-workflows.md:98 f759ddd20677450cb0e66df3aa7f56cb
+msgid "`note_template`"
+msgstr ""
+
+#: ../../06-workflows.md:99 75d381f1b3a7409b807dc7c1bc9b5aae
+msgid "`note_folder`"
+msgstr ""
+
+#: ../../06-workflows.md:101 10c3221de44143a3ab419c587ce8b0fd
+msgid "These settings are loaded on app startup via `get_app_settings`."
+msgstr ""
+
+#: ../../06-workflows.md:103 df29283e6b1c49de9ece36dd4cbe6899
+msgid "Workflow 5: System Tray and Window Lifecycle"
+msgstr ""
+
+#: ../../06-workflows.md:117 cf2a12e24bc040d9b59e7334f7dddd5f
+msgid "Workflow 6: App Startup"
+msgstr ""
+

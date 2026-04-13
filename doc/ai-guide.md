@@ -5,10 +5,12 @@
 ## Recommended Reading Order
 
 1. Start with `00-overview.md` for product scope and deployment model.
-2. Read `01-repo-map.md` to locate entry points and important directories.
-3. Use `02-architecture.md` and `03-workflows.md` for cross-cutting behavior.
-4. Check `04-data-and-api.md` before touching the database, Tauri commands, or shared types.
-5. Use `06-runbook.md` and `07-testing.md` before validating changes.
+2. Read `04-repo-map.md` to locate entry points and important directories.
+3. Use `02-architecture.md` and `06-workflows.md` for cross-cutting behavior.
+4. Check `05-data-and-api.md` before touching the database, Tauri commands, or shared types.
+5. Use `10-runbook.md` and `09-testing.md` before validating changes.
+6. Use `08-build.md` when the change affects releases, GitHub Actions, or docs publishing.
+7. Use `12-document.md` when generating, updating, translating, or maintaining the PKB itself.
 
 ## Project Rules Worth Preserving
 
@@ -30,6 +32,6 @@
 ---
 <!-- PKB-metadata
 last_updated: 2026-04-12
-commit: a34edf3
+commit: 628f0c1
 updated_by: human+ai
 -->

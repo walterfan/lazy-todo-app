@@ -1,0 +1,220 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../01-quick-start.md:1 f967d89b3be443279b6a6529312f93e4
+msgid "Quick Start"
+msgstr ""
+
+#: ../../01-quick-start.md:5 621081c801b54f8ca40e157c4c6fd35c
+msgid ""
+"This guide helps you get the Lazy Todo App running locally in under 5 "
+"minutes."
+msgstr ""
+
+#: ../../01-quick-start.md:7 43f82966d57047f2a1002283cc61d66e
+msgid "Prerequisites"
+msgstr ""
+
+#: ../../01-quick-start.md cff039e45d89489daf5f89c354ca84fb
+msgid "Tool"
+msgstr ""
+
+#: ../../01-quick-start.md e501058e12334fb896a0e6eede9fe080
+msgid "Version"
+msgstr ""
+
+#: ../../01-quick-start.md 2c21289348e742cb8e937c0107ea39c0
+msgid "Install"
+msgstr ""
+
+#: ../../01-quick-start.md 64ed02b043ee47ed86fe5222c260b9c9
+msgid "Node.js"
+msgstr ""
+
+#: ../../01-quick-start.md 36c56d6c0f7749ec9e42c2219f24edb3
+msgid "≥ 18"
+msgstr ""
+
+#: ../../01-quick-start.md 7f74f77cfb024f6dbd760c7cae51b679
+msgid "[nodejs.org](https://nodejs.org/)"
+msgstr ""
+
+#: ../../01-quick-start.md c9c1af0f31264caaa7c2b0ed8aeed3a5
+msgid "pnpm"
+msgstr ""
+
+#: ../../01-quick-start.md 2c4c7513a77940ecb86214ac3be1aedc
+msgid "≥ 9"
+msgstr ""
+
+#: ../../01-quick-start.md 80a0b13c1ec942ffb2146152d3bf73a2
+msgid "`npm install -g pnpm`"
+msgstr ""
+
+#: ../../01-quick-start.md 1fd0ea92a6df43f09c3b1bb811e1ee13
+msgid "Rust"
+msgstr ""
+
+#: ../../01-quick-start.md 1e5e36f0eb5246a88190825fab73e2b3
+msgid "stable"
+msgstr ""
+
+#: ../../01-quick-start.md e3aaf2e2bcd74b82bcb2350a41c38fbb
+msgid "[rustup.rs](https://rustup.rs/)"
+msgstr ""
+
+#: ../../01-quick-start.md a78ac313b32047098d77f2409e19b274
+msgid "Tauri CLI"
+msgstr ""
+
+#: ../../01-quick-start.md b5ea3b16891045e49a03d57545c056bd
+msgid "≥ 2.x"
+msgstr ""
+
+#: ../../01-quick-start.md 22f72e4380d8412192ea9f037ca57c67
+msgid "`cargo install tauri-cli --version \"^2\"`"
+msgstr ""
+
+#: ../../01-quick-start.md:16 cdaa09f90f7145c0a4ed4021efba8d0b
+msgid "**macOS extra**: Xcode Command Line Tools (`xcode-select --install`)"
+msgstr ""
+
+#: ../../01-quick-start.md:18 3c000e717fda4b258cc33c17eec3184f
+msgid ""
+"**Linux extra**: see [Tauri "
+"prerequisites](https://v2.tauri.app/start/prerequisites/)"
+msgstr ""
+
+#: ../../01-quick-start.md:20 c12e5714a94c4210852a2a88d91a84be
+msgid "1. Clone & Install"
+msgstr ""
+
+#: ../../01-quick-start.md:28 c6a894fc600d4db188f1e369530b5236
+msgid "2. Run in Development Mode"
+msgstr ""
+
+#: ../../01-quick-start.md:35 e2d24820495d43ff8cb78584bcda9cd9
+msgid "This will:"
+msgstr ""
+
+#: ../../01-quick-start.md:36 4deb62c4f7e64137a8f29b3212c0c794
+msgid "Start the Vite dev server on `http://localhost:1420`"
+msgstr ""
+
+#: ../../01-quick-start.md:37 56deeefc1e2d4110a8ae6121efa64b09
+msgid "Compile the Rust backend"
+msgstr ""
+
+#: ../../01-quick-start.md:38 43b2f1d703174205a38d3b1a7460920d
+msgid "Open the Tauri window"
+msgstr ""
+
+#: ../../01-quick-start.md:40 cdf8f496db574b91a3a8d827e5553d07
+msgid "3. Build for Production"
+msgstr ""
+
+#: ../../01-quick-start.md:46 85ae9615052c46b39d910a2b696e630f
+msgid "The installer/bundle is output to `src-tauri/target/release/bundle/`."
+msgstr ""
+
+#: ../../01-quick-start.md:48 ec861750ee3046c6a72a5cf1c3039bdd
+msgid "4. Run Tests"
+msgstr ""
+
+#: ../../01-quick-start.md:58 7d948cc0b12c4f358893de936bf9f9bb
+msgid "5. Verify It Works"
+msgstr ""
+
+#: ../../01-quick-start.md:60 21ecfca3413243b0acf6f0137e6cf0eb
+msgid "The app window should open with the todo list UI."
+msgstr ""
+
+#: ../../01-quick-start.md:61 0aa1f3e62b4549caa8b0bf1db9206226
+msgid "Try adding a new todo item."
+msgstr ""
+
+#: ../../01-quick-start.md:62 3027285e172a4ada9764f3c8a8ebe07e
+msgid "Mark it as complete."
+msgstr ""
+
+#: ../../01-quick-start.md:63 1a11889826fb489d91f340f6a9cf3b09
+msgid ""
+"Restart the app — your data should persist (stored in local SQLite via "
+"`src-tauri`)."
+msgstr ""
+
+#: ../../01-quick-start.md:65 3e0483bcbede4ee093ef90fb437f8418
+msgid "Common Issues"
+msgstr ""
+
+#: ../../01-quick-start.md fdf20900acdd484cb7615cbaacfbba3a
+msgid "Symptom"
+msgstr ""
+
+#: ../../01-quick-start.md 8546ec7710784fcf8c6deb2966510463
+msgid "Fix"
+msgstr ""
+
+#: ../../01-quick-start.md d5337b84ab89443ba8079a81cb512817
+msgid "`error: failed to run custom build command for webkit2gtk-sys`"
+msgstr ""
+
+#: ../../01-quick-start.md 6f48fcf8231443fca5343b24a6c0fd67
+msgid ""
+"Install GTK dev libs: `sudo apt install libgtk-3-dev "
+"libwebkit2gtk-4.1-dev`"
+msgstr ""
+
+#: ../../01-quick-start.md 0546e559b3de4fb6afea859d7ecdff5a
+msgid "Port 1420 already in use"
+msgstr ""
+
+#: ../../01-quick-start.md c7d90ae936274062b1bc0dfdad9e6543
+msgid "Kill the process or set `VITE_PORT` in `.env`"
+msgstr ""
+
+#: ../../01-quick-start.md 05cd958ef1d54144ad77c1604e71eb50
+msgid "Rust compilation slow on first run"
+msgstr ""
+
+#: ../../01-quick-start.md 70ae693160034ef098b972bf056b2bd6
+msgid "Normal — subsequent builds use incremental compilation"
+msgstr ""
+
+#: ../../01-quick-start.md:73 83211e0165cc4d0cab6e94c2027b5790
+msgid "Next Steps"
+msgstr ""
+
+#: ../../01-quick-start.md:75 47d4e89a2b2d468c9c0aac73704c2608
+msgid ""
+"[Architecture](02-architecture.md) — understand how the pieces fit "
+"together"
+msgstr ""
+
+#: ../../01-quick-start.md:76 900fd85ed2684d90940448ffa35a02f1
+msgid "[Workflows](06-workflows.md) — day-to-day development workflows"
+msgstr ""
+
+#: ../../01-quick-start.md:77 5f7dcb6d4d9d47a88dc5a5517642154e
+msgid "[Build](08-build.md) — detailed build configuration"
+msgstr ""
+

@@ -1,0 +1,986 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: 2026-04-12 23:14+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../12-document.md:1 37a06d6f6f6e4c5da5c98d47d36cc095
+msgid "Lazy Todo App — Generating the Project Knowledge Base"
+msgstr "Lazy Todo App — 生成项目知识库"
+
+#: ../../12-document.md:5 dc3c07ebda404c37846811974aee5f8d
+msgid "Purpose"
+msgstr "目的"
+
+#: ../../12-document.md:7 ba75bfcc07fb4396bf39d9ef29dd74d2
+msgid ""
+"This page explains how to create, update, translate, and publish the "
+"Project Knowledge Base (PKB) for `lazy-todo-app`."
+msgstr "本页说明如何为 `lazy-todo-app` 创建、更新、翻译并发布项目知识库（PKB）。"
+
+#: ../../12-document.md:9 04f28e01d7ec4600aff04953e03455fe
+msgid ""
+"In this repository, the PKB lives directly under `doc/`. English Markdown"
+" is the source of truth, the content is often drafted or updated with an "
+"LLM plus documentation skills, and the published site is built with "
+"`Sphinx + MyST + sphinx-intl + Mermaid`."
+msgstr ""
+"在这个仓库中，PKB 直接位于 `doc/` 下。英文 Markdown 是事实来源，文档内容通常通过 LLM "
+"配合文档技能起草或更新，最终发布站点使用 `Sphinx + MyST + sphinx-intl + Mermaid` 构建。"
+
+#: ../../12-document.md:11 9043a18930ee4950bbea169ce1695cf4
+msgid "The current documentation workflow combines:"
+msgstr "当前的文档工作流结合了："
+
+#: ../../12-document.md:13 101f6dd1117e4bd688c453e451a8aa10
+msgid "an LLM to analyze the repo and draft PKB pages"
+msgstr "使用 LLM 分析仓库并起草 PKB 页面"
+
+#: ../../12-document.md:14 1f02accb951744a9bcbb5c7f84474808
+msgid ""
+"skills such as the Project Knowledge Base skill to enforce structure and "
+"conventions"
+msgstr "使用诸如 Project Knowledge Base skill 之类的技能来约束结构和规范"
+
+#: ../../12-document.md:15 d2683d2c0a3f4178accddaa0481465c8
+msgid "human review to correct intent, wording, and architectural judgment"
+msgstr "通过人工审阅修正文档意图、表述和架构判断"
+
+#: ../../12-document.md:16 0312e78b866344abbedb84d5dbb93be5
+msgid "Sphinx tooling to build bilingual HTML output"
+msgstr "使用 Sphinx 工具链构建双语 HTML 输出"
+
+#: ../../12-document.md:18 d712a32ae2504fa1a080e5fbbb3efd5d
+msgid "LLM + Skills Workflow"
+msgstr "LLM + Skills 工作流"
+
+#: ../../12-document.md:20 a7ae7fca9d4249b3a3d129f6ba695c02
+msgid ""
+"For this project, PKB pages are typically generated or updated through an"
+" LLM-assisted workflow rather than written fully by hand from scratch."
+msgstr "在这个项目中，PKB 页面通常通过 LLM 辅助工作流生成或更新，而不是完全从零手工编写。"
+
+#: ../../12-document.md:22 07c1b77e7f6e4deb8c1c43471ef3f007
+msgid "The practical flow is:"
+msgstr "实际流程如下："
+
+#: ../../12-document.md:24 f11f760b66744f0ba7046297ac41d6b6
+msgid "The LLM reads the repository structure, key configs, and existing docs."
+msgstr "LLM 读取仓库结构、关键配置和现有文档。"
+
+#: ../../12-document.md:25 2f433613f23e46c9bdf9c9cfcbedbd47
+msgid ""
+"A documentation skill such as the Project Knowledge Base skill helps "
+"structure the output into PKB pages like overview, repo map, "
+"architecture, workflows, runbook, and testing docs."
+msgstr ""
+"像 Project Knowledge Base skill 这样的文档技能会帮助把输出组织成 overview、repo "
+"map、architecture、workflows、runbook 和 testing 等 PKB 页面。"
+
+#: ../../12-document.md:26 0f5fd259cf6445408b7052d430c99425
+msgid "The generated Markdown is written into `doc/` as English source pages."
+msgstr "生成的 Markdown 会作为英文源页面写入 `doc/`。"
+
+#: ../../12-document.md:27 466c6247ebe7406ebe7a1137f84c2792
+msgid ""
+"A human reviews and edits the result to make sure the \"why\", "
+"terminology, and product intent are correct."
+msgstr "随后由人工审阅和修改结果，以确保文档中的“为什么”、术语和产品意图都是正确的。"
+
+#: ../../12-document.md:28 89d1c70cc26340b9bbe30f0b42752daf
+msgid ""
+"The docs are translated through gettext catalogs and then built into the "
+"bilingual site with `Sphinx + MyST + sphinx-intl`."
+msgstr "文档通过 gettext catalog 进行翻译，然后使用 `Sphinx + MyST + sphinx-intl` 构建成双语站点。"
+
+#: ../../12-document.md:29 5fe41b2773894c2bb148411da6d27fc3
+msgid ""
+"Mermaid diagrams are used when workflows or architecture benefit from "
+"visual explanation."
+msgstr "当工作流或架构需要可视化说明时，会使用 Mermaid 图。"
+
+#: ../../12-document.md:31 cdec2e1d45954ae999a8950e3e020714
+msgid ""
+"This means the PKB should be treated as human-reviewed, AI-assisted "
+"documentation. The LLM is responsible for fast synthesis and structure; "
+"the human is responsible for validating accuracy, intent, and trade-offs."
+msgstr "这意味着 PKB 应该被视为“人工审阅、AI 辅助”的文档。LLM 负责快速归纳和组织结构；人工则负责验证准确性、意图和取舍。"
+
+#: ../../12-document.md:33 ce6195f6cfee4aed86127eb853989773
+msgid "Advisory Auto-Update Loop"
+msgstr "告警式自动更新循环"
+
+#: ../../12-document.md:35 62846632b72441c88b1211419810a898
+msgid ""
+"Today, this repository uses an advisory PKB update loop rather than a "
+"fully automatic doc-writing bot."
+msgstr "当前，这个仓库采用的是告警式 PKB 更新循环，而不是全自动写文档机器人。"
+
+#: ../../12-document.md:37 93f7d334f73449388b93cb8b143ddd57
+msgid "The implemented pieces are:"
+msgstr "当前已实现的组成部分包括："
+
+#: ../../12-document.md:39 fcb8f0e6040f4c99a30d6d7a9768e5c3
+msgid "`scripts/check_pkb_staleness.py` for rule-based PKB impact analysis"
+msgstr "`scripts/check_pkb_staleness.py` 用于基于规则的 PKB 影响分析"
+
+#: ../../12-document.md:40 77c18b93e41f4dc5bccf79e564619e31
+msgid "`npm run pkb:check` for local advisory checks"
+msgstr "`npm run pkb:check` 用于本地告警检查"
+
+#: ../../12-document.md:41 ed189b43598e476e9fe3872173119c7c
+msgid ""
+"`/.github/workflows/pkb-check.yml` for PR and branch summaries in GitHub "
+"Actions"
+msgstr "`/.github/workflows/pkb-check.yml` 用于在 GitHub Actions 中生成 PR 和分支摘要"
+
+#: ../../12-document.md:43 afbf1064fc6648ba897a1b5865bfe520
+msgid "The current loop works like this:"
+msgstr "当前循环的工作方式如下："
+
+#: ../../12-document.md:45 2e0b061a40ab4bfb8c4f60aafc4922fc
+msgid "Code, workflow, or configuration changes land in a branch or pull request."
+msgstr ""
+
+#: ../../12-document.md:46 aac847b035fc4ba4aeb70e504dfb18ea
+msgid "The PKB checker maps changed files to likely-affected PKB pages."
+msgstr ""
+
+#: ../../12-document.md:47 864b8288760f4c60ae83c7d49eb1ece1
+msgid "The checker reports whether those PKB pages were updated in the same diff."
+msgstr ""
+
+#: ../../12-document.md:48 c478c1dc83064a3b8c6745a58b51332a
+msgid ""
+"A human uses the summary to decide which English PKB pages should be "
+"refreshed."
+msgstr ""
+
+#: ../../12-document.md:49 7dcf33b8faf943358fb545c6701d2a02
+msgid ""
+"The LLM plus documentation skills can then draft the updated English PKB "
+"content."
+msgstr ""
+
+#: ../../12-document.md:50 1b68e382bf3b4954b1ecd6477db86074
+msgid "A human reviews the generated Markdown before translation and publishing."
+msgstr ""
+
+#: ../../12-document.md:52 f20b71d6664541a5b8f74c420d661936
+msgid ""
+"The important design rule is that the checker is deterministic, but the "
+"actual documentation refresh still happens through the human-reviewed LLM"
+" + skills workflow."
+msgstr "一个重要设计原则是：检查器本身应保持确定性，但真正的文档刷新仍然通过“人工审阅的 LLM + skills 工作流”完成。"
+
+#: ../../12-document.md:54 9bb727c0c4ad44d887f37f1789569fd7
+msgid "Future Design: Automatic PKB Update with an LLM Agent"
+msgstr ""
+
+#: ../../12-document.md:56 78811052514f43eeb736191d54ba084b
+msgid ""
+"This section describes a future design for keeping the PKB updated more "
+"automatically when code changes land. It is a design goal for future "
+"implementation, not a fully implemented workflow today."
+msgstr ""
+
+#: ../../12-document.md:58 dfd6c482cb10478aaae8cd8b895a55c6
+msgid "Design Goal"
+msgstr ""
+
+#: ../../12-document.md:60 77aea73fa5db4bd3ba23828fbe580017
+msgid ""
+"The goal is to reduce documentation drift by detecting likely doc impact "
+"as part of development and then using an LLM agent to propose or prepare "
+"PKB updates in time."
+msgstr ""
+
+#: ../../12-document.md:62 99698459ddf6416a99869184d281c009
+#, fuzzy
+msgid "The intended properties are:"
+msgstr "当前已实现的组成部分包括："
+
+#: ../../12-document.md:64 e25d8aadac064efd9f8abefbee7a490b
+msgid "advisory first, not merge-blocking by default"
+msgstr ""
+
+#: ../../12-document.md:65 056876afd4824a04b15f5f25e16f40ff
+msgid "deterministic impact detection before any LLM generation"
+msgstr ""
+
+#: ../../12-document.md:66 93e75d1738904f98832fc7db8e4197ed
+msgid "English Markdown remains the source of truth"
+msgstr ""
+
+#: ../../12-document.md:67 1597536745274aef9cb214b63295303d
+msgid "human review remains required before publishing"
+msgstr ""
+
+#: ../../12-document.md:68 f6cc17abd3b94d7d8e34fa6fd25f9964
+msgid "Chinese catalogs and Sphinx output are refreshed after English doc changes"
+msgstr ""
+
+#: ../../12-document.md:70 bb0e1e78a9514336a34d3bda570ccec4
+msgid "Proposed Future Flow"
+msgstr ""
+
+#: ../../12-document.md:83 08a542eef7494b4fb08d16ba53915c58
+msgid "Proposed Components"
+msgstr ""
+
+#: ../../12-document.md:85 f4777f5472b6446aaac8c7978789f764
+msgid "1. PKB Impact Checker"
+msgstr ""
+
+#: ../../12-document.md:87 07d2ab6a3573443288a68501836ea62c
+msgid ""
+"A lightweight checker should inspect changed files in a branch, pull "
+"request, or local diff and infer which PKB pages are likely stale."
+msgstr ""
+
+#: ../../12-document.md:89 407ffeee771c4affb51159e7907463a1
+msgid "Example mapping rules:"
+msgstr ""
+
+#: ../../12-document.md:91 c2719ba48157446c8880543e19eaaff3
+msgid ""
+"frontend data and UI contract changes -> `05-data-and-api.md`, "
+"`09-testing.md`"
+msgstr ""
+
+#: ../../12-document.md:92 b1d4741b672247c4b89164de56526fd0
+msgid ""
+"tray, window, or lifecycle changes -> `02-architecture.md`, "
+"`06-workflows.md`, `10-runbook.md`"
+msgstr ""
+
+#: ../../12-document.md:93 9657232bdccf4e99a603af346f9e1559
+msgid "release, build, or workflow changes -> `08-build.md`"
+msgstr ""
+
+#: ../../12-document.md:94 0bc404ffc83a49bfb3d4fff6165bb4e6
+msgid "documentation process changes -> `12-document.md`, `ai-guide.md`"
+msgstr ""
+
+#: ../../12-document.md:95 ee86ae51c2f947bf894f23709deca998
+msgid "broad feature changes -> `00-overview.md`"
+msgstr ""
+
+#: ../../12-document.md:97 0f971cd366254ca5b526e4d8c51a9d6e
+msgid ""
+"This stage should be rule-based and deterministic so the repository can "
+"explain why a doc refresh was suggested."
+msgstr ""
+
+#: ../../12-document.md:99 a5e2823b43b94eca9b72bc5a47237b8a
+msgid "2. LLM Agent Drafting Step"
+msgstr ""
+
+#: ../../12-document.md:101 76a071a8e0b849acbbf1182c44211823
+msgid ""
+"After the likely-affected PKB pages are identified, an LLM agent with "
+"documentation skills should:"
+msgstr ""
+
+#: ../../12-document.md:103 d6a8df7eb9c74d14a1c3e68e713ab6cd
+#, fuzzy
+msgid "read the changed source files"
+msgstr "步骤 1：创建英文源文件"
+
+#: ../../12-document.md:104 9ce0c97fd94348638d0e6366ce9524d3
+#, fuzzy
+msgid "read the related PKB pages"
+msgstr "相关页面"
+
+#: ../../12-document.md:105 cc02c9a655b845fc8d9c54cfec1ad799
+msgid "draft updates to the affected English Markdown pages"
+msgstr ""
+
+#: ../../12-document.md:106 05abaed807a64561b868e3eea434ad68
+msgid "preserve the existing numbered PKB structure and metadata conventions"
+msgstr ""
+
+#: ../../12-document.md:108 49a50a3f980f4be78050308ea3513653
+msgid "The LLM should focus on:"
+msgstr ""
+
+#: ../../12-document.md:110 9de20b686f5340709f1aa86f2439e2ee
+msgid ""
+"mechanical updates such as file paths, workflows, commands, and "
+"dependency changes"
+msgstr ""
+
+#: ../../12-document.md:111 0f46d8be8fbd44d38d063e4d4e6c8e0f
+msgid "architectural summaries based on real code"
+msgstr ""
+
+#: ../../12-document.md:112 86b8ae6708544c1e91bca10042fe3d29
+msgid "concise diagrams where they materially improve clarity"
+msgstr ""
+
+#: ../../12-document.md:114 1895ca0adff14878bdc3c053c53658bd
+msgid "The LLM should not silently invent:"
+msgstr ""
+
+#: ../../12-document.md:116 91e0987b3a5741a2980705c1b3a258e4
+msgid "product intent"
+msgstr ""
+
+#: ../../12-document.md:117 1abd9c6aef6240b4b43887d25bfee181
+msgid "ADR-level trade-offs"
+msgstr ""
+
+#: ../../12-document.md:118 b7915082938c4623a5daccaeeb7ef258
+msgid "release decisions"
+msgstr ""
+
+#: ../../12-document.md:119 ee2ec20d825349a892c79ad894871f56
+msgid "human rationale that is not visible from the code or changelog"
+msgstr ""
+
+#: ../../12-document.md:121 4f1601caab0847f38dc11421a989eda9
+msgid "3. Human Review Gate"
+msgstr ""
+
+#: ../../12-document.md:123 ef6decac1c8345dcac79bfe9f0553010
+msgid "Even in the future automated flow, a human should still review:"
+msgstr ""
+
+#: ../../12-document.md:125 c5421be3d44047f584c91da671b3613a
+msgid "whether the right PKB pages were updated"
+msgstr ""
+
+#: ../../12-document.md:126 921cb1aa088a4310a82b546530e2a243
+msgid "whether the LLM summary matches the actual change"
+msgstr ""
+
+#: ../../12-document.md:127 1d8a506478ab421aac3a96b925f04c44
+msgid "whether architecture explanations capture the real \"why\""
+msgstr ""
+
+#: ../../12-document.md:128 27393ac77c144e3b9b5768e7aea2305c
+msgid "whether Mermaid diagrams are valid and helpful"
+msgstr ""
+
+#: ../../12-document.md:130 1bf46d3685f149cbb168fa1bc6202512
+msgid ""
+"The intended model is AI-assisted update preparation, not fully "
+"autonomous publishing."
+msgstr ""
+
+#: ../../12-document.md:132 201b9b091acf48b5bf182e7224fb19ac
+msgid "4. Translation and Build Step"
+msgstr ""
+
+#: ../../12-document.md:134 a86a2edca2f845dfbac0efd3b43bf5c6
+msgid ""
+"Once the English source is approved, the future workflow should continue "
+"with the current translation and build pipeline:"
+msgstr ""
+
+#: ../../12-document.md:143 395c33f38b5f4f869d60714cc63a275e
+msgid "That keeps the existing repo rule unchanged:"
+msgstr ""
+
+#: ../../12-document.md:145 64a44e3dd0984804819d8f9e89a20a30
+msgid "English Markdown in `doc/` is the source of truth"
+msgstr ""
+
+#: ../../12-document.md:146 4a62194ae4c24b7ea92506ad79c35421
+msgid "Chinese pages are derived from `.po` catalogs"
+msgstr ""
+
+#: ../../12-document.md:147 1af4127dd7874c5dac0a0ab7a457ca1b
+msgid "Sphinx publishes the bilingual site"
+msgstr ""
+
+#: ../../12-document.md:149 ad51b6b5cb994706939cf07499d90c45
+msgid "Suggested Future Trigger Points"
+msgstr ""
+
+#: ../../12-document.md:151 024ffd395bce490bab8428bc953f8233
+msgid "The future automation could run in three places:"
+msgstr ""
+
+#: ../../12-document.md:153 6e5333e456dc4d75bc71902632175570
+msgid "On pull requests, as an advisory PKB freshness check"
+msgstr ""
+
+#: ../../12-document.md:154 880b08769eb4473e8ec726ac578fb16d
+msgid "Before release tagging, as part of the release checklist"
+msgstr ""
+
+#: ../../12-document.md:155 a897aa634b994ac4abca41b7cf10b076
+msgid ""
+"Locally, through a convenience command that suggests which PKB pages to "
+"refresh"
+msgstr ""
+
+#: ../../12-document.md:157 7177f17423e04f8598fe67ab5817e84b
+msgid "Recommended first step:"
+msgstr ""
+
+#: ../../12-document.md:159 3949ea39188f437fa85623165bd88503
+msgid "start with advisory warnings and generated suggestions"
+msgstr ""
+
+#: ../../12-document.md:160 9044f401742343fdbbd79f0345a286c8
+msgid "do not auto-commit docs changes initially"
+msgstr ""
+
+#: ../../12-document.md:161 fab63a40913741188cc3c97540369685
+msgid ""
+"only consider automated PR creation after the mapping and review flow "
+"prove reliable"
+msgstr ""
+
+#: ../../12-document.md:163 e6b4fa54a07d4bdd8f26c02ac28ea365
+msgid "Non-Goals for the First Version"
+msgstr ""
+
+#: ../../12-document.md:165 3b79410bd61d4d1782df91586fad2a0a
+msgid "The first implementation should avoid:"
+msgstr ""
+
+#: ../../12-document.md:167 0e4d84e9a4774f9095096051c7d7b978
+msgid "directly pushing generated docs to `main`"
+msgstr ""
+
+#: ../../12-document.md:168 9fc9f12f307f41d5b41595a54b913f63
+msgid "modifying Chinese translations without human review"
+msgstr ""
+
+#: ../../12-document.md:169 bd10a1bc576b4df5baac183fed512d40
+msgid "blocking normal development on doc freshness"
+msgstr ""
+
+#: ../../12-document.md:170 c3e9d66c018d4f6e9844d2c7fa26bca8
+msgid "calling a live LLM directly inside core release gating"
+msgstr ""
+
+#: ../../12-document.md:172 a7500f7f852a4849a4622573159303b9
+msgid "Why This Design Fits This Repo"
+msgstr ""
+
+#: ../../12-document.md:174 51864b32ad464e66823a52e0a30b9bc8
+msgid "This repository already has:"
+msgstr ""
+
+#: ../../12-document.md:176 542d30f3620e4b8c92359565c344f36f
+msgid "numbered PKB pages under `doc/`"
+msgstr ""
+
+#: ../../12-document.md:177 57f2fbbf6fcd4464a16bff5cf8ce78e8
+msgid "metadata footers for freshness tracking"
+msgstr ""
+
+#: ../../12-document.md:178 a1e9c5e1bd8c45ea8cb10c21dadedb34
+msgid "a bilingual Sphinx build pipeline"
+msgstr ""
+
+#: ../../12-document.md:179 d48227728edd475c9232e6a7210ffb3e
+msgid "an LLM + skills authoring pattern already described in this page"
+msgstr ""
+
+#: ../../12-document.md:181 97d6525d72a14897a12b98c23aeedc9a
+msgid ""
+"That makes it a good fit for an incremental future design where code "
+"changes trigger PKB suggestions early, but human-reviewed Markdown "
+"remains the final published source."
+msgstr ""
+
+#: ../../12-document.md:183 a52794894aea4f1b80638cf079fec016
+msgid "What the PKB Includes"
+msgstr "PKB 包含的内容"
+
+#: ../../12-document.md:185 1c3a76301ac8421cbd6735e65c999ef7
+msgid "The current PKB is organized as:"
+msgstr ""
+
+#: ../../12-document.md:187 70109260aabe4ee488357c807cb30bbc
+msgid "`index.md` as the Sphinx root and docs navigation"
+msgstr ""
+
+#: ../../12-document.md:188 90e6d76cda84445cabef9e08312aad3c
+msgid "`00-overview.md` to `12-document.md` as the core project docs"
+msgstr ""
+
+#: ../../12-document.md:189 c336899f39554fa494c99c9a7fe1fdd2
+msgid "`ai-guide.md` as the AI onboarding guide"
+msgstr ""
+
+#: ../../12-document.md:190 c55f25078d6a44cdb1dd1a9124fd9243
+msgid "`adr/` for architecture decisions"
+msgstr ""
+
+#: ../../12-document.md:191 1e510f90622349319ff1a9122dc88acc
+msgid "`changes/` for structured change proposals"
+msgstr ""
+
+#: ../../12-document.md:192 d0dfe8a26de446fa8f47f407c8a5310c
+msgid "`locale/zh_CN/LC_MESSAGES/` for Chinese translation catalogs"
+msgstr ""
+
+#: ../../12-document.md:193 72fe899512784df4a37140cb225ddd1d
+msgid "`_templates/` and `_static/` for Sphinx theme overrides and custom styling"
+msgstr ""
+
+#: ../../12-document.md:195 4d98791cd6974805a1a3dd25780428a7
+msgid "Source of Truth"
+msgstr "事实来源"
+
+#: ../../12-document.md:197 f6ca9c8d36704394b62fd4cf6ea7e7a9
+msgid "Follow these rules when editing project docs:"
+msgstr ""
+
+#: ../../12-document.md:199 21bc292e7dc34565a376788572c3add0
+msgid "Write or update the English Markdown file first in `doc/`."
+msgstr ""
+
+#: ../../12-document.md:200 9af30f94526f483887b1b138e7974048
+msgid "Treat the English Markdown as the authoritative source."
+msgstr ""
+
+#: ../../12-document.md:201 3c1f22f43ad0445aaded12fbb66c6682
+msgid ""
+"Regenerate or update the Chinese gettext catalogs only after the English "
+"source is correct."
+msgstr ""
+
+#: ../../12-document.md:202 c850c18218a945508ca7381c99237e46
+msgid "Rebuild the Sphinx site after documentation changes."
+msgstr ""
+
+#: ../../12-document.md:204 6758b2b6a51a412f8b40faf34a1e3fb3
+msgid "This means you should edit:"
+msgstr ""
+
+#: ../../12-document.md:206 223f083201814c17b0bdcb9176add9fa
+msgid "`doc/*.md` for English source pages"
+msgstr ""
+
+#: ../../12-document.md:207 e71b8c13edd34455b4d00f06f25271bd
+msgid "`doc/index.md` when navigation changes"
+msgstr ""
+
+#: ../../12-document.md:208 391a844474cc453d914eb30bdb001333
+msgid "`doc/locale/zh_CN/LC_MESSAGES/*.po` for Chinese translations"
+msgstr ""
+
+#: ../../12-document.md:210 5f2115b299fa4b16babb8b954181c3d0
+msgid ""
+"Even if a page was generated by an LLM or a skill, the checked-in "
+"Markdown files remain the canonical project docs after review."
+msgstr "即使某个页面是由 LLM 或 skill 生成的，经过审阅后，仓库中的 Markdown 文件仍然是规范项目文档。"
+
+#: ../../12-document.md:212 74a278f3b94848e1a6686c04e46a7de6
+msgid "Create a New PKB Page"
+msgstr "创建新的 PKB 页面"
+
+#: ../../12-document.md:214 e699aa6032224af8b09bb5a0a74272bb
+msgid ""
+"Use this workflow when adding a new documentation page such as "
+"`12-document.md`."
+msgstr ""
+
+#: ../../12-document.md:216 eadfcd1c894440c9b292b127e13297db
+msgid "Step 1: Create the English Source File"
+msgstr "步骤 1：创建英文源文件"
+
+#: ../../12-document.md:218 d66c38c205fd42bda25e8e05e18f203d
+#, fuzzy
+msgid "Create a new Markdown page in `doc/`."
+msgstr "创建新的 PKB 页面"
+
+#: ../../12-document.md:220 74ba37c9b5e745fdb993f36eb9bde870
+msgid "Recommended conventions:"
+msgstr ""
+
+#: ../../12-document.md:222 6fd447613b614b8482eeb24e957d2b08
+msgid "Use a title in the form `Lazy Todo App — Topic Name`"
+msgstr ""
+
+#: ../../12-document.md:223 794487d10bbc4dcab5ebe2389b52845e
+msgid "Add `<!-- maintained-by: human+ai -->` near the top"
+msgstr ""
+
+#: ../../12-document.md:224 4c55842c975b49548ffd9d98519a8554
+msgid "End the file with a `<!-- PKB-metadata -->` footer"
+msgstr ""
+
+#: ../../12-document.md:225 a710f74f56184a68b98cefd2f356d48c
+msgid "Keep code references real and verified"
+msgstr ""
+
+#: ../../12-document.md:226 484e3aca20eb4898961d5f2bf3e681f4
+msgid "Prefer Mermaid diagrams only when they clarify structure or workflow"
+msgstr ""
+
+#: ../../12-document.md:227 0da994b31943430485e22c722113a8eb
+msgid ""
+"Mention the relevant build or generation stack when it matters, such as "
+"`Sphinx`, `MyST`, `sphinx-intl`, and `Mermaid`"
+msgstr ""
+
+#: ../../12-document.md:229 a7c3c21d148547e4bd5a24ad5cb123bb
+msgid "Step 2: Add the Page to the Docs Navigation"
+msgstr "步骤 2：将页面加入文档导航"
+
+#: ../../12-document.md:231 46889b657b2644569706c9e9dc34b675
+msgid "Update `doc/index.md` and add the new page to the Sphinx `toctree`."
+msgstr ""
+
+#: ../../12-document.md:233 4717588065344e168104029648a647d7
+msgid "Example:"
+msgstr ""
+
+#: ../../12-document.md:247 da6b2b38afe44b4e8e77af98bfa1d803
+msgid ""
+"Without this step, the page may exist on disk but will not appear in the "
+"docs navigation."
+msgstr ""
+
+#: ../../12-document.md:249 39aa1218b87143028678442dc7019175
+msgid "Step 3: Add PKB Metadata"
+msgstr "步骤 3：添加 PKB 元数据"
+
+#: ../../12-document.md:251 03be67720cd348698afcf9b78ee10ad9
+msgid "Each page should end with:"
+msgstr ""
+
+#: ../../12-document.md:262 fc6873a4a72044ffa29241a8027226b3
+msgid "Field meanings:"
+msgstr ""
+
+#: ../../12-document.md:264 f3e22f30acd242ae862422969652bdc8
+msgid "`last_updated`: the date of the meaningful doc update"
+msgstr ""
+
+#: ../../12-document.md:265 4ab7d2fd1c21490fb5515d97d4928e20
+msgid "`commit`: the current short git commit from `git rev-parse --short HEAD`"
+msgstr ""
+
+#: ../../12-document.md:266 cf9d3f6f924a46e4a43c38df9409c6b0
+msgid "`updated_by`: usually `human+ai` in this repo"
+msgstr ""
+
+#: ../../12-document.md:268 d6bf066322574f69a8768a528350222b
+msgid "Update an Existing PKB Page"
+msgstr "更新已有的 PKB 页面"
+
+#: ../../12-document.md:270 7317fbb50a2d4275be98aa79f21b6243
+#, fuzzy
+msgid "When changing an existing page:"
+msgstr "更新已有的 PKB 页面"
+
+#: ../../12-document.md:272 7814ed69dbfe4b12a1e3999c7c7f5dfc
+msgid "Edit the English Markdown source first."
+msgstr ""
+
+#: ../../12-document.md:273 a9e93ff040b24d0bb8e9fa45917f36d3
+msgid ""
+"Check whether the change affects navigation, file references, commands, "
+"workflows, or diagrams."
+msgstr ""
+
+#: ../../12-document.md:274 7163dfb1336f4f9dbaec1f510c05aed6
+msgid "Update the PKB metadata footer."
+msgstr ""
+
+#: ../../12-document.md:275 a69bdf5f659d4b25bd8420cc0d1fe233
+msgid "Refresh translations if the English wording changed."
+msgstr ""
+
+#: ../../12-document.md:276 85788fd45ce44a589cf3ffcd3720f3af
+msgid "Rebuild the docs locally."
+msgstr ""
+
+#: ../../12-document.md:278 8d0bcee5dd7849bebfd1f8e31f05e280
+msgid "Typical changes that require translation refresh:"
+msgstr ""
+
+#: ../../12-document.md:280 e0807f0c67734e8a8f0da0e3a0cbabd5
+msgid "new sections or renamed headings"
+msgstr ""
+
+#: ../../12-document.md:281 780cc7a8c8474a7fb731c3b5efe6ab32
+msgid "changed explanatory paragraphs"
+msgstr ""
+
+#: ../../12-document.md:282 4b8cbe5f5a4947a082886b041d13e326
+msgid "updated command examples"
+msgstr ""
+
+#: ../../12-document.md:283 000a56f2728a4cd094862b4bc822ee2e
+msgid "changed workflow descriptions"
+msgstr ""
+
+#: ../../12-document.md:285 484cc68811e548d792a7362dc9568a49
+msgid "Refresh Chinese Translations"
+msgstr "刷新中文翻译"
+
+#: ../../12-document.md:287 e5ee25a7e3d64fd9bdb33e7c7d96842a
+msgid "After changing English source pages, refresh the gettext catalogs:"
+msgstr ""
+
+#: ../../12-document.md:295 ac07f65a99fa4d3c9bd967273f6ca2bf
+msgid "Then review the affected `.po` files in:"
+msgstr ""
+
+#: ../../12-document.md:301 33ac0be5ece74d5a85aa1e09babde826
+msgid "Typical examples:"
+msgstr ""
+
+#: ../../12-document.md:303 ff6182c2d2e04306b9b53f5b06c74a4b
+msgid "`index.po` when navigation changes"
+msgstr ""
+
+#: ../../12-document.md:304 5905496f5a1248198c19b699139fe8dc
+msgid "`08-build.po` when the build guide changes"
+msgstr ""
+
+#: ../../12-document.md:305 6660dac51fa94a8a81e97e34dd4ef0bc
+msgid "`12-document.po` when this page changes"
+msgstr ""
+
+#: ../../12-document.md:307 6dfeb0126caa4465a2e18ead2525c344
+msgid "Look for:"
+msgstr ""
+
+#: ../../12-document.md:309 9f5b79dfd68f4a228999a41006594a84
+msgid "new untranslated `msgid` entries"
+msgstr ""
+
+#: ../../12-document.md:310 f336a015789d445e8f51e84c1e778dc0
+msgid "`#, fuzzy` markers"
+msgstr ""
+
+#: ../../12-document.md:311 aec053cc16c640a0ae93c5b738087ee4
+msgid "wording drift between English source and Chinese translation"
+msgstr ""
+
+#: ../../12-document.md:313 0dbb200fba5744888660e372098a64f0
+msgid "After updating translations, rebuild the site:"
+msgstr ""
+
+#: ../../12-document.md:320 e896a0d4904a4b468c6915afe26eaf4b
+msgid ""
+"If you only changed Chinese `.po` files and did not change the English "
+"Markdown source, you usually do not need to rerun `make gettext` and "
+"`make intl-update`."
+msgstr ""
+
+#: ../../12-document.md:322 f079153dd7d444f09969b1c52c164fef
+msgid "Build and Preview the PKB"
+msgstr "构建与预览 PKB"
+
+#: ../../12-document.md:324 7da967e319ad4407a5a98ff88a23cbda
+msgid "Local HTML Build"
+msgstr "本地 HTML 构建"
+
+#: ../../12-document.md:332 f89973c373dd49d0b23abe45737b714d
+msgid "Output directories:"
+msgstr ""
+
+#: ../../12-document.md:334 fefa33808e334fe299bcffc5e42e26bc
+msgid "English: `doc/_build/en/html/`"
+msgstr ""
+
+#: ../../12-document.md:335 c6024610a0b54060874c00f21bf69e14
+msgid "Chinese: `doc/_build/zh_CN/html/`"
+msgstr ""
+
+#: ../../12-document.md:337 cc2216fdcd284011a2162d9313ce758e
+msgid "Local Preview Server"
+msgstr "本地预览服务"
+
+#: ../../12-document.md:344 519cae3f1e0e49d7a728e281a937f064
+msgid "GitHub Pages Staging Build"
+msgstr "GitHub Pages 预发布构建"
+
+#: ../../12-document.md:351 8689535b88f2498a9893aeed22e49b50
+msgid "This prepares `doc/_build/site/` for GitHub Pages deployment."
+msgstr ""
+
+#: ../../12-document.md:353 494c37e6c90e42c0a76bbce73f3e687a
+msgid "Suggested Authoring Checklist"
+msgstr "建议的编写检查清单"
+
+#: ../../12-document.md:355 301456ed24be4ddea1f7369841418703
+msgid "Before considering a PKB update complete, verify:"
+msgstr ""
+
+#: ../../12-document.md:357 4a2561e882024a51858a45950419d625
+msgid "The English Markdown source is correct and readable."
+msgstr ""
+
+#: ../../12-document.md:358 0e71c560849d492993782287b62c0e7c
+msgid "The page is included in `doc/index.md` if it should appear in navigation."
+msgstr ""
+
+#: ../../12-document.md:359 96a80abd8faa4be9941ddc8cfa436c07
+msgid "File references and commands still match the repository."
+msgstr ""
+
+#: ../../12-document.md:360 e77ee26487f548ae8988a71066faf89a
+msgid "Mermaid diagrams use parser-safe labels."
+msgstr ""
+
+#: ../../12-document.md:361 1254f3eebbfd43439d337a8e0f6e01f4
+msgid ""
+"LLM-generated content has been reviewed by a human for wording, intent, "
+"and technical accuracy."
+msgstr ""
+
+#: ../../12-document.md:362 789d5724293944d0a68cf8722888b902
+msgid "The PKB metadata footer is updated."
+msgstr ""
+
+#: ../../12-document.md:363 61c4bfea2e094e96801ec42b16166a37
+msgid "Chinese translation catalogs are refreshed when English text changed."
+msgstr ""
+
+#: ../../12-document.md:364 daac151e447047f1b63a9125e797ad83
+msgid "`poetry run make html` succeeds locally."
+msgstr ""
+
+#: ../../12-document.md:365 7ab271ab1bc143188fd9a51f5fcc2844
+msgid ""
+"Future automation designs are documented as advisory or planned behavior "
+"unless they are already implemented."
+msgstr ""
+
+#: ../../12-document.md:367 13e223127bc840e9bc40e264e10baba8
+msgid "Common Mistakes"
+msgstr "常见错误"
+
+#: ../../12-document.md:72 d28cbd6e27ae4f1b85f84448ffc4e2ea
+#, fuzzy
+msgid "Mistake"
+msgstr "常见错误"
+
+#: ../../12-document.md:72 baa70d1a587641d0b0068461a26eb553
+msgid "Result"
+msgstr ""
+
+#: ../../12-document.md:72 ec27342522d440f8893d3e78cc53d555
+msgid "Fix"
+msgstr ""
+
+#: ../../12-document.md:72 d4885e3cdba34a39af7a279b4ad3ac77
+msgid "Add a new page but forget `index.md`"
+msgstr ""
+
+#: ../../12-document.md:72 7009371ae3934fb3abec0e3be89f022e
+msgid "Page is not visible in docs navigation"
+msgstr ""
+
+#: ../../12-document.md:72 2d7a83fa7527494d9deb2baebae76800
+msgid "Add it to the `toctree`"
+msgstr ""
+
+#: ../../12-document.md:72 58fc557b59634693bbcab1d7ba718de7
+msgid "Edit only Chinese `.po` files while English source is outdated"
+msgstr ""
+
+#: ../../12-document.md:72 936c9200ce2443de96ad935056ddb31d
+msgid "Translation drifts from the real source"
+msgstr ""
+
+#: ../../12-document.md:72 1a4aadb69a394302883a3316a2915114
+msgid "Update English Markdown first"
+msgstr ""
+
+#: ../../12-document.md:72 1f0ab99098d741348643093ef5f87585
+msgid "Forget the PKB metadata footer"
+msgstr ""
+
+#: ../../12-document.md:72 5ee3b3a4f94a49b180e5eb2b22f0b235
+msgid "Doc freshness becomes hard to track"
+msgstr ""
+
+#: ../../12-document.md:72 f8b205f12e0244d994bdf20c30879e31
+msgid "Add or refresh the footer"
+msgstr ""
+
+#: ../../12-document.md:72 5c811fabf34144c3a62a0bdb1ea16189
+msgid "Put fragile text in Mermaid node labels"
+msgstr ""
+
+#: ../../12-document.md:72 5a03ea71f29c42d892c96860fabe152a
+msgid "Mermaid build or render errors"
+msgstr ""
+
+#: ../../12-document.md:72 e8a91407669f41878387839b935dec98
+msgid "Use quoted, parser-safe labels"
+msgstr ""
+
+#: ../../12-document.md:72 244a320ec5e04eeeb8084aefcb5f8895
+msgid "Skip `intl-update` after changing English docs"
+msgstr ""
+
+#: ../../12-document.md:72 c77f059a83cd481ba8dd411c348cd1ef
+msgid "Chinese site misses new strings"
+msgstr ""
+
+#: ../../12-document.md:72 96fae4ce98164ac0a9a9ddd406644808
+msgid "Run `make gettext` and `make intl-update`"
+msgstr ""
+
+#: ../../12-document.md:72 87b5b8f2af1b47fabf64aa58882fff0c
+msgid "Trust LLM output without review"
+msgstr ""
+
+#: ../../12-document.md:72 692ceaedb1344d0486ed70c074726ce1
+msgid "Docs may be fluent but semantically wrong"
+msgstr ""
+
+#: ../../12-document.md:72 51767cd3d4b5474d83b11462974db634
+msgid ""
+"Review commands, file paths, architecture claims, and release steps "
+"before publishing"
+msgstr ""
+
+#: ../../12-document.md:72 cfdbdcee75834952b3b971657da3518f
+msgid "Present a future automation idea as if it already exists"
+msgstr ""
+
+#: ../../12-document.md:72 c359e65c54e3444fb963e79b07343de3
+msgid "Readers assume the repo already enforces it"
+msgstr ""
+
+#: ../../12-document.md:72 ff14d01e8da847b7b3c3894e98c7b151
+msgid "Mark design sections clearly as future or planned behavior"
+msgstr ""
+
+#: ../../12-document.md:379 5537ebda41e04e08b5e04a9a44f39dc7
+msgid "Related Pages"
+msgstr "相关页面"
+
+#: ../../12-document.md:381 a915ccd3985b4c73a8cfd293148bf9be
+msgid "`08-build.md` for build, release, and publish pipelines"
+msgstr ""
+
+#: ../../12-document.md:382 3fe82e03f42d499e9af7c7d5cb3ec4af
+msgid "`10-runbook.md` for local setup, debugging, and verification commands"
+msgstr ""
+
+#: ../../12-document.md:383 b02e9a7e2e664237a975c5b1f126d32a
+msgid "`ai-guide.md` for AI-facing maintenance rules"
+msgstr ""
+

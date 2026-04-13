@@ -1,0 +1,189 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../09-testing.md:1 47882dee058846dbb175819fe06ea0a5
+msgid "Lazy Todo App — Testing Strategy"
+msgstr ""
+
+#: ../../09-testing.md:5 319798b965b84d998d4a920960e9008a
+msgid "Test Layers"
+msgstr ""
+
+#: ../../09-testing.md 12f8e563498c41c4a6e2ce87825c3b62
+msgid "Layer"
+msgstr ""
+
+#: ../../09-testing.md e626cba788e74e3ba5d28f0f6ab54fef
+msgid "Primary Checks"
+msgstr ""
+
+#: ../../09-testing.md cbf182b4ac6b430cb3a008d2ec4d068a
+msgid "Notes"
+msgstr ""
+
+#: ../../09-testing.md b748e3d31d1f403e91603220cd5cf75c
+msgid "TypeScript frontend"
+msgstr ""
+
+#: ../../09-testing.md 5f274d001aeb461eb12ab28284870043
+msgid "`npm run build`, `npx tsc --noEmit`"
+msgstr ""
+
+#: ../../09-testing.md b048ab34a1984c7e887a731dcdb6f49a
+msgid "Validates React components, hooks, and shared types"
+msgstr ""
+
+#: ../../09-testing.md e9682c22102447ccbe8e6c44e71c3e89
+msgid "Rust backend"
+msgstr ""
+
+#: ../../09-testing.md 102c3d9eb5bc4e658129c0482dc6789f
+msgid "`cargo check`, `cargo clippy`, `cargo test`"
+msgstr ""
+
+#: ../../09-testing.md 723f5545a2de4b61845e82c8193c05fc
+msgid "Validates Tauri commands, SQLite access, and model contracts"
+msgstr ""
+
+#: ../../09-testing.md 3860df08790d4813ad95802629a57ae7
+msgid "Desktop behavior"
+msgstr ""
+
+#: ../../09-testing.md 55beb3d9eeca421495d6f4f76999e884
+msgid "Manual smoke test"
+msgstr ""
+
+#: ../../09-testing.md 0310fdfb7ce74c71a0a552605f512d58
+msgid ""
+"Tray behavior, notifications, note windows, and focus handling are OS-"
+"facing"
+msgstr ""
+
+#: ../../09-testing.md 907950a8ba1141dcb11f5688c809bbc5
+msgid "Documentation"
+msgstr ""
+
+#: ../../09-testing.md a54d6165b51b4b94bfcaa99fa2f5475b
+msgid "`poetry run make html`"
+msgstr ""
+
+#: ../../09-testing.md 1c2354b3c5cf4c608ff52f5f6f1ebb23
+msgid "Ensures Sphinx/MyST/i18n docs remain buildable"
+msgstr ""
+
+#: ../../09-testing.md:14 9b8b071cd457402583b9b439d8613522
+msgid "Core Regression Areas"
+msgstr ""
+
+#: ../../09-testing.md:16 e992631e392e4f378547a02697df73d4
+msgid "Todos"
+msgstr ""
+
+#: ../../09-testing.md:18 aedd5029b9bd4f98be0aa980c956414a
+msgid "Add, edit, toggle, and delete a todo."
+msgstr ""
+
+#: ../../09-testing.md:19 c58688842a234b569311e37945021f6f
+msgid "Verify search filters active tasks by title and description."
+msgstr ""
+
+#: ../../09-testing.md:20 015a163225274f8ab3b38fe04e9e80e8
+msgid "Verify display mode changes between list and grid without losing data."
+msgstr ""
+
+#: ../../09-testing.md:22 54ce1d1b502440c4a3cfa21099223f39
+msgid "Sticky Notes"
+msgstr ""
+
+#: ../../09-testing.md:24 38347bfd122142bb94bca414f05b4fe7
+msgid "Create a note from the main window and from the tray shortcut."
+msgstr ""
+
+#: ../../09-testing.md:25 4320e180cea44a428af200b979d7abd3
+msgid "Edit title, content, and color inline."
+msgstr ""
+
+#: ../../09-testing.md:26 5031b3c8a6794f17a04c76f693f87298
+msgid ""
+"Open a note in a dedicated pop-out window and verify updates persist back"
+" to SQLite."
+msgstr ""
+
+#: ../../09-testing.md:27 d8e2516019734eee82f88631739c9d5c
+msgid ""
+"Confirm external Markdown links open via the shell plugin instead of "
+"navigating inside the webview."
+msgstr ""
+
+#: ../../09-testing.md:29 dd8a5fb0a5ad43bc9fdffc9a81f37c82
+msgid "Pomodoro"
+msgstr ""
+
+#: ../../09-testing.md:31 5d6f436f684d4ed8973453bcc11f48cd
+msgid "Save timer durations and milestone settings."
+msgstr ""
+
+#: ../../09-testing.md:32 78f6d37ed03b4509a963fe828be90d77
+msgid "Start, pause, resume, skip, and reset a cycle."
+msgstr ""
+
+#: ../../09-testing.md:33 3119dfffa77e42e1aedb3a365b1223b1
+msgid "Verify the tray tooltip changes during active sessions."
+msgstr ""
+
+#: ../../09-testing.md:34 7bced23228d4409b825706396b4f6a7c
+msgid ""
+"Confirm milestone status updates between `active`, `completed`, and "
+"`cancelled`."
+msgstr ""
+
+#: ../../09-testing.md:36 6c446527cd9c47a284919fa90aad3859
+msgid "Settings and Storage"
+msgstr ""
+
+#: ../../09-testing.md:38 a4ce00db60724e3aa83704bc77f1b7b8
+msgid ""
+"Update page size, todo display, note display, note folder, and note "
+"template."
+msgstr ""
+
+#: ../../09-testing.md:39 aef99762f6bb46368842d6f7e949b58b
+msgid "Restart the app and confirm settings reload from `app_settings`."
+msgstr ""
+
+#: ../../09-testing.md:40 b7afe8059a1642e7bae211058cf5fc68
+msgid ""
+"Verify database directory precedence: `LAZY_TODO_DB_DIR`, config file, "
+"then app data dir."
+msgstr ""
+
+#: ../../09-testing.md:42 052e178e23b9408da33f39f403475732
+msgid "Documentation Verification"
+msgstr ""
+
+#: ../../09-testing.md:52 f9b4ab26cd424b65b4fb4d5b864b2b4f
+msgid ""
+"The English source should build to `_build/en/html/`, the Chinese site "
+"should build to `_build/zh_CN/html/`, and the language switcher should be"
+" present on every page."
+msgstr ""
+

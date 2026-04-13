@@ -29,7 +29,7 @@ RULES: tuple[Rule, ...] = (
             "src-tauri/src/db.rs",
             "src/types/**",
         ),
-        docs=("doc/04-data-and-api.md", "doc/07-testing.md"),
+        docs=("doc/05-data-and-api.md", "doc/09-testing.md"),
     ),
     Rule(
         patterns=(
@@ -39,7 +39,7 @@ RULES: tuple[Rule, ...] = (
             "src/components/NoteCard.tsx",
             "src/components/PomodoroPanel.tsx",
         ),
-        docs=("doc/02-architecture.md", "doc/03-workflows.md", "doc/06-runbook.md"),
+        docs=("doc/02-architecture.md", "doc/06-workflows.md", "doc/10-runbook.md"),
     ),
     Rule(
         patterns=(
@@ -53,7 +53,7 @@ RULES: tuple[Rule, ...] = (
     ),
     Rule(
         patterns=(
-            "doc/09-document.md",
+            "doc/12-document.md",
             "doc/ai-guide.md",
             "doc/conf.py",
             "doc/Makefile",
@@ -62,7 +62,7 @@ RULES: tuple[Rule, ...] = (
             "doc/_templates/**",
             "doc/_static/**",
         ),
-        docs=("doc/09-document.md", "doc/ai-guide.md"),
+        docs=("doc/12-document.md", "doc/ai-guide.md"),
     ),
 )
 
@@ -154,7 +154,7 @@ def mapped_docs_for_path(path: str) -> set[str]:
             mapped.update(rule.docs)
 
     if path.startswith("src/") or path.startswith("src-tauri/src/"):
-        mapped.update(("doc/00-overview.md", "doc/07-testing.md"))
+        mapped.update(("doc/00-overview.md", "doc/09-testing.md"))
 
     return mapped
 

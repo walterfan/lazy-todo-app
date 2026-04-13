@@ -1,0 +1,852 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: 2026-04-12 23:59+0800\n"
+"Last-Translator: human+ai\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../03-tech-stack.md:1 d94b50d78c344a108aa41ff24210a25b
+msgid "Lazy Todo App — Tech Stack"
+msgstr "Lazy Todo App — 技术栈"
+
+#: ../../03-tech-stack.md:5 359f8ace9f964c959c46b09e25c522d0
+msgid "Purpose"
+msgstr "目的"
+
+#: ../../03-tech-stack.md:7 2b5c8023a5804d3aa66d436879b7d85f
+msgid ""
+"This page explains the main technologies used in `lazy-todo-app` and, "
+"more importantly, how they work together at runtime."
+msgstr "本页说明 `lazy-todo-app` 使用的主要技术，以及更重要的，它们在运行时是如何协同工作的。"
+
+#: ../../03-tech-stack.md:9 489ef57ad6154377a309f8d66700d2ac
+msgid "If you are new to this stack, the key idea is:"
+msgstr "如果你刚接触这套技术栈，最关键的理解是："
+
+#: ../../03-tech-stack.md:11 ded5a9595cb7409caa7ec53dbd5a318c
+msgid "React renders the user interface inside a desktop webview"
+msgstr "React 在桌面 WebView 中渲染用户界面"
+
+#: ../../03-tech-stack.md:12 12c54b51a06344a1bce8e933dd3d05b2
+msgid ""
+"Tauri wraps that webview as a native desktop app and provides the bridge "
+"to Rust"
+msgstr "Tauri 将这个 WebView 包装成原生桌面应用，并提供到 Rust 的桥接层"
+
+#: ../../03-tech-stack.md:13 71a883dc060c4615a0e7a9048465db3b
+msgid ""
+"Rust handles desktop capabilities, command execution, and SQLite "
+"persistence"
+msgstr "Rust 负责桌面能力、命令执行以及 SQLite 持久化"
+
+#: ../../03-tech-stack.md:15 71f1bf7bfb2b42ed9921cd3a9a01eeba
+msgid "System View"
+msgstr "系统视图"
+
+#: ../../03-tech-stack.md:26 4398a5ce092c4749a4f21e8488296af5
+msgid "Stack Summary"
+msgstr "技术栈概要"
+
+#: ../../03-tech-stack.md:17 756e877d7a5748ddb7b7e91660b7a94f
+msgid "Layer"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 58cc76855c06476aaf37e664bf74c3b6
+msgid "Main Technology"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 5910b02ea9864de7b3db0cf129b94e5b
+#, fuzzy
+msgid "Why It Exists In This Repo"
+msgstr "Tauri 在这个仓库中负责什么"
+
+#: ../../03-tech-stack.md:17 63beef2b8aaa481ea9474f2765e0caef
+#, fuzzy
+msgid "Desktop shell"
+msgstr "桌面构建"
+
+#: ../../03-tech-stack.md:17 fceea979199f4eb2ac36d45712b4bf7b
+msgid "Tauri v2"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 6af0fc35e5e74870a982d64d8f9297ec
+msgid ""
+"Turns the app into a native desktop program with windows, tray, "
+"notifications, and packaging"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 9e981942935c42319c999f196e3a566c
+#, fuzzy
+msgid "Frontend UI"
+msgstr "前端构建"
+
+#: ../../03-tech-stack.md:17 a8e5fe6575ed46789a6ce1b27bb544f0
+#, fuzzy
+msgid "React 18 + TypeScript"
+msgstr "React + TypeScript 前端"
+
+#: ../../03-tech-stack.md:17 6afdfd08631e4de0a347131823fd5f89
+msgid "Builds the todo, note, pomodoro, and settings interfaces"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 d153b30f9ad941588c102f7b5aa003bc
+#, fuzzy
+msgid "Frontend build tool"
+msgstr "前端构建"
+
+#: ../../03-tech-stack.md:17 58e32be5ef3a4dcca7be95d8258b0e87
+msgid "Vite"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 8487205acda54228b046b04dd91f44f1
+msgid "Provides fast local development and bundles the web assets for Tauri"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 270ad62ac1c045e5b2dbaa4584a2ddbc
+msgid "Backend runtime"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 0753ce580b974547b07a49f50e8f9f83
+msgid "Rust"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 6febffde5a174da8820a2132ffcbecd7
+msgid ""
+"Implements Tauri commands, database access, tray logic, and window "
+"lifecycle"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 f39f804e5a7343ff9b16d4230d18331d
+msgid "Local storage"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 2dd42f27b78c457cafe4b3849c8ab24b
+msgid "SQLite via `rusqlite`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 7688d6c279db4515b7cb7839f40cd8a6
+msgid "Persists todos, sticky notes, pomodoro state, and app settings"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 d5b573c9a6c54109a112e25cfcad9182
+msgid "Markdown rendering"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 57daab2434534d1b8dd08b7383f1c110
+msgid "`react-markdown` + `remark-gfm`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 927ed6e2fc9d4b16a061dca59ba66f43
+msgid "Renders note content with GitHub Flavored Markdown support"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 c472ac63a05a4f4293f653c14948841a
+msgid "Native integrations"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 e0bfaf53b0034076b048378fc2fe01b0
+#, fuzzy
+msgid "Tauri plugins"
+msgstr "什么是 Tauri"
+
+#: ../../03-tech-stack.md:17 4c128f7fdc56490b888dd04a22de79c6
+msgid "Opens external links and shows native notifications"
+msgstr ""
+
+#: ../../03-tech-stack.md:38 2e05e6dbfdff4b5b93ed9317c76d5043
+msgid "React + TypeScript Frontend"
+msgstr "React + TypeScript 前端"
+
+#: ../../03-tech-stack.md:40 76d6c6faed72409d80521ed732e1cbf1
+msgid "What React Is Doing Here"
+msgstr "React 在这里负责什么"
+
+#: ../../03-tech-stack.md:42 0c44b0c35aae4282abeb3af1bb1907bc
+msgid ""
+"React is the UI layer. It is responsible for rendering the screens and "
+"responding to user interactions such as:"
+msgstr "React 是界面层。它负责渲染各个页面，并响应用户交互，例如："
+
+#: ../../03-tech-stack.md:44 b47f698979624a2ba069a88849397c3a
+msgid "adding or completing todos"
+msgstr ""
+
+#: ../../03-tech-stack.md:45 cbc9de317b1642f6a6c67432d96da788
+msgid "editing sticky notes"
+msgstr ""
+
+#: ../../03-tech-stack.md:46 503b5657f909467e890cf78e8ecbbabe
+msgid "switching pomodoro phases"
+msgstr ""
+
+#: ../../03-tech-stack.md:47 aed4aa1427a04da6835eac38cb6c4a7b
+msgid "opening the settings panel"
+msgstr ""
+
+#: ../../03-tech-stack.md:49 dcb381d45fea4fea8e1b09bdcdc23cbf
+msgid "The frontend code lives in `src/`."
+msgstr "前端代码位于 `src/`。"
+
+#: ../../03-tech-stack.md:51 9d0d4e1df15c43068619f3195eda59ef
+msgid "Important frontend files:"
+msgstr "重要的前端文件包括："
+
+#: ../../03-tech-stack.md:53 418dec8209e14822a6558d23a1122a3f
+msgid ""
+"`src/main.tsx`: bootstraps the UI and decides whether to render the main "
+"app or a dedicated note window"
+msgstr ""
+
+#: ../../03-tech-stack.md:54 5a866ab8073d4f95ac4ab0472b75c0ea
+msgid "`src/App.tsx`: main application shell"
+msgstr ""
+
+#: ../../03-tech-stack.md:55 3abf44631de64fb7b61f0c00ebd58417
+msgid ""
+"`src/components/`: reusable UI pieces such as todo lists, note cards, and"
+" pomodoro panels"
+msgstr ""
+
+#: ../../03-tech-stack.md:56 60688be9eaa14583a6219aab6dd303c6
+msgid ""
+"`src/hooks/`: logic reuse for countdowns, pomodoro state, settings, and "
+"data access"
+msgstr ""
+
+#: ../../03-tech-stack.md:57 bb10380ebf534cb2b59dc5f01ff53fe2
+msgid "`src/types/`: shared TypeScript types used by the frontend"
+msgstr ""
+
+#: ../../03-tech-stack.md:59 aad94716b1da4e4f8af598b40040c969
+msgid "Why TypeScript Matters"
+msgstr "为什么 TypeScript 很重要"
+
+#: ../../03-tech-stack.md:61 77771ed71265473097d87eb3a70d3abd
+msgid ""
+"TypeScript adds static types on top of JavaScript. In this repo, that is "
+"useful because the frontend sends structured data to Rust commands and "
+"expects structured responses back."
+msgstr ""
+"TypeScript 在 JavaScript 之上增加了静态类型。在这个仓库中，这一点很有价值，因为前端会把结构化数据发送给 Rust "
+"命令，并期望得到结构化的返回结果。"
+
+#: ../../03-tech-stack.md:63 e86d9f53c1774f38838078b651df4b82
+msgid "That helps with:"
+msgstr ""
+
+#: ../../03-tech-stack.md:65 3fdf58130fc34f439fe410423f855653
+msgid "catching incorrect field names at development time"
+msgstr ""
+
+#: ../../03-tech-stack.md:66 742ae79479a04549be18dc85e1b19871
+msgid "making component props easier to understand"
+msgstr ""
+
+#: ../../03-tech-stack.md:67 a54be5f33d34472d91c4e57909ccfeea
+msgid "keeping frontend models aligned with backend data shapes"
+msgstr ""
+
+#: ../../03-tech-stack.md:69 e784792a9efc4b0cae15ae3116c50be8
+msgid "Frontend Libraries In Use"
+msgstr "当前使用的前端库"
+
+#: ../../03-tech-stack.md:17 d4ee1a3c137d48b5a6a88fc41de66ceb
+msgid "Package"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 423d43dc859c45568a9de2e8fa0dd07a
+#: 5670a451ff3245dc86ec35bd0c0ac1f0
+#, fuzzy
+msgid "Role In This Repo"
+msgstr "Tauri 在这个仓库中负责什么"
+
+#: ../../03-tech-stack.md:17 085d0d9f6894456abf621a5d0e615201
+msgid "`react`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 a2bc3c68b7b54967b2842da07d3f5467
+msgid "Component rendering and state-driven UI updates"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 a18e867ff7754964a568b98799944056
+msgid "`react-dom`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 c45dc3586278410a96c0169378b244f9
+msgid "Mounts the React app into the Tauri webview DOM"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 d882246170854b32ade767d27a10012c
+msgid "`@tauri-apps/api`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 2a047a4fce2c482ea4853a89f7371ab0
+msgid "Lets the frontend call backend Tauri commands"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 f46d74579f31469eaaf46eb9d551561d
+msgid "`@tauri-apps/plugin-shell`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 2dc47a39fa9548ebbcc33110aa6189fa
+msgid "Opens external HTTP links in the system browser"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 ee4e1808d0914e8daef9bff301da95c5
+msgid "`@tauri-apps/plugin-notification`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 c7d5b8cd85bc41beb9bdabfe64a830c7
+msgid "Supports native desktop notifications from the app"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 104d4ed3e203446bab96243dbf9f1778
+msgid "`react-markdown`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 a76d2be6973240e4855d238ee5b8f76c
+msgid "Converts Markdown note text into rendered HTML"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 7676c18d44ff4566bdc68450189ae14e
+msgid "`remark-gfm`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 b9c6664ca03e4eb18c0b481cd5e3010e
+msgid ""
+"Adds GitHub Flavored Markdown features such as tables and task list "
+"formatting"
+msgstr ""
+
+#: ../../03-tech-stack.md:81 fd6631c4cac24964acecfac961768aff
+msgid "How React Fits This App"
+msgstr "React 如何融入这个应用"
+
+#: ../../03-tech-stack.md:83 ee07e06cc80f4bf9919e836e480f1099
+msgid "Think of React as the \"screen logic\" layer:"
+msgstr ""
+
+#: ../../03-tech-stack.md:85 f50fff66c7fd4f21a14538eb65de6997
+msgid "it reads current app state"
+msgstr ""
+
+#: ../../03-tech-stack.md:86 4ae3174f61474a8ca75e72f6ea58cd25
+msgid "it renders the visible UI from that state"
+msgstr ""
+
+#: ../../03-tech-stack.md:87 c5273cd33c1f40459c2ddf70d2f9c93e
+msgid "it calls Tauri when the UI needs native or persistent behavior"
+msgstr ""
+
+#: ../../03-tech-stack.md:89 92a5e2a53d594249bd1788351d195bfe
+msgid ""
+"React does **not** directly talk to SQLite or native desktop APIs. Those "
+"responsibilities stay behind the Tauri bridge."
+msgstr "React **不会**直接访问 SQLite 或原生桌面 API。这些职责都放在 Tauri 桥接层之后。"
+
+#: ../../03-tech-stack.md:91 7698a89ea8904f589b642442278f228f
+msgid "Tauri Desktop Layer"
+msgstr "Tauri 桌面层"
+
+#: ../../03-tech-stack.md:93 3ef40f2d8deb4becbd9ba5fadca13885
+msgid "What Tauri Is"
+msgstr "什么是 Tauri"
+
+#: ../../03-tech-stack.md:95 2b422a7c47bb4b94ae0996725309b433
+msgid "Tauri is the desktop application framework that combines:"
+msgstr "Tauri 是一个桌面应用框架，它把以下两部分结合在一起："
+
+#: ../../03-tech-stack.md:97 bbe7ca3ebbda41b6947748ad863e5750
+msgid "a web frontend, rendered inside a native webview"
+msgstr ""
+
+#: ../../03-tech-stack.md:98 407727444e4e4ae3adbc2b5b090d2362
+#, fuzzy
+msgid "a Rust backend, running as the native host application"
+msgstr "Rust 是这个 Tauri 原生宿主应用所使用的后端语言。"
+
+#: ../../03-tech-stack.md:100 73ddbe092b484145af1c107bcefe8e03
+msgid ""
+"That means you can use familiar web UI tools like React and CSS while "
+"still shipping a desktop app for macOS, Linux, and Windows."
+msgstr "这意味着你可以继续使用 React、CSS 这样的 Web UI 工具，同时把应用打包为 macOS、Linux 和 Windows 的桌面程序。"
+
+#: ../../03-tech-stack.md:102 532074889ca744408101412ba1e83095
+msgid "What Tauri Does In This Repo"
+msgstr "Tauri 在这个仓库中负责什么"
+
+#: ../../03-tech-stack.md:104 2f2cf6525a7e48609e900021bb0af693
+msgid "In `lazy-todo-app`, Tauri is responsible for:"
+msgstr ""
+
+#: ../../03-tech-stack.md:106 ce892ebfe0234e1a8afd7609b03eaa6c
+msgid "creating and running the desktop application"
+msgstr ""
+
+#: ../../03-tech-stack.md:107 132258fb498544c599335b2a260bf7fd
+msgid "managing the main window and note pop-out windows"
+msgstr ""
+
+#: ../../03-tech-stack.md:108 0fce1353dffd4ff986e1b12a27863599
+msgid "exposing backend commands to the frontend through `invoke()`"
+msgstr ""
+
+#: ../../03-tech-stack.md:109 5fe99b478c29413a8a9bb8a7fde87b7e
+msgid "handling system tray behavior"
+msgstr ""
+
+#: ../../03-tech-stack.md:110 eb51fb2c49fb4e869523df3e9ca70332
+msgid "packaging the app into desktop installers"
+msgstr ""
+
+#: ../../03-tech-stack.md:112 e8b4efe6b3aa4d258bc026a56a15dcc3
+msgid "The main Tauri setup lives in `src-tauri/src/lib.rs`."
+msgstr "Tauri 的主要启动和配置逻辑位于 `src-tauri/src/lib.rs`。"
+
+#: ../../03-tech-stack.md:114 14d2ef4ff7d84c38b82f6c70e4677c4d
+msgid "Concrete examples from this repo:"
+msgstr "这个仓库中的具体例子包括："
+
+#: ../../03-tech-stack.md:116 b1bdcb20d78c4431bdf6c650dff37e76
+msgid "the app registers command handlers with `tauri::generate_handler!`"
+msgstr ""
+
+#: ../../03-tech-stack.md:117 e8ff4b01ae6147eeaaa0ec90c3600982
+msgid ""
+"the database is created once and stored as managed state with "
+"`app.manage(database)`"
+msgstr ""
+
+#: ../../03-tech-stack.md:118 5038f2e095da4760864d99dc1b7a105f
+msgid "the tray menu is created in Rust and can show, hide, or quit the app"
+msgstr ""
+
+#: ../../03-tech-stack.md:119 0cb1aceca81a487298f29837139da52e
+msgid "closing the main window hides it instead of fully exiting the app"
+msgstr ""
+
+#: ../../03-tech-stack.md:121 dd4a7f1a0d0843ce992f4c62086b743a
+msgid "Why Tauri Is Helpful Here"
+msgstr "为什么这个项目适合使用 Tauri"
+
+#: ../../03-tech-stack.md:123 83d3ff826ea845df9120c691f334a8ec
+msgid "For this project, Tauri gives a clean split:"
+msgstr ""
+
+#: ../../03-tech-stack.md:125 770a2c8cf0514b37a411e22c7087c667
+msgid "React focuses on UI and interaction"
+msgstr ""
+
+#: ../../03-tech-stack.md:126 8eededb11e454c7d960353d0ba1c3cbb
+msgid "Rust focuses on local persistence and desktop-native behavior"
+msgstr ""
+
+#: ../../03-tech-stack.md:128 99a65c5286d14f159eb572f4cbae7611
+msgid ""
+"This is a good fit for an offline-first productivity tool that needs "
+"windows, tray integration, notifications, and local files without "
+"introducing a remote backend service."
+msgstr ""
+
+#: ../../03-tech-stack.md:130 747328fd4d5b4042a7fd2da652e27793
+msgid "Rust Backend"
+msgstr "Rust 后端"
+
+#: ../../03-tech-stack.md:132 702060f7090e45ff9a1a5fdec7ea02fb
+msgid "What Rust Is Doing Here"
+msgstr "Rust 在这里负责什么"
+
+#: ../../03-tech-stack.md:134 c29ec6c7ddd9405c90651e1fa03a1a7d
+msgid "Rust is the backend language used by the Tauri host application."
+msgstr "Rust 是这个 Tauri 原生宿主应用所使用的后端语言。"
+
+#: ../../03-tech-stack.md:136 307b20da5bbe4232b7a88ec29443fc1f
+msgid "In this repo, Rust handles:"
+msgstr ""
+
+#: ../../03-tech-stack.md:138 27895e8b9f2445558e8c7d7465873b0c
+msgid "command handlers that the frontend invokes"
+msgstr ""
+
+#: ../../03-tech-stack.md:139 efcb1b06a60f44a4858302e64dedb35c
+msgid "SQLite persistence"
+msgstr ""
+
+#: ../../03-tech-stack.md:140 1f5a5db6a18741df98efd73de4fa2bf5
+msgid "tray setup and window lifecycle"
+msgstr ""
+
+#: ../../03-tech-stack.md:141 2a65c2e4802f4c278c64bc72e12ba8d1
+msgid "platform-aware path resolution for the local database"
+msgstr ""
+
+#: ../../03-tech-stack.md:143 c249be455464446fbd1b1016d95927a9
+msgid "Main Rust Areas"
+msgstr "Rust 代码的主要区域"
+
+#: ../../03-tech-stack.md:17 604ebbda23594b35aeac2386c32d6211
+msgid "Path"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 e8de170a463744ca9868e4eefc92368e
+msgid "Responsibility"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 b9e6640ca38f4bbcb1a5c181b0697744
+msgid "`src-tauri/src/lib.rs`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 ee9b32ddc6984569a84af238b843feff
+msgid "Tauri app startup, plugin registration, tray setup, command registration"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 eea6b662f38140c9bc07ddeec021ecdf
+msgid "`src-tauri/src/commands/`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 6d4456f2e7ae4d8f93e7deae0a023926
+msgid "Tauri command handlers for todos, notes, pomodoro, and app actions"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 a734e66e6d8a473d87737502570972ff
+msgid "`src-tauri/src/db.rs`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 3fcc790153ed4bbc85405441ac91ef0a
+msgid "SQLite setup and persistence operations"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 4bdd265c1cb54b9fbbfa06e58b534b89
+msgid "`src-tauri/src/models/`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 5617f111985b4beca6943f78747cf406
+msgid "Rust data models for app entities"
+msgstr ""
+
+#: ../../03-tech-stack.md:152 e2578d86f75e4f0188ea27e0a70e7caa
+msgid "Why Rust Helps"
+msgstr "为什么 Rust 有帮助"
+
+#: ../../03-tech-stack.md:154 14de4e0d818b4f7b8fe4fea7e0983c6c
+msgid "Rust is a strong fit for the desktop/backend side because it gives:"
+msgstr ""
+
+#: ../../03-tech-stack.md:156 e61890befefb44829705dd03e14c5952
+msgid "good performance for a native desktop host"
+msgstr ""
+
+#: ../../03-tech-stack.md:157 b35245b29df645e8a39540becf62ba92
+msgid "strong compile-time checks"
+msgstr ""
+
+#: ../../03-tech-stack.md:158 907e1b5a68864472befd56466ab1c449
+msgid "safe memory management without a garbage collector"
+msgstr ""
+
+#: ../../03-tech-stack.md:159 b0350e7e2e764e6696abacbedb6aef38
+msgid "a clean way to represent typed command inputs and outputs"
+msgstr ""
+
+#: ../../03-tech-stack.md:161 a5db860fefb94753a3807143a782504c
+msgid ""
+"For a beginner, the most important concept is not low-level memory "
+"management. The useful takeaway is that Rust helps make the command layer"
+" and persistence layer more reliable."
+msgstr "对于初学者来说，最重要的点并不是底层内存管理。更值得记住的是，Rust 能让命令层和持久化层更可靠。"
+
+#: ../../03-tech-stack.md:163 f7a59f482029499994cc891331a9be5e
+msgid "Key Rust Dependencies In This Repo"
+msgstr "这个仓库中的关键 Rust 依赖"
+
+#: ../../03-tech-stack.md:17 9f1bcf9029724df49aa0ff1d43bd79e9
+msgid "Crate"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 f8260e8a28a446658b23779081fd95c2
+msgid "`tauri`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 99478617f16c442da370382b2f1a0b2f
+msgid "Desktop runtime, command bridge, window and tray APIs"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 0db91dcbe75b420aae918dd60187b72f
+msgid "`tauri-build`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 ea163845aaf742eebc10ab44d6ed61f2
+msgid "Build-time support for packaging the Tauri app"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 b19ef668ab0d4c278f71805d544ece6e
+msgid "`tauri-plugin-shell`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 693cd40520964b14b893d37e081d905d
+msgid "Shell and external-link integration"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 6329a891b0db4102bf02e45e59b46803
+msgid "`tauri-plugin-notification`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 e2da1116b1994e209ce14ce3ffbca950
+msgid "Native desktop notifications"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 04d83b844dac48fba367ef442c38134a
+msgid "`serde`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 a0ece074701a4cb687a0cbc40ba8b44a
+msgid "Serialization and deserialization of structured data"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 4bc821b3fcc54718a59973ee5baa5128
+msgid "`serde_json`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 47eb30b7a22045e79c804bc34db127bc
+msgid "JSON parsing for config and payload handling"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 30ae8f7453d643dab1cb82997ebe6881
+msgid "`rusqlite`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 79b1866d0a42497f8a10ef2b6c34d2d6
+msgid "SQLite access from Rust"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 1ffc7d2c55ab4498a9643846d4c59e1d
+msgid "`chrono`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 a83bf842726b4f3391203caf3f901bfb
+msgid "Date and time handling for todos and pomodoro data"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 f1912c9687b643e9ace788215be69a59
+msgid "`dirs`"
+msgstr ""
+
+#: ../../03-tech-stack.md:17 f7ebd8292d4a4c918a35050c93dcccf8
+msgid "Cross-platform lookup of user and app data directories"
+msgstr ""
+
+#: ../../03-tech-stack.md:177 0c9e566849d04ea89f2e599025a55040
+msgid "Data Flow: React -> Tauri -> Rust -> SQLite"
+msgstr "数据流：React -> Tauri -> Rust -> SQLite"
+
+#: ../../03-tech-stack.md:179 069b07c0bb8a435b9821ba97fa1f27b9
+msgid ""
+"When a user performs an action such as creating a todo, the request path "
+"is:"
+msgstr "当用户执行诸如创建 todo 这样的操作时，请求路径如下："
+
+#: ../../03-tech-stack.md:181 45b543c8d26f48ba8d6031200da74b43
+msgid "A React component handles the click or form submission."
+msgstr ""
+
+#: ../../03-tech-stack.md:182 13e5d2dbb30b466e86c74bbe441c7ec0
+msgid "The frontend calls a Tauri command through `invoke()`."
+msgstr ""
+
+#: ../../03-tech-stack.md:183 f67afb5a97344277b3198bc839255912
+msgid "Rust receives that command in `src-tauri/src/commands/`."
+msgstr ""
+
+#: ../../03-tech-stack.md:184 6a994e562951483da6ba13c833c6ce7c
+msgid "The Rust command uses the shared `Database` state."
+msgstr ""
+
+#: ../../03-tech-stack.md:185 3cfd17ea8d864c8fbdc354607fddb409
+msgid "`rusqlite` reads or writes data in SQLite."
+msgstr ""
+
+#: ../../03-tech-stack.md:186 97b0547d89b04b71bc7f35e1bd577891
+msgid "Rust returns a structured result back to the frontend."
+msgstr ""
+
+#: ../../03-tech-stack.md:187 e0e958c348b34c6e846b00d17d72316d
+msgid "React updates the UI with the new state."
+msgstr ""
+
+#: ../../03-tech-stack.md:189 8804e929aa944337a4451fe75abea471
+msgid ""
+"This separation is important because it keeps persistence and desktop "
+"capabilities out of the browser-like frontend layer."
+msgstr "这种分层很重要，因为它把持久化和原生桌面能力从类似浏览器的前端层中隔离了出去。"
+
+#: ../../03-tech-stack.md:191 dfcb551254e1476382eb00c3ba5310e3
+msgid "Build And Packaging Toolchain"
+msgstr "构建与打包工具链"
+
+#: ../../03-tech-stack.md:193 ced8f23ed7794e4bb2e6037facc6a893
+msgid "Frontend Build"
+msgstr "前端构建"
+
+#: ../../03-tech-stack.md:195 7edfcd10edac4b99b3576c46baa8b1bc
+msgid "The frontend uses Vite and TypeScript:"
+msgstr ""
+
+#: ../../03-tech-stack.md:197 29565f2740f84982939d73b6254c9cfb
+msgid "`npm run dev` starts the Vite development server"
+msgstr ""
+
+#: ../../03-tech-stack.md:198 2dbac69dffd343c3a52415eb901c0de4
+msgid "`npm run build` runs TypeScript checks and bundles frontend assets"
+msgstr ""
+
+#: ../../03-tech-stack.md:200 4499156b8fc6442fa964936a27566c6c
+msgid "Desktop Build"
+msgstr "桌面构建"
+
+#: ../../03-tech-stack.md:202 90af2d9edb134d448427f8e47329e08a
+msgid "The desktop app is built with Tauri:"
+msgstr ""
+
+#: ../../03-tech-stack.md:204 dc799402137448c1912782f850172b04
+msgid "`npm run tauri dev` runs the desktop app in development mode"
+msgstr ""
+
+#: ../../03-tech-stack.md:205 a9f3f6e5e9664f94a7df0bc1ab6463e5
+msgid "`npm run tauri build` packages the app for the current platform"
+msgstr ""
+
+#: ../../03-tech-stack.md:207 0ec97af3253f4dc7bf2b7172e00cf874
+msgid "Generated installers are created under `src-tauri/target/release/bundle/`."
+msgstr ""
+
+#: ../../03-tech-stack.md:209 3b194c931a7c41f5854132fa5c25e416
+msgid "Release Automation"
+msgstr "发布自动化"
+
+#: ../../03-tech-stack.md:211 a457059dd5254fa39279b6fbc7d733f7
+msgid "The repo also includes GitHub Actions workflows for:"
+msgstr ""
+
+#: ../../03-tech-stack.md:213 568961f567f74d3e98df1e0465c8b946
+msgid "desktop release builds on version tags"
+msgstr ""
+
+#: ../../03-tech-stack.md:214 1819e4d0af4d4ec9915fcc00badbc954
+msgid "documentation publishing to GitHub Pages"
+msgstr ""
+
+#: ../../03-tech-stack.md:215 9e0860b8f6c04b3194f67b67412200ed
+msgid "advisory PKB freshness checks for docs maintenance"
+msgstr ""
+
+#: ../../03-tech-stack.md:217 33e240632e114c498fa655c626b1bc87
+msgid "See `08-build.md` for the release and publishing workflow in detail."
+msgstr "更详细的发布和上线流程，请参见 `08-build.md`。"
+
+#: ../../03-tech-stack.md:219 0f8a5f5be92b4d3291e158dbd34c5d0c
+msgid "What To Learn First"
+msgstr "建议先学习什么"
+
+#: ../../03-tech-stack.md:221 fc0694a56a2c4c169ab1a06d97a95ac7
+msgid "If this stack is new to you, learn it in this order:"
+msgstr "如果这套技术栈对你来说是新的，建议按这个顺序学习："
+
+#: ../../03-tech-stack.md:223 8205e686e2bc43039e67ceb99bb30d4e
+msgid "Read `src/main.tsx` and `src/App.tsx` to see how the UI starts."
+msgstr ""
+
+#: ../../03-tech-stack.md:224 371e96cd6d89465495a35fb96637e3aa
+msgid "Read `src-tauri/src/lib.rs` to understand how Tauri boots the native app."
+msgstr ""
+
+#: ../../03-tech-stack.md:225 d48efaaf7e684b4fb5cdac42d766b0db
+msgid ""
+"Read one command file under `src-tauri/src/commands/` to see how "
+"frontend-to-backend calls work."
+msgstr ""
+
+#: ../../03-tech-stack.md:226 82f27a2ea49343b1bd44ee479ca21da2
+msgid "Read `src-tauri/src/db.rs` to understand local persistence."
+msgstr ""
+
+#: ../../03-tech-stack.md:227 520a0d9d7e8f458394f16f33a85c813b
+msgid ""
+"Run `npm run tauri dev` and watch how a UI action travels through the "
+"stack."
+msgstr ""
+
+#: ../../03-tech-stack.md:229 b77d4bf57d1441e0b50ddd39bbb37c4e
+msgid ""
+"That order usually makes the architecture easier to understand than "
+"learning React, Rust, and Tauri in isolation."
+msgstr "和把 React、Rust、Tauri 分开孤立地学习相比，这种顺序通常更容易帮助你理解整套架构。"
+
+#: ../../03-tech-stack.md:231 d0b4dfce1ee945e99ceb8fa3b1dcb8b3
+msgid "Common Misconceptions"
+msgstr "常见误解"
+
+#: ../../03-tech-stack.md:17 9e2c1723e5f542a481bc549865e2120a
+#, fuzzy
+msgid "Misconception"
+msgstr "常见误解"
+
+#: ../../03-tech-stack.md:17 407c407f526e45dd9ee718210cffb787
+#, fuzzy
+msgid "Reality In This Repo"
+msgstr "Tauri 在这个仓库中负责什么"
+
+#: ../../03-tech-stack.md:17 e2a7a064f0df41f1ba89b73b2bbfa48f
+#, fuzzy
+msgid "\"React is the whole app.\""
+msgstr "React 如何融入这个应用"
+
+#: ../../03-tech-stack.md:17 f647d2f7c6fc47cba351f25616743876
+msgid ""
+"React is only the UI layer. Native behavior and persistence live in Rust "
+"through Tauri."
+msgstr ""
+
+#: ../../03-tech-stack.md:17 0bec953faa754fa5a3ec4ece51274eba
+msgid "\"Tauri replaces React.\""
+msgstr ""
+
+#: ../../03-tech-stack.md:17 b0b7ba8285ec409d911408f8a71642c2
+msgid ""
+"Tauri does not replace React. It wraps the React app as a desktop "
+"application and bridges it to native code."
+msgstr ""
+
+#: ../../03-tech-stack.md:17 3381c566d7b14d3e94af7f4363a239ea
+msgid "\"Rust is only for performance.\""
+msgstr ""
+
+#: ../../03-tech-stack.md:17 f6cdf745fdcd4824bfb803803cf76511
+msgid ""
+"Here Rust is mainly valuable for reliability, desktop integration, and "
+"typed command handling."
+msgstr ""
+
+#: ../../03-tech-stack.md:17 0b21886708d34324a055f97d8aaffca4
+msgid "\"The frontend can talk directly to SQLite.\""
+msgstr ""
+
+#: ../../03-tech-stack.md:17 145ea016068e45bf9f3442e800b2be5d
+msgid ""
+"It cannot. The frontend goes through Tauri commands, and Rust owns "
+"database access."
+msgstr ""
+

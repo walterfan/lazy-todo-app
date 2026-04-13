@@ -1,0 +1,287 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../07-conventions.md:1 5cc61e2e23ce4b59b3f238878afeb0bc
+msgid "Lazy Todo App — Conventions"
+msgstr ""
+
+#: ../../07-conventions.md:5 21f803241aea47579b24e6f2e9a87e1b
+msgid "Code Style"
+msgstr ""
+
+#: ../../07-conventions.md:7 59179ce0ea2644598a9f1dfdf80cfa51
+msgid "Rust"
+msgstr ""
+
+#: ../../07-conventions.md:9 f265947f95294fe1aaa7895609513e85
+msgid "**Edition**: 2021"
+msgstr ""
+
+#: ../../07-conventions.md:10 824a2f7b1cdd4d65941ab0c7464ea88a
+msgid "**Formatting**: Standard `rustfmt` defaults"
+msgstr ""
+
+#: ../../07-conventions.md:11 ef21788b860b4d869c1303357749eab9
+msgid ""
+"**Naming**: `snake_case` for files, functions, variables; `PascalCase` "
+"for structs"
+msgstr ""
+
+#: ../../07-conventions.md:12 f63550b459bf48f0a0b5910632b713b1
+msgid ""
+"**Error handling**: All Tauri commands return `Result<T, String>`, "
+"mapping internal errors via `.map_err(|e| e.to_string())`"
+msgstr ""
+
+#: ../../07-conventions.md:13 d52e2dce9a7048dca3442fbc6c397006
+msgid ""
+"**Database access**: All SQL goes through `db.rs` methods; command "
+"handlers never construct SQL directly"
+msgstr ""
+
+#: ../../07-conventions.md:14 5b68bdb42b93458ab0a25d077a6f5298
+msgid ""
+"**State sharing**: `Database` struct wraps `Mutex<Connection>` and is "
+"injected via `app.manage()`; accessed in commands via `State<'_, "
+"Database>`"
+msgstr ""
+
+#: ../../07-conventions.md:15 23587c4fa1324b9eaaf42967dea68b4b
+msgid ""
+"**Serde**: All models derive `Serialize`/`Deserialize` for JSON IPC; "
+"input structs use `Option<T>` for partial updates"
+msgstr ""
+
+#: ../../07-conventions.md:17 0c0998afa3cd43f0815e7cefe31d9efe
+msgid "TypeScript / React"
+msgstr ""
+
+#: ../../07-conventions.md:19 19e87c134a5c4952a1f1dbf991170692
+msgid "**React version**: 18 with function components only (no class components)"
+msgstr ""
+
+#: ../../07-conventions.md:20 2e4f7e282c0e4aa4bd0ab54c4a714b82
+msgid "**State**: `useState` and `useEffect` hooks; no external state library"
+msgstr ""
+
+#: ../../07-conventions.md:21 eabd8ec5b1864656b3667f524c9038e2
+msgid ""
+"**Hooks**: Custom hooks prefixed with `use` encapsulate Tauri `invoke()` "
+"calls and local state"
+msgstr ""
+
+#: ../../07-conventions.md:22 4279f34e1a0249c6863b75b935210557
+msgid "**Components**: One component per file, `PascalCase` filenames"
+msgstr ""
+
+#: ../../07-conventions.md:23 448fbae19b2a4390bb4911b51e3af887
+msgid ""
+"**Types**: Separate `types/*.ts` files for domain types; interfaces "
+"preferred over type aliases for objects"
+msgstr ""
+
+#: ../../07-conventions.md:24 e87d14307f174a0fb54713709c7a63a2
+msgid ""
+"**Imports**: Named imports from `@tauri-apps/api/core` (`invoke`) and "
+"`@tauri-apps/api/event` (`listen`)"
+msgstr ""
+
+#: ../../07-conventions.md:25 7587ac3b9d0347ab9131e1072ae3362c
+msgid "**Strict mode**: TypeScript strict mode enabled via `tsconfig.json`"
+msgstr ""
+
+#: ../../07-conventions.md:27 e1b4a9775c4a446ba796e8fd5a43d8be
+msgid "CSS"
+msgstr ""
+
+#: ../../07-conventions.md:29 a817c5c0567a4371ba2ebfb1e696ea56
+msgid "**Single file**: All styles in `src/App.css`"
+msgstr ""
+
+#: ../../07-conventions.md:30 e2dfb82491bd4500a730d8a94d1479c1
+msgid ""
+"**Theme**: Dark theme using CSS custom properties (`--bg-primary`, "
+"`--text-main`, etc.)"
+msgstr ""
+
+#: ../../07-conventions.md:31 633385734b7f4032bec6efb738fb92c3
+msgid ""
+"**Naming**: BEM-like flat classes (`.pomo-ring`, `.note-card`, `.tab-"
+"btn.active`)"
+msgstr ""
+
+#: ../../07-conventions.md:32 5a6d61274acf42788694fd964cfcaa45
+msgid "**Layout**: Flexbox and CSS Grid; no CSS framework"
+msgstr ""
+
+#: ../../07-conventions.md:33 73d89ca2cc80472e92a0b37d4c299b44
+msgid "**Animations**: CSS `@keyframes` for alerts and transitions"
+msgstr ""
+
+#: ../../07-conventions.md:35 c19fc00751bf4438ada3aab4398aeb8f
+msgid "File Organization Rules"
+msgstr ""
+
+#: ../../07-conventions.md:37 2e44280661f94db1a9330c168a94cd2f
+msgid "**Backend models** in `src-tauri/src/models/` — one file per domain entity"
+msgstr ""
+
+#: ../../07-conventions.md:38 552bfc2a4d944dd0867d2ef4b7ce28bc
+msgid ""
+"**Backend commands** in `src-tauri/src/commands/` — one file per feature "
+"area"
+msgstr ""
+
+#: ../../07-conventions.md:39 caa5f8cf309f4efc96429d24fcb0d92c
+msgid "**Frontend types** in `src/types/` — mirror backend models"
+msgstr ""
+
+#: ../../07-conventions.md:40 99d7190508b84ad4869c2b2d6e755f4e
+msgid "**Frontend hooks** in `src/hooks/` — one per feature or concern"
+msgstr ""
+
+#: ../../07-conventions.md:41 63a89df476ea43f7b9b46d87eae3093c
+msgid "**Frontend components** in `src/components/` — one component per file"
+msgstr ""
+
+#: ../../07-conventions.md:42 fbec1a5b7d5c49d58694c6b5e199d1db
+msgid ""
+"**All DB queries** centralized in `db.rs` — command handlers are thin "
+"wrappers"
+msgstr ""
+
+#: ../../07-conventions.md:44 bdf10ab86ded4f7c9da4073083b6a41a
+msgid "IPC Contract"
+msgstr ""
+
+#: ../../07-conventions.md:46 34a8fa7854574543820c92cf9f12cd7f
+msgid "Frontend calls backend **only** via `invoke()` from `@tauri-apps/api/core`"
+msgstr ""
+
+#: ../../07-conventions.md:47 4377a690903349a39d77c1c2397a16d1
+msgid ""
+"Backend sends events to frontend via `window.emit()` (Tauri `Emitter` "
+"trait)"
+msgstr ""
+
+#: ../../07-conventions.md:48 71d9b17460fe4262823c89d642bfae5b
+msgid ""
+"All command return types must be JSON-serializable (`Serialize` in Rust, "
+"matching TypeScript interfaces)"
+msgstr ""
+
+#: ../../07-conventions.md:49 acfc4bf3418c4909b4f7dec906a18c93
+msgid "Errors are returned as plain strings (no structured error types currently)"
+msgstr ""
+
+#: ../../07-conventions.md:51 ab2d4416c03a427db2070f937a179e99
+msgid "Error Handling"
+msgstr ""
+
+#: ../../07-conventions.md d23b02e19756489aa9d1d59dfa10b922
+msgid "Layer"
+msgstr ""
+
+#: ../../07-conventions.md 1df58887b49c48a1b6ea577c5a975870
+msgid "Pattern"
+msgstr ""
+
+#: ../../07-conventions.md 530fa1d7b18b4064ae11b7d18c0d327f
+msgid "Rust DB"
+msgstr ""
+
+#: ../../07-conventions.md 3560e70d02564ddcadc23034d4075b8a
+msgid "`rusqlite::Result<T>` propagated to commands"
+msgstr ""
+
+#: ../../07-conventions.md 64b594c13e634412b3084fbb5b8056d8
+msgid "Rust commands"
+msgstr ""
+
+#: ../../07-conventions.md 43d2d8fce6b44a73ae2ef0dc6978317d
+msgid "`.map_err(|e| e.to_string())` converts to `Result<T, String>`"
+msgstr ""
+
+#: ../../07-conventions.md b10c979833cd404f8e75d0af2efa3618
+msgid "Frontend hooks"
+msgstr ""
+
+#: ../../07-conventions.md db9c40e954ab4a96a1c5baf0f865ba3d
+msgid "`.catch(console.error)` — errors logged, UI shows stale data"
+msgstr ""
+
+#: ../../07-conventions.md 53ec7a56efff43c9844f449af35bf274
+msgid "Frontend UI"
+msgstr ""
+
+#: ../../07-conventions.md d714d62f548e45179e3c1175d5b33f39
+msgid "Loading states shown while data is fetched"
+msgstr ""
+
+#: ../../07-conventions.md:60 9e3e7a3f97394f5899c7469515af388d
+msgid "Git Conventions"
+msgstr ""
+
+#: ../../07-conventions.md:62 73c82f411355403ebceef59cb6419eaf
+msgid "**Branch**: `master` is the main branch"
+msgstr ""
+
+#: ../../07-conventions.md:63 308a9db3449b4c16ba741e80743d0f17
+msgid ""
+"**Pre-commit**: `cargo clippy`, `cargo test`, `tsc --noEmit` (via `pre-"
+"commit` framework)"
+msgstr ""
+
+#: ../../07-conventions.md:64 17345315c70b47d18825a0a5f61bf752
+msgid ""
+"**Commit style**: Conventional commits recommended (`feat:`, `fix:`, "
+"`docs:`, etc.)"
+msgstr ""
+
+#: ../../07-conventions.md:66 e5cbc0d385a74c138151fac253d9831a
+msgid "Architectural Constraints (from CLAUDE.md)"
+msgstr ""
+
+#: ../../07-conventions.md:68 787d5048ff7340178fce02fb89e1d3d5
+msgid "These rules are enforced for AI agents contributing to the project:"
+msgstr ""
+
+#: ../../07-conventions.md:70 2620d536813241d5ab15c036029380d6
+msgid "All Tauri commands defined in `src-tauri/src/commands/`"
+msgstr ""
+
+#: ../../07-conventions.md:71 e102a49ef07b4abc88e1156fca8c15e3
+msgid "State management uses Tauri's managed state (`tauri::State`)"
+msgstr ""
+
+#: ../../07-conventions.md:72 6bf5d067197b4664a0b378cb4985793d
+msgid "Frontend calls backend ONLY through `@tauri-apps/api/core.invoke()`"
+msgstr ""
+
+#: ../../07-conventions.md:73 a2cf216f71744bc09687fc4f1702814a
+msgid "All data persistence goes through Rust/SQLite"
+msgstr ""
+
+#: ../../07-conventions.md:74 ede406834e5243e783d49b83418a41c9
+msgid "All Tauri commands return `Result<T, String>`"
+msgstr ""
+

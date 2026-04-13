@@ -1,0 +1,712 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../05-data-and-api.md:1 a5e5ca2c75d144fa81e23eac56c7b98e
+msgid "Lazy Todo App — Data & API Reference"
+msgstr ""
+
+#: ../../05-data-and-api.md:5 3137daf7029c4962a15a637ebd54c419
+msgid "Database"
+msgstr ""
+
+#: ../../05-data-and-api.md:7 849e45caa8fa40a781a8b7d7019a06d7
+msgid "**Engine**: SQLite via `rusqlite` with the `bundled` feature"
+msgstr ""
+
+#: ../../05-data-and-api.md:8 46c9a4766f1e4a93869a19a3d483a25d
+msgid "**File**: `todos.db`"
+msgstr ""
+
+#: ../../05-data-and-api.md:9 cdd7f9597ff747d5b5e2a85ed30eda5b
+msgid ""
+"**Schema creation**: `db.rs::Database::new()` initializes all tables on "
+"startup"
+msgstr ""
+
+#: ../../05-data-and-api.md:10 962d57400fa44e4b9a5390b725597242
+msgid ""
+"**Configuration precedence**: `LAZY_TODO_DB_DIR` -> `~/.config/lazy-todo-"
+"app/config.json` -> Tauri app data dir"
+msgstr ""
+
+#: ../../05-data-and-api.md:12 408b2b61ef784000b88123614714c084
+msgid "Table: `todos`"
+msgstr ""
+
+#: ../../05-data-and-api.md 0d8c4d1cd6084ed2bc9954f5730e1df6
+#: 62fb265ebe4548f8924de26e962a5c05 aca7be1b2cfb43bd8bd088d021ee3b2b
+#: b0d586c243ae45b29dfba8367899ba50 b6835862934f4d1a8e64f2d528abc857
+msgid "Column"
+msgstr ""
+
+#: ../../05-data-and-api.md 47ccf3b43ed14aadb03519205a7c3732
+#: a56a9464bf4047138f44ed25b2b139cf db3b842b352c452bafacde21b115c6ad
+#: e33cd895ecdd45b5ac575f31e789df76 ed41c8f9df934ecf848095b7d6af0691
+msgid "Type"
+msgstr ""
+
+#: ../../05-data-and-api.md 0299216c5d9a47f1b91750deeda1b307
+#: 0c187488e07a49639f0d45da848932ef 8066d4bf2c1048e1b3be771af8b9ce90
+#: 884aaf16cd38409b928b92485bb8b5a7 d84b5e286618474dbcb79805ef3c2048
+msgid "Default"
+msgstr ""
+
+#: ../../05-data-and-api.md 1f1f9257b68940638faab9652d3394cb
+#: 31ef7fbb04794932a3b4e2dea4e9e299 6a0b7eb360954020ae8f787931d48d79
+#: c9d2b07d0ded468fb627f4ca752cd859 d7a2b9a0c8a9496f92e063646eb23d6f
+msgid "Notes"
+msgstr ""
+
+#: ../../05-data-and-api.md 3d33340cee1744e8a132b46c67bb5fe1
+#: 458c713fd1984db4b1912946b8b1d7f9 6ce1f8e0f9644a48b5a536c8a38d20ad
+#: 7b544f480f1f4a6187018a96329537cf 8630a2ad6f764a5f968085cf7474e75f
+#: d2d51c1a26114da4a014e00db70329e2 de2748b899874c74ad459bcd539cecd1
+#: f7b9dee746c94ceab1b8cb29dedba153
+msgid "`id`"
+msgstr ""
+
+#: ../../05-data-and-api.md 0642c6d016354f9c9d15b0eb935e18b1
+#: 2926f105a50e4a64ab27f3e50478593a 2a1baaa81ae1462897be9e1f6ef985b7
+#: 2d500a409edc4b9c8bbf0e57587cc622 35eb9584ab8e45f5ab2e2eb58370f162
+#: 38414586fb6a492595b3a604d6e90638 38c466cb8b9e4c8e9f8b7947ce376b70
+#: 4202433891d94a0d9ed36201b40928e7 829ce2d182ba412d98ceb5852e790e8a
+#: aad9faa1d763440f922b39f0394444d9 bd46232f4b5e4f2a8857ee3cd9a25db1
+#: bf10c34709ee433584c1adcfaee5f556 fcf4477893884ec3840278535e0c34b7
+msgid "INTEGER"
+msgstr ""
+
+#: ../../05-data-and-api.md 2ec9586e12384792887b967a6aad65ed
+#: 5d5b2094b36046c79a3dd92db46ceba2 96632849d20d43b7a4c56f76801eb008
+msgid "AUTOINCREMENT"
+msgstr ""
+
+#: ../../05-data-and-api.md 790e8dfd940942c993d4db58d152cb94
+#: c8830f0529df45f8bc3d966f3668be3f d3becf1d4db44cd18ea9d34a3bf37d53
+msgid "Primary key"
+msgstr ""
+
+#: ../../05-data-and-api.md 66b5c2c1ac854059861ab89f5af7cd75
+#: dd189311d62a49c88a868aff44bfe806
+msgid "`title`"
+msgstr ""
+
+#: ../../05-data-and-api.md 06cd65dcc19844f0b23e6ad5460d4efb
+#: 24626914098241aead30d19fd0a19204 44af07e72cad4dd6828f6630f8ac16ea
+#: 44e8ac90d3724d0bb8121cc9c0d2038a 4c7837014a2c42b79d62268fc0941aa9
+#: 4caca64a32ba4d4eb88b937c54e4449a 66d1c75568664006b4b6beea6ad3e61c
+#: 673236b0025b4779bb4103768c9a777e 6b86d1e9665e49b2b2e790d77e99ce58
+#: 8baa64bfad26408999821fafe4958e6b 97109bfd699440d18a2dacd4abe1e32a
+#: 9d48cb3984554eddb5007744ebd268b8 ac03e71e39c44e489c6a114c3d60b754
+#: eb661df3208948bbabdf35aa09329f55 f187b0bb2b2f466c90ca8736b031ebe1
+msgid "TEXT"
+msgstr ""
+
+#: ../../05-data-and-api.md 0916fca6cb1b45df8949c2832da79931
+#: 45872d4c2eef4f569254db97d2ff42e4 64f3352c5d024b779b06191ea55a2e53
+#: 72290070a16542268c3d5dd2017062aa 817fd7562e24490cb21b97e5bce2e5e7
+#: 873da03ee16440e0b2c508fa884db47a 99c9a849614b48d28a6a174f12d9f1f3
+#: a8beffb177b645128db2cde8d5dbc183 d80c587476fb412a8d918722becf5b2b
+#: ef571bf67bfb44a8aecaf51da991d5c4
+msgid "—"
+msgstr ""
+
+#: ../../05-data-and-api.md 20583737d3514b53806b97882f098224
+#: 431915fd03ad46099b485242ebe75ea1 f5648af6c2c44ffaa93f4c373652bc91
+msgid "Required"
+msgstr ""
+
+#: ../../05-data-and-api.md 4cb0f4f0f1a44cd9a9d5d77fe0515571
+msgid "`description`"
+msgstr ""
+
+#: ../../05-data-and-api.md 25bca184ede948dc84f3f0e9b033e4d1
+#: 7e807a352db54b7886b8eca20857420c 9e591baf23014cbe82e7515847104270
+#: a2fb847f69eb431788b5e221c36fd91e cfe95c70db8f43de840b75a36a2e2feb
+msgid "`''`"
+msgstr ""
+
+#: ../../05-data-and-api.md cb117231227f489896b4cea37f5e5399
+msgid "`priority`"
+msgstr ""
+
+#: ../../05-data-and-api.md fe1fc4ef48c94811bdff7b82a18182cf
+msgid "`2`"
+msgstr ""
+
+#: ../../05-data-and-api.md d00ec2a8e571471abfb7b33ad5003136
+msgid "`1=high`, `2=medium`, `3=low`"
+msgstr ""
+
+#: ../../05-data-and-api.md 137e8f42f2b644c29d1998d1889ca92d
+msgid "`completed`"
+msgstr ""
+
+#: ../../05-data-and-api.md 2582254f7d0a4911baf1ab3908be2347
+msgid "`0`"
+msgstr ""
+
+#: ../../05-data-and-api.md 0cfec7d7459546fba1676b32e169a047
+msgid "Boolean flag"
+msgstr ""
+
+#: ../../05-data-and-api.md b57e3e433c93429e8eb3a20cb9f91509
+msgid "`deadline`"
+msgstr ""
+
+#: ../../05-data-and-api.md 141af58c890048a5b62e347605fef8bf
+msgid "NULL"
+msgstr ""
+
+#: ../../05-data-and-api.md 360283de43f849838f71ab5ac662b438
+msgid "ISO 8601 datetime"
+msgstr ""
+
+#: ../../05-data-and-api.md 09eb60c1c9334715b78220419a4d49a8
+#: 3b595442eebb4472a4cc40c85e6dfd21
+msgid "`created_at`"
+msgstr ""
+
+#: ../../05-data-and-api.md 07f9962739844b368a653d5f0df346f6
+#: 8b49d2af85d14bf68eccb32cc240ef3a d8c143d3bc1742cdb4d3106570899072
+#: e7757609b5514ff7987261c823cddc78
+msgid "`datetime('now')`"
+msgstr ""
+
+#: ../../05-data-and-api.md 1384f13614be42579917638c35062139
+#: 44b0684e2f754750b32187931c383ae8
+msgid "UTC timestamp"
+msgstr ""
+
+#: ../../05-data-and-api.md:24 b034298cee8b422c99b2da818070d2d7
+msgid "Table: `sticky_notes`"
+msgstr ""
+
+#: ../../05-data-and-api.md 9962da0fb88145c68cba4f7f6b8830d1
+msgid "`content`"
+msgstr ""
+
+#: ../../05-data-and-api.md 29c08b752bfc424fa10a223615513a0b
+msgid "Markdown body"
+msgstr ""
+
+#: ../../05-data-and-api.md b19fc9b15cf24bed9a38853563a162e4
+msgid "`color`"
+msgstr ""
+
+#: ../../05-data-and-api.md e28532ea8a89431597fb8da449b8c878
+msgid "`'yellow'`"
+msgstr ""
+
+#: ../../05-data-and-api.md 5f69176b640f4098b6415ffc3a3234bf
+msgid "One of the supported note colors"
+msgstr ""
+
+#: ../../05-data-and-api.md 0c066839ff3b4144a2c9a46eb14839d6
+msgid "`updated_at`"
+msgstr ""
+
+#: ../../05-data-and-api.md 36c8d10c01564c8385d5a2735cf82ec8
+msgid "Updated on each edit"
+msgstr ""
+
+#: ../../05-data-and-api.md:35 f102a590bf7e4fafb0cc9f55f0b238c4
+msgid "Table: `pomodoro_settings`"
+msgstr ""
+
+#: ../../05-data-and-api.md:37 beb17761f9cb474591d3a3a584ff1ee5
+msgid "Singleton row (`id = 1`) for timer configuration."
+msgstr ""
+
+#: ../../05-data-and-api.md a027aa269d0b4290a3eac417f795008b
+#: efda85bcd5e04ab28e9c9c97aea28823
+msgid "1"
+msgstr ""
+
+#: ../../05-data-and-api.md 64bd3685bd2048a4a55a085dbf8a7f1f
+#: b9e491bcb9cd4d41802ad8d54f717334
+msgid "`CHECK (id = 1)`"
+msgstr ""
+
+#: ../../05-data-and-api.md 6b3a8687b60243158d8ac7952ca8cefa
+msgid "`work_minutes`"
+msgstr ""
+
+#: ../../05-data-and-api.md 8cb7a0d07d7e4a15aafb82e883148a56
+msgid "`25`"
+msgstr ""
+
+#: ../../05-data-and-api.md 067095ed6fa8455fa5c74f79d5b1fe50
+msgid "Focus duration"
+msgstr ""
+
+#: ../../05-data-and-api.md e1d091ed509c403799e2a570d43fbaff
+msgid "`short_break_min`"
+msgstr ""
+
+#: ../../05-data-and-api.md 1ed58ac50c14483cb5194201810737bc
+msgid "`5`"
+msgstr ""
+
+#: ../../05-data-and-api.md 29ef8aa211384b60ac89bc3d29310b77
+msgid "Short break duration"
+msgstr ""
+
+#: ../../05-data-and-api.md 5f9aa2e3f77b41c791d50205c8ee654b
+msgid "`long_break_min`"
+msgstr ""
+
+#: ../../05-data-and-api.md 33d6a9c65aea470cb89d89db8eb7a414
+msgid "`15`"
+msgstr ""
+
+#: ../../05-data-and-api.md 562416bfa934412f90a6c748911bcb38
+msgid "Long break duration"
+msgstr ""
+
+#: ../../05-data-and-api.md c2b349b73a77461f9eca7c6989bca754
+msgid "`rounds_per_cycle`"
+msgstr ""
+
+#: ../../05-data-and-api.md 8fa632c2a523464a9899d576a1dab82e
+msgid "`4`"
+msgstr ""
+
+#: ../../05-data-and-api.md 104258dca05d46bd88c83dff2f084374
+msgid "Work rounds before long break"
+msgstr ""
+
+#: ../../05-data-and-api.md 01ac881519694a2482e55a8e592282b9
+msgid "`milestones_json`"
+msgstr ""
+
+#: ../../05-data-and-api.md d62c8e5c3d6545d999b14f4442cec478
+msgid "`'[]'`"
+msgstr ""
+
+#: ../../05-data-and-api.md a2d63ab9bfd544f193d7ef57f1e283a4
+msgid "Serialized `PomodoroMilestone[]`"
+msgstr ""
+
+#: ../../05-data-and-api.md:48 0dc0bc1e45c94b10b01e44ef09ff5057
+msgid "Table: `pomodoro_sessions`"
+msgstr ""
+
+#: ../../05-data-and-api.md ea265e24481a4f4aa113118713049e74
+msgid "`completed_at`"
+msgstr ""
+
+#: ../../05-data-and-api.md 88359546ac924c49bd185b21bb1ce442
+msgid "Completion time"
+msgstr ""
+
+#: ../../05-data-and-api.md 0129530b8c80491e9004161e1d9b39fa
+#: 63f09c38947947a78b06e852fe835545
+msgid "`duration_min`"
+msgstr ""
+
+#: ../../05-data-and-api.md a4bb91e949ca41188d560106b5273c94
+msgid "Completed work-session length"
+msgstr ""
+
+#: ../../05-data-and-api.md:56 50ca062fd6a04b7291fcfb216bcb564b
+msgid "Table: `app_settings`"
+msgstr ""
+
+#: ../../05-data-and-api.md:58 c12e6612dcba4da3b830d38c1f46c62d
+msgid "Singleton row (`id = 1`) for UI preferences."
+msgstr ""
+
+#: ../../05-data-and-api.md 0b27e637dddc466387530d2ad0ec95ae
+msgid "`page_size`"
+msgstr ""
+
+#: ../../05-data-and-api.md b46f97e9f7ae470aa6db53298b49e6d2
+msgid "`50`"
+msgstr ""
+
+#: ../../05-data-and-api.md a3f91accbed944198d89651d2be1ce0f
+msgid "Shared list size preference"
+msgstr ""
+
+#: ../../05-data-and-api.md 0b564ae59a604b98b6d4f7417d93a514
+msgid "`todo_display`"
+msgstr ""
+
+#: ../../05-data-and-api.md 6cce643700b7489b926b7064fa3ee8d4
+msgid "`'list'`"
+msgstr ""
+
+#: ../../05-data-and-api.md 206d11035d0a42558c02a75d4c3ed756
+#: 7d2ac84e332c4221ba7e8dc58fcd5171
+msgid "`list` or `grid`"
+msgstr ""
+
+#: ../../05-data-and-api.md 0e197cc7c49e4bfab5a8cad76ed32623
+msgid "`note_display`"
+msgstr ""
+
+#: ../../05-data-and-api.md 658bb4867ca543fda046f4bf80763433
+msgid "`'grid'`"
+msgstr ""
+
+#: ../../05-data-and-api.md 7df314acdcc847c5a69b20ab491c029a
+msgid "`note_template`"
+msgstr ""
+
+#: ../../05-data-and-api.md 85b30239ba6b446f8c50dbdd595587d9
+msgid "Default Markdown template"
+msgstr ""
+
+#: ../../05-data-and-api.md 902f635880dc4a278d65ddd88c8df6fc
+msgid "`note_folder`"
+msgstr ""
+
+#: ../../05-data-and-api.md 6e26584fa45f48b68e0e568f7d7d0e43
+msgid "Label/category hint for notes"
+msgstr ""
+
+#: ../../05-data-and-api.md:69 d9b6679a9f0b46eba590c98a95f4532c
+msgid "Tauri Commands (IPC API)"
+msgstr ""
+
+#: ../../05-data-and-api.md:71 a1c05bf7ecf34f3086e23be1bca25c4b
+msgid ""
+"All commands are called from the frontend through `invoke()` and return "
+"`Result<T, String>` on the Rust side."
+msgstr ""
+
+#: ../../05-data-and-api.md:73 f37e169264544392919956150d56a06a
+msgid "Todo Commands"
+msgstr ""
+
+#: ../../05-data-and-api.md 3dee00df91f14f95b691efbc933e47bc
+#: 40c7ba20cdcc4ddaad83f71be1638e49 4398d62dd58c42cba1a7675f16052f59
+#: 9ae84d8de69e45bab361b74429868034
+msgid "Command"
+msgstr ""
+
+#: ../../05-data-and-api.md 0e302f43823545c8834f4a9e4a71a2d5
+#: 4f804bbd6bd748cc8f9a5be38dcf596e a54010c6300c448cb9cb0e92fe399e5b
+#: eb9307a67631496498a5a0c055c2ec82
+msgid "Input"
+msgstr ""
+
+#: ../../05-data-and-api.md 3f10b4ea37fd4bfda11227a1603630ca
+#: 6a2740dd424d490781d5fe9da14595ab 95f6e2feafb943cfb2bc1bbcb84140e5
+#: be51f36d348544518f11fa364ea2a6ed
+msgid "Output"
+msgstr ""
+
+#: ../../05-data-and-api.md 08e6fce9a27449ed849050c77d69adc8
+#: 68f33eba62704ff88cc33a73fbb42d97 de093964a2d249f0b3b079b0c7a7ed3e
+#: e96e9930c0a948fea5021a80e83f833b
+msgid "Description"
+msgstr ""
+
+#: ../../05-data-and-api.md c1b89bdbfd454a758824298bd3a3c7d7
+msgid "`list_todos`"
+msgstr ""
+
+#: ../../05-data-and-api.md e872d4a39a6b4aa0b1f25a7b3a00e9f2
+msgid "`Todo[]`"
+msgstr ""
+
+#: ../../05-data-and-api.md f8ee0906129d4269a58494722ed7fdae
+msgid "Returns todos ordered by completion, priority, then deadline"
+msgstr ""
+
+#: ../../05-data-and-api.md 2529400aae324df39d0409ada7aeedc7
+msgid "`add_todo`"
+msgstr ""
+
+#: ../../05-data-and-api.md f94dc4c9fe484131b2c1613f1f06fe36
+msgid "`CreateTodo`"
+msgstr ""
+
+#: ../../05-data-and-api.md 1478397e0dd940e9bf508cb07a85e4e8
+#: 1532606ef3c94bf7bb4e5be69891886d efc4bf23a01c463cbf388370e9d2d7dd
+msgid "`Todo`"
+msgstr ""
+
+#: ../../05-data-and-api.md 67a0de91eb2e4835b73bca7930b3a6b3
+msgid "Inserts a new todo"
+msgstr ""
+
+#: ../../05-data-and-api.md 3c0352b61f154d24a0c42c00267d1b13
+msgid "`toggle_todo`"
+msgstr ""
+
+#: ../../05-data-and-api.md e9771544de994a8699553521a50607f2
+msgid "Flips the completed flag"
+msgstr ""
+
+#: ../../05-data-and-api.md 02dcf4cf576a4fd5ae294dfec0805f45
+msgid "`update_todo`"
+msgstr ""
+
+#: ../../05-data-and-api.md 74b1f546d6164550a8227cd29e98dd3c
+msgid "`UpdateTodo`"
+msgstr ""
+
+#: ../../05-data-and-api.md f68a201e696a486f82708a0c7ca02ce3
+msgid "Applies partial updates"
+msgstr ""
+
+#: ../../05-data-and-api.md 539fdbad3e4642aaac46505ab90ef7f8
+msgid "`delete_todo`"
+msgstr ""
+
+#: ../../05-data-and-api.md 1a8da07212cb49458c62399f4c4601d8
+#: 2dd193a707ec4c95b13a5ce64d18efb3 3e43f1a086d049f79dbe25debb80fbb7
+#: 4450d584897c4f4abe362d2cc3002807 5fbd16a400eb4a18a401848938f06cf2
+#: 6eb8c78e2c434609a3a006fa44e9562e 9dc447e302684deaaadd0269326a0a8a
+#: b01ddd52435749899bd86bdaac3454de e5dc33314e624292a84c6259ddd20dce
+msgid "`()`"
+msgstr ""
+
+#: ../../05-data-and-api.md a0816ed01b464ba0bc35c49b33800379
+msgid "Deletes the row"
+msgstr ""
+
+#: ../../05-data-and-api.md:83 6e16f0f05f1646aa819f4291cc8abcd2
+msgid "Note Commands"
+msgstr ""
+
+#: ../../05-data-and-api.md 1dc8dd6cff3f4dd2af63ee2e40bd83ef
+msgid "`list_notes`"
+msgstr ""
+
+#: ../../05-data-and-api.md 16ab7bc069b54fa3ae154bacf1c52bc1
+msgid "`StickyNote[]`"
+msgstr ""
+
+#: ../../05-data-and-api.md 3ea8ce1538154e12b5bcc41636be8456
+msgid "Returns notes ordered by `updated_at DESC`"
+msgstr ""
+
+#: ../../05-data-and-api.md 16b5e49ed9d84492ac4a7c674a262f96
+msgid "`add_note`"
+msgstr ""
+
+#: ../../05-data-and-api.md 857a8e8cb60f4e9fb87c929997640360
+msgid "`CreateNote`"
+msgstr ""
+
+#: ../../05-data-and-api.md b70e2fc7699c47a191e0d6bd8c56532e
+#: d251d2710da44dc9bcfc8ccf8c470dc7
+msgid "`StickyNote`"
+msgstr ""
+
+#: ../../05-data-and-api.md ab2a059b25304a2ba3fe7bd4df8fe54a
+msgid "Inserts a note"
+msgstr ""
+
+#: ../../05-data-and-api.md ed931c35e2cb4570ad19cafc99267044
+msgid "`update_note`"
+msgstr ""
+
+#: ../../05-data-and-api.md f2d8b35b8d6141b1a2ed11e0017f835f
+msgid "`UpdateNote`"
+msgstr ""
+
+#: ../../05-data-and-api.md b696411026234b01b3c3d02e83a488ff
+msgid "Persists inline or window edits"
+msgstr ""
+
+#: ../../05-data-and-api.md a7680fb90778401797e5928d0ebb60b3
+msgid "`delete_note`"
+msgstr ""
+
+#: ../../05-data-and-api.md b0239fd269254ae58a5e39c7d24fad36
+msgid "Deletes a note"
+msgstr ""
+
+#: ../../05-data-and-api.md:92 e801e0040c4946c98353bc4c5a0e0219
+msgid "Pomodoro Commands"
+msgstr ""
+
+#: ../../05-data-and-api.md 048ba3cb23e146a98c7cf8bc579a9098
+msgid "`get_pomodoro_settings`"
+msgstr ""
+
+#: ../../05-data-and-api.md 30a780cc5aba4f8e92dad841643cf94a
+#: 9c28845e98a046fa8cddfa60ffdd84d5
+msgid "`PomodoroSettings`"
+msgstr ""
+
+#: ../../05-data-and-api.md 8e858d82dbd7476a9fee4fd279b74379
+msgid "Loads timer settings and milestones"
+msgstr ""
+
+#: ../../05-data-and-api.md ac272c2f10614b3da7d2dfa89217c4e1
+msgid "`save_pomodoro_settings`"
+msgstr ""
+
+#: ../../05-data-and-api.md 9a779106db9b4c749dc6ed34e4259fdc
+msgid "Upserts the singleton settings row"
+msgstr ""
+
+#: ../../05-data-and-api.md 16fc1f8545b9415cabf42839c914aa08
+msgid "`record_pomodoro_session`"
+msgstr ""
+
+#: ../../05-data-and-api.md dc65137ec02b4c74b1bb345689a03ccc
+msgid "Records a completed work interval"
+msgstr ""
+
+#: ../../05-data-and-api.md 5c788ea59df743e49832ed5850d8e41c
+msgid "`get_today_pomodoro_count`"
+msgstr ""
+
+#: ../../05-data-and-api.md 6ccd34eddf7046849c67ebc21eadcffa
+msgid "`i64`"
+msgstr ""
+
+#: ../../05-data-and-api.md 67ec54e3580f47ea97f5d846e06fa423
+msgid "Counts sessions completed today"
+msgstr ""
+
+#: ../../05-data-and-api.md 40d56691a7a54d5b840c3969d15132f5
+msgid "`get_weekly_pomodoro_stats`"
+msgstr ""
+
+#: ../../05-data-and-api.md 831e51b7bc3141ddb874543a825cf310
+msgid "`DayStat[]`"
+msgstr ""
+
+#: ../../05-data-and-api.md a7c17b2bfd984d9d97bf74ce342341dc
+msgid "Seven-day rolling stats"
+msgstr ""
+
+#: ../../05-data-and-api.md cc2b15d8fd274d9e95d8e67077a31e1c
+msgid "`update_tray_tooltip`"
+msgstr ""
+
+#: ../../05-data-and-api.md b8770186f400422595377177078b2ca2
+msgid "`text`"
+msgstr ""
+
+#: ../../05-data-and-api.md 1a94129f57f44dc7a3d2143f62232d67
+msgid "Updates the tray tooltip"
+msgstr ""
+
+#: ../../05-data-and-api.md:103 564b923e1790477691e288cd5e822738
+msgid "App Commands"
+msgstr ""
+
+#: ../../05-data-and-api.md e00372d0e35847309bbe60bb53c12db1
+msgid "`get_db_path`"
+msgstr ""
+
+#: ../../05-data-and-api.md 8061fea0dd12469aa0f930eef207891c
+msgid "`String`"
+msgstr ""
+
+#: ../../05-data-and-api.md e4e75a168488494db5f9be303bf76185
+msgid "Returns the active SQLite path"
+msgstr ""
+
+#: ../../05-data-and-api.md bb16e9739f2d4fe6bbead6f0a457a8a2
+msgid "`get_app_settings`"
+msgstr ""
+
+#: ../../05-data-and-api.md 0d6b23c1f3ce480b83c7730aacb74506
+#: 6d5938f4b7f0452a91c191e3e4b28a77
+msgid "`AppSettings`"
+msgstr ""
+
+#: ../../05-data-and-api.md 1b254abfeff1428da73647bdd50675fd
+msgid "Loads persisted UI preferences"
+msgstr ""
+
+#: ../../05-data-and-api.md 5e912b3379e84fccbc175b21c49cead2
+msgid "`save_app_settings`"
+msgstr ""
+
+#: ../../05-data-and-api.md 9eed7bb001704aa4a1424bdae83adafe
+msgid "Persists preferences"
+msgstr ""
+
+#: ../../05-data-and-api.md d0a998ef78734c77a4f6ba3aae08ef71
+msgid "`quit_app`"
+msgstr ""
+
+#: ../../05-data-and-api.md d2d741273da842c6998df977668c7ad0
+msgid "Exits the application"
+msgstr ""
+
+#: ../../05-data-and-api.md 432747436faa4bf4b1e39afd9cf5313b
+msgid "`open_note_window`"
+msgstr ""
+
+#: ../../05-data-and-api.md 993f15b400494f6eb5cc66d762524c73
+msgid "`note_id`, `title`"
+msgstr ""
+
+#: ../../05-data-and-api.md f8b1326b296946969c8d9ee3f88662d4
+msgid "Creates or focuses a note-specific webview"
+msgstr ""
+
+#: ../../05-data-and-api.md:113 fb0145d15be84cc6b6471a6edf4c6609
+msgid "Shared Types"
+msgstr ""
+
+#: ../../05-data-and-api.md:115 672639a823d24cc4afdd2ea4ade7e867
+msgid "TypeScript: App Settings"
+msgstr ""
+
+#: ../../05-data-and-api.md:129 979f0b1dffdd4b6b9c2860035e50ad42
+msgid "Rust: Pomodoro Milestone"
+msgstr ""
+
+#: ../../05-data-and-api.md:139 a851a725b96c4d909d1b2b885c967979
+msgid "Events"
+msgstr ""
+
+#: ../../05-data-and-api.md ceee27132bed4fe5a0a123aa0e450598
+msgid "Event"
+msgstr ""
+
+#: ../../05-data-and-api.md d9ad92ebdc0c48a48c0511aa7b36e246
+msgid "Direction"
+msgstr ""
+
+#: ../../05-data-and-api.md 8f404686ccf64184a0e1df7877ecff5f
+msgid "Payload"
+msgstr ""
+
+#: ../../05-data-and-api.md 0e45637634174216bdd36db4b3e58b51
+msgid "Purpose"
+msgstr ""
+
+#: ../../05-data-and-api.md edd7b8f457e749088eb09115da901573
+msgid "`tray-new-note`"
+msgstr ""
+
+#: ../../05-data-and-api.md 92b2bfec204c4670963fdda4f4d18fd8
+msgid "Rust -> Frontend"
+msgstr ""
+
+#: ../../05-data-and-api.md 0260ab372de94e0ab8ae2f52dd1d45f5
+msgid "Tells the main window to switch to the Notes tab and focus the editor"
+msgstr ""
+

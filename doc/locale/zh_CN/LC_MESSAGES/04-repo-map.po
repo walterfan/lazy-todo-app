@@ -1,0 +1,212 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../04-repo-map.md:1 d1d4b50421084be895c1f03dcacec935
+msgid "Lazy Todo App — Repository Map"
+msgstr ""
+
+#: ../../04-repo-map.md:5 0c796dd9ac114faeb5cc5a1c016bd5d0
+msgid "Directory Structure"
+msgstr ""
+
+#: ../../04-repo-map.md:96 f3b7ba2705e34668b54d586ee7983740
+msgid "Entry Points"
+msgstr ""
+
+#: ../../04-repo-map.md 2f9360041482409dbc6e671f9056a5c3
+msgid "Context"
+msgstr ""
+
+#: ../../04-repo-map.md b9a7b7e615e44d0f8638f226aff03c92
+#: ff024e96a77c4a278dd8c595d6318d8a
+msgid "File"
+msgstr ""
+
+#: ../../04-repo-map.md d6526bba60594b12be2844d0e98f926d
+#: fea4eaf268144c34a42506e977d0dfe1
+msgid "Purpose"
+msgstr ""
+
+#: ../../04-repo-map.md ff1fa5fe0db641a191a5314f4e019d17
+msgid "Rust binary"
+msgstr ""
+
+#: ../../04-repo-map.md 46955144a7e946e6b90fc0ff3c6b7591
+msgid "`src-tauri/src/main.rs`"
+msgstr ""
+
+#: ../../04-repo-map.md 192aaaa29c60426e9dce76ca3aef6849
+msgid "Calls `lazy_todo_app_lib::run()`"
+msgstr ""
+
+#: ../../04-repo-map.md 0ce505e0ce314470ae0f12f702753180
+msgid "Tauri setup"
+msgstr ""
+
+#: ../../04-repo-map.md 337ece412d7848a9a102983d61ab7613
+msgid "`src-tauri/src/lib.rs`"
+msgstr ""
+
+#: ../../04-repo-map.md 8cb2f5c37daa432f9b8460c7e71f0c36
+msgid "Resolves DB directory, initializes tray, registers commands"
+msgstr ""
+
+#: ../../04-repo-map.md e35b0795aa3645ddbe0ce029db7c6fd7
+msgid "React bootstrap"
+msgstr ""
+
+#: ../../04-repo-map.md 6eab6671d94746e1850d5272ee31f12a
+msgid "`src/main.tsx`"
+msgstr ""
+
+#: ../../04-repo-map.md 083349eb5aad40ea8024c9cf2f4daba7
+msgid "Routes between the main app and pop-out note windows"
+msgstr ""
+
+#: ../../04-repo-map.md 62ffe618040c49e5abbd659f5d045947
+msgid "Main shell"
+msgstr ""
+
+#: ../../04-repo-map.md 47dbe421fb834060960af39dace4bf54
+msgid "`src/App.tsx`"
+msgstr ""
+
+#: ../../04-repo-map.md 1052763a1ab44fbd894b0dc2396cd506
+msgid "Tabs, search, settings panel, tray event handling"
+msgstr ""
+
+#: ../../04-repo-map.md a2784b1d914b4f84ba4b9b1239a1afc4
+msgid "Standalone note view"
+msgstr ""
+
+#: ../../04-repo-map.md 072e415af66c4932ac2ef2c95bfcc5a9
+msgid "`src/components/NoteWindow.tsx`"
+msgstr ""
+
+#: ../../04-repo-map.md a9c5c35b3dc34e13895594ae25de1fb6
+msgid "Focused single-note window UI"
+msgstr ""
+
+#: ../../04-repo-map.md 32b093fc61ce44de8a6bc16906e69097
+msgid "Vite entry"
+msgstr ""
+
+#: ../../04-repo-map.md 4ada6d439be84a299d9ea0f7bcd12cee
+msgid "`index.html`"
+msgstr ""
+
+#: ../../04-repo-map.md 3690e16cc34e4eeb865839f0f6b587bd
+msgid "Loads `/src/main.tsx`"
+msgstr ""
+
+#: ../../04-repo-map.md:107 71b2a27a305940f5beabfc1512f757bd
+msgid "Key Configuration Files"
+msgstr ""
+
+#: ../../04-repo-map.md 69c828cec3034dd686ff63bc9286e2fc
+msgid "`CLAUDE.md`"
+msgstr ""
+
+#: ../../04-repo-map.md 3c4537de18ba4788adce8fe88219d6be
+msgid "AI agent contribution constraints"
+msgstr ""
+
+#: ../../04-repo-map.md 97ac0304fbbd48d8ae143d8d102e441f
+msgid "`package.json`"
+msgstr ""
+
+#: ../../04-repo-map.md 888c1a20e1b8426f9e9d711d2eb1fa94
+msgid "npm scripts and frontend packages"
+msgstr ""
+
+#: ../../04-repo-map.md a856c48a9fd24df080411a37f51a5344
+msgid "`src-tauri/Cargo.toml`"
+msgstr ""
+
+#: ../../04-repo-map.md 526c9f36a75b4b03ba1f9ef261c91bdc
+msgid "Rust crate dependencies"
+msgstr ""
+
+#: ../../04-repo-map.md d26367945f13490a8a4af94e9ecd0c9b
+msgid "`src-tauri/tauri.conf.json`"
+msgstr ""
+
+#: ../../04-repo-map.md 09d8f49392944a31b29af574e2680c08
+msgid "App identifier, bundle targets, build commands"
+msgstr ""
+
+#: ../../04-repo-map.md 6e281908b42a42f89f8f3287201db764
+msgid "`src-tauri/capabilities/default.json`"
+msgstr ""
+
+#: ../../04-repo-map.md 1e0ac5aa2a7d42f9aff5cfb9fb094d2f
+msgid "Tauri permissions"
+msgstr ""
+
+#: ../../04-repo-map.md 1364bf97cadb4621a61846b0fac93063
+msgid "`.github/workflows/release.yml`"
+msgstr ""
+
+#: ../../04-repo-map.md d49151b61b964813bbcad30b84648b4e
+msgid "GitHub Release build automation"
+msgstr ""
+
+#: ../../04-repo-map.md 6ecb5741654a4b40ab7cea1b0bcfe83e
+msgid "`doc/conf.py`"
+msgstr ""
+
+#: ../../04-repo-map.md d56bb8a9850d4e488e2ddbd27bd1d554
+msgid "Sphinx, MyST, and i18n configuration"
+msgstr ""
+
+#: ../../04-repo-map.md f24fb7cd8a2846a7a4457d7d6ea67f8b
+msgid "`doc/Makefile`"
+msgstr ""
+
+#: ../../04-repo-map.md a3f9dddf932f40d897d7ca2d2f150755
+msgid "gettext and bilingual HTML build targets"
+msgstr ""
+
+#: ../../04-repo-map.md:120 c2330e3079eb4a9f9c30ec087087dd41
+msgid "Naming Conventions"
+msgstr ""
+
+#: ../../04-repo-map.md:122 e81e9b0cdca7418a830e5ca2a77b1c63
+msgid "**Rust files**: `snake_case.rs`"
+msgstr ""
+
+#: ../../04-repo-map.md:123 7754b09284ce4d1fb6db8e6a8e56ca34
+msgid "**React components**: `PascalCase.tsx`"
+msgstr ""
+
+#: ../../04-repo-map.md:124 09c2a2cd9bec421aa8a3674c98703491
+msgid "**React hooks**: `useCamelCase.ts`"
+msgstr ""
+
+#: ../../04-repo-map.md:125 d4af668ac89741b3acd1319de7ffc37b
+msgid "**Type files**: domain-oriented `.ts` files under `src/types/`"
+msgstr ""
+
+#: ../../04-repo-map.md:126 c52ab2a5576649a0b220b712bd6d4f44
+msgid "**Documentation**: numbered PKB files under `doc/` with metadata footers"
+msgstr ""
+

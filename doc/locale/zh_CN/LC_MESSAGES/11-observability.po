@@ -1,0 +1,573 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../11-observability.md:1 ae5e799f483a4afc915b86fc2499b2f9
+msgid "Observability — Log, Metrics, Alert"
+msgstr ""
+
+#: ../../11-observability.md:5 0c4ad55072ee49d9b89add6a01e03a6b
+msgid ""
+"This document describes the **LMA** (Logging, Metrics, Alerting) strategy"
+" for diagnosing issues and monitoring the Lazy Todo App."
+msgstr ""
+
+#: ../../11-observability.md:7 6a2294dda67a46f492d0b67d670d303f
+msgid ""
+"**Relationship to [10-runbook.md](10-runbook.md)**: The runbook covers "
+"*operational procedures* (how to respond). This doc covers the "
+"*observability infrastructure* (how to see what's happening)."
+msgstr ""
+
+#: ../../11-observability.md:11 d8b480eff65a4b3cbb2f4aa2c9a53792
+msgid "Philosophy"
+msgstr ""
+
+#: ../../11-observability.md:13 6fbe657191ed4d8eb9a16e08d008a782
+msgid "Even a desktop/local-first app benefits from structured observability:"
+msgstr ""
+
+#: ../../11-observability.md:15 929f8d32a70a487cb3bb0ffabb3af297
+msgid "**Logging** — understand what happened and why"
+msgstr ""
+
+#: ../../11-observability.md:16 a4111bb378174d71bde7c2258bc49cba
+msgid "**Metrics** — understand how the system is performing"
+msgstr ""
+
+#: ../../11-observability.md:17 bfe326ae0971449bb12f4609172dd131
+msgid "**Alerting** — get notified when something goes wrong"
+msgstr ""
+
+#: ../../11-observability.md:40 108bbad7e67644149114d430ab17d7e1
+msgid "1. Logging"
+msgstr ""
+
+#: ../../11-observability.md:42 3b4711d5b2d34587ab43d3752c8775c8
+msgid "Frontend (TypeScript / React)"
+msgstr ""
+
+#: ../../11-observability.md 6a626af3fc0f4b6c9b22642a56d37b3b
+#: c224019cb6f549919454a5a9ffabbf06
+msgid "Aspect"
+msgstr ""
+
+#: ../../11-observability.md 31fbb0b6f897436ba46f81b5aac141c1
+#: ca454ac78aa9483b8dd233ddca207ac4
+msgid "Approach"
+msgstr ""
+
+#: ../../11-observability.md 71fe6f28228a46bb803f33b99bd4729e
+#: fddda0cb55084366806f668425ba3a38
+msgid "**Library**"
+msgstr ""
+
+#: ../../11-observability.md 41a0f5f1b4a54838868f7dfc7d2d1709
+msgid "`console.*` in dev; structured logger (e.g. `loglevel` or custom) in prod"
+msgstr ""
+
+#: ../../11-observability.md 0d1b90f5f491492e9b60bad14387d986
+#: 159a7c5099b140f99f31f835cd8cbd69
+msgid "**Levels**"
+msgstr ""
+
+#: ../../11-observability.md a0eef2199027424d8d7289315d32c42a
+msgid "`debug`, `info`, `warn`, `error`"
+msgstr ""
+
+#: ../../11-observability.md 4c08b68748e64eb9b9ada64a06c64194
+#: f389c275bb914d69a433c30405c93b09
+msgid "**Format**"
+msgstr ""
+
+#: ../../11-observability.md 428f17ad00e44493ab5b4510b8fa555b
+#, python-brace-format
+msgid "JSON-structured where possible: `{ ts, level, module, msg, data }`"
+msgstr ""
+
+#: ../../11-observability.md de6d7878bef84c819132ca6f974a1c9e
+#: fd5060c791ea4ed6917f47bab738cd40
+msgid "**Output**"
+msgstr ""
+
+#: ../../11-observability.md 864c4c24d96d45b1a29290772bf9f303
+msgid ""
+"Browser DevTools console; optionally forward to Rust backend via Tauri "
+"commands"
+msgstr ""
+
+#: ../../11-observability.md:51 6aa00a163cff4ac9a313e749d5ff867b
+msgid "Backend (Rust / Tauri)"
+msgstr ""
+
+#: ../../11-observability.md e432ff5c76f944a49a904136a146b7f4
+msgid "`tracing` + `tracing-subscriber` (Rust ecosystem standard)"
+msgstr ""
+
+#: ../../11-observability.md 4e55f3f344a74704ba604ed9e2370c03
+msgid "`TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`"
+msgstr ""
+
+#: ../../11-observability.md a7e6a1a614dd4903bc903f91f2a08286
+msgid "Structured JSON or human-readable (configurable via `RUST_LOG`)"
+msgstr ""
+
+#: ../../11-observability.md 06f36e326e164fe98232e43a225fbf05
+msgid "`stdout` in dev; log file in production (`app_data_dir/logs/`)"
+msgstr ""
+
+#: ../../11-observability.md 0b52b49ea82b41b6a0494aedd3e02abb
+msgid "**Rotation**"
+msgstr ""
+
+#: ../../11-observability.md 460cdef51b7d47e88e320e3ef9701ee7
+msgid "`tracing-appender` with daily rotation, keep 7 days"
+msgstr ""
+
+#: ../../11-observability.md:61 158fa0f781044cdb8fa0af0215907bb2
+msgid "Log Configuration"
+msgstr ""
+
+#: ../../11-observability.md:71 66add910238046bbb003c9ef3db4d846
+msgid "Log Location"
+msgstr ""
+
+#: ../../11-observability.md 2fe62c05b60a40259243cf957a6278af
+msgid "Platform"
+msgstr ""
+
+#: ../../11-observability.md ff756267c0a44617a433328dd25ee687
+msgid "Path"
+msgstr ""
+
+#: ../../11-observability.md ec64c9f466d447daaf463131b5d7a1fc
+msgid "macOS"
+msgstr ""
+
+#: ../../11-observability.md 472b2a6293844b718074ab812856f064
+msgid "`~/Library/Application Support/com.lazy-todo-app/logs/`"
+msgstr ""
+
+#: ../../11-observability.md 4688f47edb1246bcbc541d679dd30964
+msgid "Linux"
+msgstr ""
+
+#: ../../11-observability.md 91384a1abab34064896eaea68a470edf
+msgid "`~/.local/share/lazy-todo-app/logs/`"
+msgstr ""
+
+#: ../../11-observability.md bd984db824cf4d0c925547883d01fbcc
+msgid "Windows"
+msgstr ""
+
+#: ../../11-observability.md 4835ce776fb14c138861ddc14bb6c2a2
+msgid "`%APPDATA%\\lazy-todo-app\\logs\\`"
+msgstr ""
+
+#: ../../11-observability.md:81 379dc2830b524ccebe43841883dbe336
+msgid "2. Metrics"
+msgstr ""
+
+#: ../../11-observability.md:83 5fe6f21ed95547d8b09ea79d938c786e
+msgid "Key Metrics to Track"
+msgstr ""
+
+#: ../../11-observability.md:85 98cb27f9d8224ee6a817dbc6a4fa5a20
+msgid "Application Metrics"
+msgstr ""
+
+#: ../../11-observability.md 645a75e308f44f4e99c62cb4061cde6b
+#: caadba6d25fa488cb8ca673c2e583c0c
+msgid "Metric"
+msgstr ""
+
+#: ../../11-observability.md bcddf1bd03524c07ae2d5afcb739e1f0
+#: fce4972176724970b31872084d7cd66b
+msgid "Type"
+msgstr ""
+
+#: ../../11-observability.md b2a373c05efb455b948a8fb315dc0282
+#: bb9af3d43ddc48e5a1a76080feccb770 bbabeb71fbcb43d194bdd02e2a952ea9
+msgid "Description"
+msgstr ""
+
+#: ../../11-observability.md b50c3d75bfb04ab088f02493c5d5196e
+msgid "`todo.created_total`"
+msgstr ""
+
+#: ../../11-observability.md 1f4083a9c62c4852b871056c8fc7cf8a
+#: 73c04e30431240f4a26ff1bdba930022 d62eea2ca7f34f778f47024bc654f932
+msgid "Counter"
+msgstr ""
+
+#: ../../11-observability.md a47f150cae134438b014600536378766
+msgid "Total todos created"
+msgstr ""
+
+#: ../../11-observability.md f0eb273b24fd4977a6df4f652f7a2092
+msgid "`todo.completed_total`"
+msgstr ""
+
+#: ../../11-observability.md 236558e2ae7c4be4b2382292fa658d86
+msgid "Total todos completed"
+msgstr ""
+
+#: ../../11-observability.md 2bbd60777b744cadb5ab424e07739c95
+msgid "`todo.deleted_total`"
+msgstr ""
+
+#: ../../11-observability.md a29a79af9522456da38f90d34f63acdb
+msgid "Total todos deleted"
+msgstr ""
+
+#: ../../11-observability.md abfa976b4d784a6a9278ab94008b3505
+msgid "`todo.active_count`"
+msgstr ""
+
+#: ../../11-observability.md 17cc6992549e4760af016b22b63f2265
+#: 547c017d2fce468d8edae838ca823c0c 879d9a77dc48462fa04fd8645bd4a2d6
+#: e7045a300e014f7d8c73f32b23dc78c2
+msgid "Gauge"
+msgstr ""
+
+#: ../../11-observability.md 9eda8eadc3514cf2b8e66dc3a4901d49
+msgid "Current active (incomplete) todos"
+msgstr ""
+
+#: ../../11-observability.md 29da9fb6e5e746cda3f6ffd9e7b23607
+msgid "`app.startup_duration_ms`"
+msgstr ""
+
+#: ../../11-observability.md aea0f14948434b92922968ca0519d784
+#: fdb85142b642423c9d29d7c32dc4f17a
+msgid "Histogram"
+msgstr ""
+
+#: ../../11-observability.md a13519f8410845d2856ad16877f34190
+msgid "Time from launch to UI ready"
+msgstr ""
+
+#: ../../11-observability.md 6cab6b892b4b49b097401695e31a3226
+msgid "`db.query_duration_ms`"
+msgstr ""
+
+#: ../../11-observability.md 47d13ce1e3e244d4a8df695583d3e2f9
+msgid "SQLite query latency"
+msgstr ""
+
+#: ../../11-observability.md:96 46a4f9add2da4ea18435a97345275f55
+msgid "System Metrics (Desktop)"
+msgstr ""
+
+#: ../../11-observability.md 56e4845f7d6644f4b61b985cb5b1d623
+msgid "`app.memory_usage_bytes`"
+msgstr ""
+
+#: ../../11-observability.md b445a1d0d498436998b3abcafedbded0
+msgid "RSS memory usage"
+msgstr ""
+
+#: ../../11-observability.md 104bcb832b8f48498ed1782b675f0c03
+msgid "`app.cpu_usage_percent`"
+msgstr ""
+
+#: ../../11-observability.md 3c4c09504e9a4b159f29d091ffb6d804
+msgid "CPU usage of the app process"
+msgstr ""
+
+#: ../../11-observability.md cb73bd266de34478b438121771b017fd
+msgid "`db.file_size_bytes`"
+msgstr ""
+
+#: ../../11-observability.md 0ff7b3d1d6314a3ab0bfb6fcd9b144db
+msgid "SQLite database file size"
+msgstr ""
+
+#: ../../11-observability.md:104 8c89e3c72834419e94c32f3333bcc0cc
+msgid "Collection Approach"
+msgstr ""
+
+#: ../../11-observability.md:106 08c54846684f4ad082a2d68a4ceae2ea
+msgid ""
+"For a desktop app, heavy metric infrastructure (Prometheus, Grafana) is "
+"overkill. Recommended approach:"
+msgstr ""
+
+#: ../../11-observability.md:108 a7f5894e165f498fa72372291e703dce
+msgid "**Development**: Log metrics to console / log file periodically"
+msgstr ""
+
+#: ../../11-observability.md:109 e5220b816cc74ec5a6bd920119818aa2
+msgid ""
+"**Optional telemetry**: If user opts in, send anonymous usage metrics to "
+"a lightweight backend"
+msgstr ""
+
+#: ../../11-observability.md:110 bb0003e4584b447d85b1ee849027cab4
+msgid ""
+"**Health check endpoint**: If the app exposes a local API, add `/health` "
+"returning basic stats"
+msgstr ""
+
+#: ../../11-observability.md:126 d373dccd25314ab8bf5be7d8f84f55d2
+msgid "3. Alerting"
+msgstr ""
+
+#: ../../11-observability.md:128 9ce5b47fab904756b785f2cb529a0098
+msgid "Desktop App Alerting Strategy"
+msgstr ""
+
+#: ../../11-observability.md:130 19802d987cf0412d879d29646ec3351c
+msgid ""
+"Since this is a local-first desktop app, \"alerting\" means **in-app "
+"notifications** rather than PagerDuty:"
+msgstr ""
+
+#: ../../11-observability.md f9963ac560534155b3361843d688b14c
+msgid "Condition"
+msgstr ""
+
+#: ../../11-observability.md 6968c0f32a3f486d98b8080144e99040
+msgid "Alert Type"
+msgstr ""
+
+#: ../../11-observability.md e72675a474e64021826dfa1e47feb0ec
+msgid "Action"
+msgstr ""
+
+#: ../../11-observability.md 2302d1c7c92e4b5e9b86067ceea525e2
+msgid "Database file corrupted"
+msgstr ""
+
+#: ../../11-observability.md 203111c3dd694e868d7569738f9282e2
+msgid "Error dialog"
+msgstr ""
+
+#: ../../11-observability.md 531a3e0a5b934fd8af5246bfa477ea5c
+msgid "Prompt user to restore from backup"
+msgstr ""
+
+#: ../../11-observability.md 97fdef07e2f5445390cb27628b6af2c5
+msgid "Database size > 100 MB"
+msgstr ""
+
+#: ../../11-observability.md 19dcf34ed52248708bb8ab95c5882773
+msgid "Warning toast"
+msgstr ""
+
+#: ../../11-observability.md b2435f680a834e4bbaf800e3a3fcc0de
+msgid "Suggest cleanup / archive"
+msgstr ""
+
+#: ../../11-observability.md b1c03550d1f04f4da26df4815be3fd1a
+msgid "Unhandled Rust panic"
+msgstr ""
+
+#: ../../11-observability.md 3e5d6b68433c415f98757df4f2f57fa7
+msgid "Error dialog + log"
+msgstr ""
+
+#: ../../11-observability.md cf9fe87bd30d4cda83f6c20dfd7df458
+msgid "Log stack trace, offer to report"
+msgstr ""
+
+#: ../../11-observability.md 7e440c328247410d9e5a3520d267e681
+msgid "Frontend uncaught exception"
+msgstr ""
+
+#: ../../11-observability.md 7c8bd5ea613c49f489452f324c62ec66
+msgid "Error boundary"
+msgstr ""
+
+#: ../../11-observability.md 4b8f54ae22d84c62971e16e38f0dfd9a
+msgid "Show fallback UI, log error"
+msgstr ""
+
+#: ../../11-observability.md 067977ba42f047e58625099784229e09
+msgid "App update available"
+msgstr ""
+
+#: ../../11-observability.md db1479ad617948cbb4eafb7da0c44984
+msgid "Info toast"
+msgstr ""
+
+#: ../../11-observability.md 11bd8d6d5a56402886a4d21958f12eef
+msgid "Prompt to download new version"
+msgstr ""
+
+#: ../../11-observability.md:140 937471a4dd744488ad15d503fb6b0669
+msgid "Error Boundary (React)"
+msgstr ""
+
+#: ../../11-observability.md:154 15eddb8d7c56419cadfdd71d74d7030c
+msgid "Rust Panic Hook"
+msgstr ""
+
+#: ../../11-observability.md:168 6b46324feb6645f7bf209a6824604c34
+msgid "4. Diagnostic Tools"
+msgstr ""
+
+#: ../../11-observability.md:170 b88b15ea0b9441869fc5fca17c38068a
+msgid "Built-in Diagnostics"
+msgstr ""
+
+#: ../../11-observability.md:172 285976975233470faa2d264dc2a6040e
+msgid "Consider adding a **Debug / Diagnostics** page in the app (dev mode only):"
+msgstr ""
+
+#: ../../11-observability.md 704ee61665dd4486bb647ed2c9737d18
+msgid "Feature"
+msgstr ""
+
+#: ../../11-observability.md 4794f36f5bda47aa8c3341e0f821025c
+msgid "Log viewer"
+msgstr ""
+
+#: ../../11-observability.md 576634ac58304c85b9f226ec82e420af
+msgid "Tail the last N log entries"
+msgstr ""
+
+#: ../../11-observability.md 4d0baab0b2334a398c53ce9ff4c1470e
+msgid "DB stats"
+msgstr ""
+
+#: ../../11-observability.md 5aa1de0411d14fa0a5b409e1fdb383e6
+msgid "Row counts, file size, last vacuum"
+msgstr ""
+
+#: ../../11-observability.md 276fe1fda0f440b9b96ac8abc7d44ded
+msgid "System info"
+msgstr ""
+
+#: ../../11-observability.md 6692366fc5d043d8ab3a6b8327b1860e
+msgid "OS, app version, Tauri version, WebView version"
+msgstr ""
+
+#: ../../11-observability.md 40a87fd55c84449bafa4797a4732fc5d
+msgid "Export logs"
+msgstr ""
+
+#: ../../11-observability.md d82fcbeff5bd494395d35a30b038520d
+msgid "Bundle logs into a zip for bug reports"
+msgstr ""
+
+#: ../../11-observability.md:181 b9facec8c5f047d38e3695a96b72fcfe
+msgid "External Tools"
+msgstr ""
+
+#: ../../11-observability.md 18e3e05625cb449b819af63b603fa0df
+msgid "Tool"
+msgstr ""
+
+#: ../../11-observability.md 39f64dd2431149c18ec1239104f3809a
+msgid "Use Case"
+msgstr ""
+
+#: ../../11-observability.md 9feaff8e27eb41f48f8ac0338b1598f4
+msgid "**Tauri DevTools**"
+msgstr ""
+
+#: ../../11-observability.md b7c54aa4212a4c1b8b617d86aa11ecf1
+msgid "Inspect WebView, network, console"
+msgstr ""
+
+#: ../../11-observability.md c47251099201450b8652c1b024f61e9f
+msgid "**SQLite Browser**"
+msgstr ""
+
+#: ../../11-observability.md a0a91f947c2540e39b5d8a0df285b5ac
+msgid "Inspect the local database directly"
+msgstr ""
+
+#: ../../11-observability.md f5f8bbed7c47475fbcafa3ad1d30b642
+msgid "**Activity Monitor / htop**"
+msgstr ""
+
+#: ../../11-observability.md c981bfed6c444879be021812210f3b77
+msgid "Check resource usage"
+msgstr ""
+
+#: ../../11-observability.md fb2c3500443a460f9a35f3ac3578b06b
+msgid "**`RUST_LOG`**"
+msgstr ""
+
+#: ../../11-observability.md 61434fc6b1d1424eba2b65b31b9e619d
+msgid "Adjust log verbosity at runtime"
+msgstr ""
+
+#: ../../11-observability.md:192 1240be69d4e746da8fb3e7b04f481104
+msgid "5. Observability Checklist"
+msgstr ""
+
+#: ../../11-observability.md:194 7e4dedcef3b840659634721d80587d7a
+msgid "[ ] Structured logging configured for both frontend and backend"
+msgstr ""
+
+#: ../../11-observability.md:195 d8268a0a171c4aec9796cfc0609ebead
+msgid "[ ] Log rotation enabled in production builds"
+msgstr ""
+
+#: ../../11-observability.md:196 2e26c41a2cbe4ba0ae77576393b90425
+msgid "[ ] Error boundaries catch and log React errors"
+msgstr ""
+
+#: ../../11-observability.md:197 bdfe7f508b064b2a9afdf965ec025b06
+msgid "[ ] Rust panic hook logs crash info"
+msgstr ""
+
+#: ../../11-observability.md:198 9d6270018baa43049d52b29d12920f60
+msgid "[ ] Key business metrics (todo CRUD counts) logged"
+msgstr ""
+
+#: ../../11-observability.md:199 48f81e5751bd46259a2a5628147ed34e
+msgid "[ ] Database health checked on startup"
+msgstr ""
+
+#: ../../11-observability.md:200 3dc5b78b7f9e4f4fa0e3ddf4acfd21db
+msgid "[ ] User-facing error messages are helpful (not raw stack traces)"
+msgstr ""
+
+#: ../../11-observability.md:201 4904435988474e6ba485b2ae5432ef9d
+msgid "[ ] Debug/diagnostics page available in dev mode"
+msgstr ""
+
+#: ../../11-observability.md:205 4f0c843a52604fe5b1bfe122bc121e12
+msgid "References"
+msgstr ""
+
+#: ../../11-observability.md:207 ada757bf18354a029c000295a276d3e4
+msgid "[Tauri Logging Plugin](https://v2.tauri.app/plugin/logging/)"
+msgstr ""
+
+#: ../../11-observability.md:208 661b9760601c4688b050c66c06b8947a
+msgid "[tracing crate](https://docs.rs/tracing/latest/tracing/)"
+msgstr ""
+
+#: ../../11-observability.md:209 d595f74171364896aef62d3e6701507c
+msgid ""
+"[React Error Boundaries](https://react.dev/reference/react/Component"
+"#catching-rendering-errors-with-an-error-boundary)"
+msgstr ""
+
+#: ../../11-observability.md:210 ecfc35b4240e4564bd861b81b111fbe1
+msgid "[10-runbook.md](10-runbook.md) — operational procedures"
+msgstr ""
+

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Lazy Todo App 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-12 22:10+0800\n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
 "PO-Revision-Date: 2026-04-12 23:42+0800\n"
 "Last-Translator: human+ai\n"
 "Language: zh_CN\n"
@@ -19,766 +19,797 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: ../../08-build.md:1
+#: ../../08-build.md:1 9dd1543a5c79472d807e1c20564cf7df
 msgid "Lazy Todo App — Build, Release, and Publish"
 msgstr "Lazy Todo App — 构建、发布与上线"
 
-#: ../../08-build.md:5
+#: ../../08-build.md:5 d9ba5a1c700f407b88048c67c48631c0
 msgid "Scope"
 msgstr "范围"
 
-#: ../../08-build.md:7
+#: ../../08-build.md:7 76be4c708e1b4d5688d96265e7c53e61
 msgid ""
 "This page describes how to build the desktop app locally, how the GitHub "
-"Actions pipelines work, and how to publish both desktop release packages and "
-"the documentation site."
-msgstr ""
-"本页说明如何在本地构建桌面应用、GitHub Actions 流水线如何工作，以及如何发布"
-"桌面发行包和文档站点。"
+"Actions pipelines work, and how to publish both desktop release packages "
+"and the documentation site."
+msgstr "本页说明如何在本地构建桌面应用、GitHub Actions 流水线如何工作，以及如何发布桌面发行包和文档站点。"
 
-#: ../../08-build.md:9
+#: ../../08-build.md:9 a5bf5b593921416fbb220b4245e85707
 msgid "The relevant automation files are:"
 msgstr "相关自动化文件如下："
 
-#: ../../08-build.md:11
+#: ../../08-build.md:11 81d5f0761b1a43f390b2efab34a0b0e0
 msgid "`/.github/workflows/release.yml` for desktop release packages"
 msgstr "`/.github/workflows/release.yml` 用于桌面发行包发布"
 
-#: ../../08-build.md:12
+#: ../../08-build.md:12 c6749b9669d340dc9261d794baee2290
 msgid "`/.github/workflows/docs.yml` for the bilingual documentation site"
 msgstr "`/.github/workflows/docs.yml` 用于双语文档站点"
 
-#: ../../08-build.md:13
+#: ../../08-build.md:13 bfee45c24702420c9e9c672cf423796a
+msgid "`/.github/workflows/pkb-check.yml` for advisory PKB freshness checks"
+msgstr "`/.github/workflows/pkb-check.yml` 用于 PKB 新鲜度告警检查"
+
+#: ../../08-build.md:14 90589d8deffd472cbaa319713b01ea65
+msgid "`scripts/check_pkb_staleness.py` for local and CI PKB impact analysis"
+msgstr "`scripts/check_pkb_staleness.py` 用于本地和 CI 中的 PKB 影响分析"
+
+#: ../../08-build.md:15 1422c2d0a0a247849b762c318ef52673
 msgid "`src-tauri/tauri.conf.json` for Tauri bundle settings"
 msgstr "`src-tauri/tauri.conf.json` 用于 Tauri 打包配置"
 
-#: ../../08-build.md:14
+#: ../../08-build.md:16 cb7c8c9ddd86409bb512802243b4dc15
 msgid "`package.json` and `src-tauri/Cargo.toml` for version tracking"
 msgstr "`package.json` 和 `src-tauri/Cargo.toml` 用于版本跟踪"
 
-#: ../../08-build.md:16
+#: ../../08-build.md:18 e6804701a14f4fbb933eef97820f40ea
 msgid "Local Build Paths"
 msgstr "本地构建路径"
 
-#: ../../08-build.md:18
+#: ../../08-build.md:20 25960f8c2ad04169889dfd1c816e31b8
 msgid "Frontend + Desktop App"
 msgstr "前端与桌面应用"
 
-#: ../../08-build.md:20
+#: ../../08-build.md:22 23cb1c81bb0a41f4bb2c45661a0ff3e7
 msgid "Development mode:"
 msgstr "开发模式："
 
-#: ../../08-build.md:27
+#: ../../08-build.md:29 82855fd15d03436b92a9043fb971c10b
 msgid "Production build:"
 msgstr "生产构建："
 
-#: ../../08-build.md:33
+#: ../../08-build.md:35 93a16e6e2d7e4d5f9a455dc51444ef09
 msgid "Typical bundle output locations:"
 msgstr "常见打包产物输出位置："
 
-#: ../../08-build.md:35
+#: ../../08-build.md:37 45c9823c8c9b4bdbab4a24284b80168f
 msgid "macOS: `src-tauri/target/release/bundle/dmg/`"
 msgstr "macOS：`src-tauri/target/release/bundle/dmg/`"
 
-#: ../../08-build.md:36
+#: ../../08-build.md:38 cb6a3375731f4e7087071ccec312e081
 msgid ""
-"Linux: `src-tauri/target/release/bundle/deb/` and `src-tauri/target/release/"
-"bundle/appimage/`"
-msgstr "Linux：`src-tauri/target/release/bundle/deb/` 与 `src-tauri/target/release/bundle/appimage/`"
+"Linux: `src-tauri/target/release/bundle/deb/` and `src-"
+"tauri/target/release/bundle/appimage/`"
+msgstr ""
+"Linux：`src-tauri/target/release/bundle/deb/` 与 `src-"
+"tauri/target/release/bundle/appimage/`"
 
-#: ../../08-build.md:37
+#: ../../08-build.md:39 18a613563b0c4142b311a420178d3d9e
 msgid ""
-"Windows: `src-tauri/target/release/bundle/msi/` and `src-tauri/target/"
-"release/bundle/nsis/`"
-msgstr "Windows：`src-tauri/target/release/bundle/msi/` 与 `src-tauri/target/release/bundle/nsis/`"
+"Windows: `src-tauri/target/release/bundle/msi/` and `src-"
+"tauri/target/release/bundle/nsis/`"
+msgstr ""
+"Windows：`src-tauri/target/release/bundle/msi/` 与 `src-"
+"tauri/target/release/bundle/nsis/`"
 
-#: ../../08-build.md:39
+#: ../../08-build.md:41 8f98dfbf6adf4ad2bd95e19cad450bb8
 msgid "Documentation Site"
 msgstr "文档站点"
 
-#: ../../08-build.md:41
+#: ../../08-build.md:43 e7fcb51f26a04baa96db49d84f62e8df
 msgid "Build the bilingual docs locally:"
 msgstr "在本地构建双语文档："
 
-#: ../../08-build.md:49
+#: ../../08-build.md:51 5ff0068a5c464e13a498b40c75482d9f
 msgid "Refresh Chinese Translation Catalogs"
 msgstr "刷新中文翻译目录"
 
-#: ../../08-build.md:51
+#: ../../08-build.md:53 49fc3bc0cb724f7aac5f13c6df8bc87a
 msgid ""
-"When English docs change, refresh the gettext catalogs before rebuilding the "
-"Chinese site:"
+"When English docs change, refresh the gettext catalogs before rebuilding "
+"the Chinese site:"
 msgstr "当英文文档发生变化时，请先刷新 gettext catalog，再重新构建中文站点："
 
-#: ../../08-build.md:58
+#: ../../08-build.md:61 a7afe59b6a80478f894abda34e4eee29
 msgid ""
-"Then review the affected translation files in `doc/locale/zh_CN/"
-"LC_MESSAGES/`, especially:"
+"Then review the affected translation files in "
+"`doc/locale/zh_CN/LC_MESSAGES/`, especially:"
 msgstr "然后检查 `doc/locale/zh_CN/LC_MESSAGES/` 中受影响的翻译文件，尤其是："
 
-#: ../../08-build.md:60
+#: ../../08-build.md:63 737c76863469477e8a3cf21e19a9f74e
 msgid "`index.po` when the docs navigation changes"
 msgstr "当文档导航发生变化时，检查 `index.po`"
 
-#: ../../08-build.md:61
+#: ../../08-build.md:64 8c959063022946c1bb21cccec4fa5457
 msgid "`08-build.po` when this page changes"
 msgstr "当本页发生变化时，检查 `08-build.po`"
 
-#: ../../08-build.md:62
+#: ../../08-build.md:65 089498f5cd4144b3a353f4a0adec9a99
 msgid "Any other `.po` files matching the English pages you edited"
 msgstr "以及与你修改的英文页面对应的其他 `.po` 文件"
 
-#: ../../08-build.md:64
+#: ../../08-build.md:67 c886152154cb46dd8f23db06a760d67e
 msgid ""
 "Look for new untranslated entries or `#, fuzzy` markers, update the "
 "translations, and then rebuild:"
 msgstr "查找新增的未翻译条目或 `#, fuzzy` 标记，更新翻译后再重新构建："
 
-#: ../../08-build.md:71
+#: ../../08-build.md:74 38590bf397d04b358b22258c399012b0
 msgid ""
-"You usually only need this refresh flow after changing the English Markdown "
-"source. If you only edit existing Chinese `.po` translations, you can skip "
-"`make gettext` and `make intl-update`."
+"You usually only need this refresh flow after changing the English "
+"Markdown source. If you only edit existing Chinese `.po` translations, "
+"you can skip `make gettext` and `make intl-update`."
 msgstr ""
-"通常只有在修改英文 Markdown 源文件后，才需要执行这套刷新流程。如果你只是修改"
-"已有的中文 `.po` 翻译，则可以跳过 `make gettext` 和 `make intl-update`。"
+"通常只有在修改英文 Markdown 源文件后，才需要执行这套刷新流程。如果你只是修改已有的中文 `.po` 翻译，则可以跳过 `make "
+"gettext` 和 `make intl-update`。"
 
-#: ../../08-build.md:73
+#: ../../08-build.md:76 26f8593fc41d4e53912d3f9626dbb01a
 msgid "Build the GitHub Pages staging site:"
 msgstr "构建 GitHub Pages 预发布站点："
 
-#: ../../08-build.md:80
+#: ../../08-build.md:83 f9483b14976b417988e1573e681c4446
 msgid "Generated output:"
 msgstr "生成输出："
 
-#: ../../08-build.md:82
+#: ../../08-build.md:85 7921a04ab5c04016b34c127e5e39e2b9
 msgid "English HTML: `doc/_build/en/html/`"
 msgstr "英文 HTML：`doc/_build/en/html/`"
 
-#: ../../08-build.md:83
+#: ../../08-build.md:86 c4991fcb551d4915a8346a6451d31bab
 msgid "Chinese HTML: `doc/_build/zh_CN/html/`"
 msgstr "中文 HTML：`doc/_build/zh_CN/html/`"
 
-#: ../../08-build.md:84
+#: ../../08-build.md:87 69ed9f2d6c0c421d9643137499567566
 msgid "Pages site root: `doc/_build/site/`"
 msgstr "Pages 站点根目录：`doc/_build/site/`"
 
-#: ../../08-build.md:86
+#: ../../08-build.md:89 c2cf16f3911245f49ee3c32cfc38c16b
 msgid "CI/CD Pipelines"
 msgstr "CI/CD 流水线"
 
-#: ../../08-build.md:64
+#: ../../08-build.md:91 9f6b68677d814786aeb9c34ea5b1cc1d
 msgid "Desktop Release Pipeline"
 msgstr "桌面发行流水线"
 
-#: ../../08-build.md:66
-msgid "`/.github/workflows/release.yml` publishes Tauri bundles to GitHub Releases."
+#: ../../08-build.md:93 ea1dc2cf9ca246aaa630301a3e0356d3
+msgid ""
+"`/.github/workflows/release.yml` publishes Tauri bundles to GitHub "
+"Releases."
 msgstr "`/.github/workflows/release.yml` 会将 Tauri 打包产物发布到 GitHub Releases。"
 
-#: ../../08-build.md:68
+#: ../../08-build.md:95 ../../08-build.md:120 ../../08-build.md:144
+#: 84ca43f4dc4e41a2b9188b52812a7b00 bfeb2c2706c04e58b413302cc4a18107
+#: d2ca43e308fc44eaa898598d332b624a
 msgid "Trigger conditions:"
 msgstr "触发条件："
 
-#: ../../08-build.md:70
+#: ../../08-build.md:97 a9e6575fbc2e4c7cac66c5668c9f9590
 msgid "Push a git tag matching `v*`"
 msgstr "推送匹配 `v*` 的 git 标签"
 
-#: ../../08-build.md:71
+#: ../../08-build.md:98 ../../08-build.md:124 ../../08-build.md:148
+#: 379fb534f23a49bd9501e6947c302986 611a8d6f42c84ab9972d700467af9c7b
+#: 9d7061c66a1c43919dfc9f8c0a278008
 msgid "Manual run via `workflow_dispatch`"
 msgstr "通过 `workflow_dispatch` 手动运行"
 
-#: ../../08-build.md:73
+#: ../../08-build.md:100 fe14fb655de4468ebc267e1803bde33a
 msgid "Build matrix:"
 msgstr "构建矩阵："
 
-#: ../../08-build.md:75
+#: ../../08-build.md:102 e20bd7e9a3164ef0a73258bd8a62d53c
 msgid "macOS Apple Silicon: `aarch64-apple-darwin`"
 msgstr "macOS Apple Silicon：`aarch64-apple-darwin`"
 
-#: ../../08-build.md:76
+#: ../../08-build.md:103 59347fa254b74aa89de086d08461c2f6
 msgid "macOS Intel: `x86_64-apple-darwin`"
 msgstr "macOS Intel：`x86_64-apple-darwin`"
 
-#: ../../08-build.md:77
+#: ../../08-build.md:104 ad61b9eaf13d49c3a79150fbcdf93d1f
 msgid "Linux: `ubuntu-22.04`"
 msgstr "Linux：`ubuntu-22.04`"
 
-#: ../../08-build.md:78
+#: ../../08-build.md:105 347ba34c836b40e1a9a1dda6cf2b459b
 msgid "Windows: `windows-latest`"
 msgstr "Windows：`windows-latest`"
 
-#: ../../08-build.md:80
+#: ../../08-build.md:107 ../../08-build.md:126 ../../08-build.md:150
+#: 1415acdde82a4cc499f41881133dc28d 4987c9bb7eb14fc589198a7baa0ec467
+#: fee41c1659324f2a948acb229f82a613
 msgid "The workflow:"
 msgstr "流水线步骤："
 
-#: ../../08-build.md:82
+#: ../../08-build.md:109 ../../08-build.md:128 2268f251f1964cabbdaa5d308d52431e
+#: c594ca5ca60e496f8ebad83b6079cd54
 msgid "Checks out the repo"
 msgstr "检出仓库代码"
 
-#: ../../08-build.md:83
+#: ../../08-build.md:110 3ebd5159e38740449f3ef64b5e500b45
 msgid "Installs platform-specific dependencies"
 msgstr "安装平台相关依赖"
 
-#: ../../08-build.md:84
+#: ../../08-build.md:111 c4eee1d9eca04f18bead4c040d4266f3
 msgid "Sets up Node.js 20 and Rust stable"
 msgstr "安装 Node.js 20 和 Rust stable"
 
-#: ../../08-build.md:85
+#: ../../08-build.md:112 86163a89fa904cee86bcaa9a2dbff8d4
 msgid "Runs `npm ci`"
 msgstr "执行 `npm ci`"
 
-#: ../../08-build.md:86
+#: ../../08-build.md:113 f7aef562b7d249c7a60a0312912a8f2e
 msgid "Calls `tauri-apps/tauri-action@v0`"
 msgstr "调用 `tauri-apps/tauri-action@v0`"
 
-#: ../../08-build.md:87
+#: ../../08-build.md:114 eb1ffae6ec2e4d52a24c72f5c300a581
 msgid "Uploads generated installers to GitHub Releases"
 msgstr "将生成的安装包上传到 GitHub Releases"
 
-#: ../../08-build.md:89
+#: ../../08-build.md:116 55cbfe7d305e49b5819a569829112654
 msgid "Documentation Publish Pipeline"
 msgstr "文档发布流水线"
 
-#: ../../08-build.md:91
+#: ../../08-build.md:118 15705d3dca6b4eb08a926fda221487bc
 msgid ""
 "`/.github/workflows/docs.yml` builds and deploys the bilingual docs to "
 "GitHub Pages."
 msgstr "`/.github/workflows/docs.yml` 会构建并将双语文档部署到 GitHub Pages。"
 
-#: ../../08-build.md:95
+#: ../../08-build.md:122 a8a6736b5dc7433eadf399626114cfb0
 msgid "Push to `main` or `master`"
 msgstr "推送到 `main` 或 `master`"
 
-#: ../../08-build.md:96
+#: ../../08-build.md:123 93cd12ad7ed54289b238a929a008ee00
 msgid ""
-"The pushed commit changes `doc/**`, `README.md`, or `/.github/workflows/"
-"docs.yml`"
+"The pushed commit changes `doc/**`, `README.md`, or "
+"`/.github/workflows/docs.yml`"
 msgstr "推送的提交变更了 `doc/**`、`README.md` 或 `/.github/workflows/docs.yml`"
 
-#: ../../08-build.md:102
+#: ../../08-build.md:129 fc10b46f5ff84c1995732376b228555a
 msgid "Sets up Python 3.12"
 msgstr "安装 Python 3.12"
 
-#: ../../08-build.md:103
+#: ../../08-build.md:130 f7c02601662443ed90bd381463eee0e5
 msgid "Installs Poetry"
 msgstr "安装 Poetry"
 
-#: ../../08-build.md:104
+#: ../../08-build.md:131 57c42cfee7294a6fbae4313b305771ef
 msgid "Runs `poetry install` in `doc/`"
 msgstr "在 `doc/` 中执行 `poetry install`"
 
-#: ../../08-build.md:105
+#: ../../08-build.md:132 6b8b7a460b53464b9fdc2af9eb459044
 msgid "Runs `poetry run make pages`"
 msgstr "执行 `poetry run make pages`"
 
-#: ../../08-build.md:106
+#: ../../08-build.md:133 4b3575151d9e475188ff7c1390b62041
 msgid "Uploads `doc/_build/site`"
 msgstr "上传 `doc/_build/site`"
 
-#: ../../08-build.md:107
+#: ../../08-build.md:134 6fcdada79af1428b8954d532ac3974e9
 msgid "Deploys to GitHub Pages"
 msgstr "部署到 GitHub Pages"
 
-#: ../../08-build.md:109
+#: ../../08-build.md:136 85ef8400423c4555ae9f13060a28c573
 msgid "Published docs URL:"
 msgstr "在线文档地址："
 
-#: ../../08-build.md:113
-msgid "Release Process"
-msgstr "发布流程"
-
-#: ../../08-build.md:115
-msgid "Step 1: Update Version Fields"
-msgstr "步骤 1：更新版本号字段"
-
-#: ../../08-build.md:117
-msgid "Before creating a new release, keep the version aligned in these files:"
-msgstr "在创建新版本前，请保持以下文件中的版本号一致："
-
-#: ../../08-build.md:119
-msgid "`package.json`"
-msgstr "`package.json`"
-
-#: ../../08-build.md:120
-msgid "`src-tauri/tauri.conf.json`"
-msgstr "`src-tauri/tauri.conf.json`"
-
-#: ../../08-build.md:121
-msgid "`src-tauri/Cargo.toml`"
-msgstr "`src-tauri/Cargo.toml`"
-
-#: ../../08-build.md:123
-msgid "Example: change all three from `0.1.0` to `0.1.1`."
-msgstr "例如：将这三个文件中的版本都从 `0.1.0` 改为 `0.1.1`。"
-
-#: ../../08-build.md:125
-msgid "Step 2: Validate Locally"
-msgstr "步骤 2：本地验证"
-
-#: ../../08-build.md:127
-msgid "Recommended checks before tagging:"
-msgstr "建议在打标签前执行以下检查："
-
-#: ../../08-build.md:137
-msgid "If you changed docs, also run:"
-msgstr "如果你修改了文档，也请执行："
-
-#: ../../08-build.md:144
-msgid "Step 3: Commit and Push"
-msgstr "步骤 3：提交并推送"
-
-#: ../../08-build.md:146
-msgid "Example:"
-msgstr "示例："
-
-#: ../../08-build.md:154
-msgid "Step 4: Create and Push the Release Tag"
-msgstr "步骤 4：创建并推送发布标签"
-
-#: ../../08-build.md:156
+#: ../../08-build.md:138 7df6256c5fb141828362501ed9993801
 msgid ""
-"The release workflow does not trigger from a normal branch push. It triggers "
-"from a tag push such as `v0.1.1`."
-msgstr "发布流水线不会因为普通分支推送而触发，它会在推送如 `v0.1.1` 这类标签时触发。"
-
-#: ../../08-build.md:163
-msgid "Step 5: Verify the GitHub Release"
-msgstr "步骤 5：验证 GitHub Release"
-
-#: ../../08-build.md:165
-msgid "After the tag push:"
-msgstr "推送标签后："
-
-#: ../../08-build.md:167
-msgid "Open the GitHub repository"
-msgstr "打开 GitHub 仓库"
-
-#: ../../08-build.md:168
-msgid "Go to `Actions`"
-msgstr "进入 `Actions`"
-
-#: ../../08-build.md:169
-msgid "Open the `publish` workflow run"
-msgstr "打开 `publish` 工作流运行记录"
-
-#: ../../08-build.md:170
-msgid "Wait for all matrix jobs to finish"
-msgstr "等待所有矩阵任务执行完成"
-
-#: ../../08-build.md:171
-msgid "Open `Releases` and confirm that the new assets are attached"
-msgstr "打开 `Releases`，确认新的构建产物已附加到发布中"
-
-#: ../../08-build.md:173
-msgid "Publishing Documentation"
-msgstr "发布文档"
-
-#: ../../08-build.md:175
-msgid "Automatic Publish"
-msgstr "自动发布"
-
-#: ../../08-build.md:177
-msgid ""
-"The docs site is published automatically when documentation-related files are "
-"pushed to `main` or `master`."
-msgstr "当与文档相关的文件被推送到 `main` 或 `master` 时，文档站点会自动发布。"
-
-#: ../../08-build.md:179
-msgid "Typical flow:"
-msgstr "典型流程："
-
-#: ../../08-build.md:187
-msgid "Then verify:"
-msgstr "然后验证："
-
-#: ../../08-build.md:189
-msgid "Open GitHub `Actions`"
-msgstr "打开 GitHub `Actions`"
-
-#: ../../08-build.md:190
-msgid "Inspect the `docs` workflow run"
-msgstr "检查 `docs` 工作流运行记录"
-
-#: ../../08-build.md:191
-msgid "Open the GitHub Pages URL after deployment finishes"
-msgstr "部署完成后打开 GitHub Pages 链接"
-
-#: ../../08-build.md:193
-msgid "Manual Publish"
-msgstr "手动发布"
-
-#: ../../08-build.md:195
-msgid "Both workflows support manual execution from the GitHub UI:"
-msgstr "两个工作流都支持从 GitHub UI 手动执行："
-
-#: ../../08-build.md:197
-msgid "Open the repository on GitHub"
-msgstr "在 GitHub 上打开该仓库"
-
-#: ../../08-build.md:199
-msgid "Select `publish` or `docs`"
-msgstr "选择 `publish` 或 `docs`"
-
-#: ../../08-build.md:200
-msgid "Click `Run workflow`"
-msgstr "点击 `Run workflow`"
-
-#: ../../08-build.md:202
-msgid "Manual execution is useful when:"
-msgstr "以下场景适合手动执行："
-
-#: ../../08-build.md:204
-msgid "A previous run failed due to transient CI issues"
-msgstr "上一次运行因临时性的 CI 问题失败"
-
-#: ../../08-build.md:205
-msgid "You want to rebuild without creating a new commit"
-msgstr "你希望不创建新提交就重新构建"
-
-#: ../../08-build.md:206
-msgid "You want to confirm a workflow fix before the next full release"
-msgstr "你希望在下一次完整发布前先验证工作流修复是否有效"
-
-#: ../../08-build.md:208
-msgid "Re-running Failed Builds"
-msgstr "重新运行失败构建"
-
-#: ../../08-build.md:210
-msgid "Re-run a Failed Release Job"
-msgstr "重新运行失败的发布任务"
-
-#: ../../08-build.md:212
-msgid ""
-"If the source code and tag are already correct, you do not need a new commit "
-"just to retry CI."
-msgstr "如果源码和标签本身没有问题，仅仅为了重试 CI 并不需要创建新的提交。"
-
-#: ../../08-build.md:214
-msgid "Use GitHub:"
-msgstr "在 GitHub 中操作："
-
-#: ../../08-build.md:216
-msgid "Open the failed workflow run in `Actions`"
-msgstr "在 `Actions` 中打开失败的工作流运行记录"
-
-#: ../../08-build.md:217
-msgid "Click `Re-run failed jobs` or `Re-run all jobs`"
-msgstr "点击 `Re-run failed jobs` 或 `Re-run all jobs`"
-
-#: ../../08-build.md:219
-msgid "When You Do Need a New Release Tag"
-msgstr "何时需要新的发布标签"
-
-#: ../../08-build.md:221
-msgid "Create a new version and a new tag when:"
-msgstr "在以下情况下，应创建新版本和新标签："
-
-#: ../../08-build.md:223
-msgid "The code or build configuration changed"
-msgstr "代码或构建配置发生了变化"
-
-#: ../../08-build.md:224
-msgid "A packaging asset was missing"
-msgstr "缺少某个打包资源"
-
-#: ../../08-build.md:225
-msgid "Version fields were wrong"
-msgstr "版本号字段设置错误"
-
-#: ../../08-build.md:226
-msgid "The previous release artifacts should not be reused"
-msgstr "之前的发布产物不应继续复用"
-
-#: ../../08-build.md:228
-msgid "In that case:"
-msgstr "此时应当："
-
-#: ../../08-build.md:230
-msgid "Fix the code or config"
-msgstr "修复代码或配置"
-
-#: ../../08-build.md:231
-msgid "Bump the version in the tracked version files"
-msgstr "在受版本跟踪的文件中提升版本号"
-
-#: ../../08-build.md:232
-msgid "Commit and push"
-msgstr "提交并推送"
-
-#: ../../08-build.md:233
-msgid "Push a new tag such as `v0.1.2`"
-msgstr "推送一个新的标签，例如 `v0.1.2`"
-
-#: ../../08-build.md:235
-msgid "Common Build and Publish Failures"
-msgstr "常见构建与发布故障"
-
-#: ../../08-build.md
-msgid "Symptom"
-msgstr "现象"
-
-#: ../../08-build.md
-msgid "Likely Cause"
-msgstr "可能原因"
-
-#: ../../08-build.md
-msgid "Fix"
-msgstr "修复方法"
-
-#: ../../08-build.md
-msgid "Windows bundle fails with `Couldn't find a .ico icon`"
-msgstr "Windows 打包失败并提示 `Couldn't find a .ico icon`"
-
-#: ../../08-build.md
-msgid "`src-tauri/tauri.conf.json` does not list `icons/icon.ico`"
-msgstr "`src-tauri/tauri.conf.json` 未列出 `icons/icon.ico`"
-
-#: ../../08-build.md
-msgid "Add `\"icons/icon.ico\"` to `bundle.icon` and re-run release"
-msgstr "将 `\"icons/icon.ico\"` 添加到 `bundle.icon` 中，然后重新执行发布"
-
-#: ../../08-build.md
-msgid "Release workflow did not start"
-msgstr "发布工作流没有启动"
-
-#: ../../08-build.md
-msgid "Only a branch was pushed, no `v*` tag was pushed"
-msgstr "只推送了分支，没有推送 `v*` 标签"
-
-#: ../../08-build.md
-msgid "Create and push a release tag such as `v0.1.1`"
-msgstr "创建并推送一个发布标签，例如 `v0.1.1`"
-
-#: ../../08-build.md
-msgid "Release has the wrong version name"
-msgstr "发布版本名称错误"
-
-#: ../../08-build.md
-msgid "Version fields are inconsistent across config files"
-msgstr "各配置文件中的版本号不一致"
-
-#: ../../08-build.md
-msgid ""
-"Keep `package.json`, `src-tauri/tauri.conf.json`, and `src-tauri/Cargo.toml` "
-"aligned"
-msgstr "保持 `package.json`、`src-tauri/tauri.conf.json` 和 `src-tauri/Cargo.toml` 中的版本号一致"
-
-#: ../../08-build.md
-msgid "Docs workflow did not start"
-msgstr "文档工作流没有启动"
-
-#: ../../08-build.md
-msgid "The commit did not change tracked docs paths"
-msgstr "该提交没有修改被跟踪的文档路径"
-
-#: ../../08-build.md
-msgid "Push changes to `doc/**`, `README.md`, or run the workflow manually"
-msgstr "推送 `doc/**`、`README.md` 的变更，或手动运行工作流"
-
-#: ../../08-build.md
-msgid "GitHub Pages deploy succeeds but site is unavailable"
-msgstr "GitHub Pages 部署成功，但站点不可访问"
-
-#: ../../08-build.md
-msgid "GitHub Pages source is not set to Actions"
-msgstr "GitHub Pages 的来源未设置为 Actions"
-
-#: ../../08-build.md
-msgid "In repo settings, set `Pages -> Source` to `GitHub Actions`"
-msgstr "在仓库设置中，将 `Pages -> Source` 设置为 `GitHub Actions`"
-
-#: ../../08-build.md
-msgid "Docs build fails after adding Mermaid diagrams"
-msgstr "添加 Mermaid 图后文档构建失败"
-
-#: ../../08-build.md
-msgid "Mermaid source contains parser-sensitive labels"
-msgstr "Mermaid 源内容中包含对解析器敏感的标签"
-
-#: ../../08-build.md
-msgid ""
-"Prefer quoted labels and avoid raw query strings or `{}` in flowchart node "
-"text"
-msgstr "优先使用带引号的标签，并避免在 flowchart 节点文本中直接写查询字符串或 `{}`"
-
-#: ../../08-build.md:246
-msgid "Suggested Release Checklist"
-msgstr "建议的发布检查清单"
-
-#: ../../08-build.md:248
-msgid "Use this checklist before publishing:"
-msgstr "发布前可使用以下检查清单："
-
-#: ../../08-build.md:250
-msgid ""
-"Version fields updated in `package.json`, `src-tauri/tauri.conf.json`, and "
-"`src-tauri/Cargo.toml`"
-msgstr "已更新 `package.json`、`src-tauri/tauri.conf.json` 和 `src-tauri/Cargo.toml` 中的版本号"
-
-#: ../../08-build.md:251
-msgid "Desktop app builds locally with `npm run tauri build`"
-msgstr "桌面应用已可通过 `npm run tauri build` 在本地构建"
-
-#: ../../08-build.md:252
-msgid "Docs build locally with `poetry run make html` when docs changed"
-msgstr "当文档发生变化时，已通过 `poetry run make html` 在本地验证文档构建"
-
-#: ../../08-build.md:253
-msgid "Release notes or README updates are committed if needed"
-msgstr "如有需要，Release 说明或 README 更新已提交"
-
-#: ../../08-build.md:254
-msgid "Main branch is pushed"
-msgstr "主分支已推送"
-
-#: ../../08-build.md:255
-msgid "Release tag is pushed"
-msgstr "发布标签已推送"
-
-#: ../../08-build.md:256
-msgid "GitHub `publish` workflow finishes successfully"
-msgstr "GitHub `publish` 工作流已成功完成"
-
-#: ../../08-build.md:257
-msgid "GitHub Release assets can be downloaded"
-msgstr "GitHub Release 产物可正常下载"
-
-#: ../../08-build.md:258
-msgid "GitHub Pages site loads correctly after docs updates"
-msgstr "文档更新后，GitHub Pages 站点可正常访问"
-
-#: ../../08-build.md:13
-msgid "`/.github/workflows/pkb-check.yml` for advisory PKB freshness checks"
-msgstr "`/.github/workflows/pkb-check.yml` 用于 PKB 新鲜度告警检查"
-
-#: ../../08-build.md:14
-msgid "`scripts/check_pkb_staleness.py` for local and CI PKB impact analysis"
-msgstr "`scripts/check_pkb_staleness.py` 用于本地和 CI 中的 PKB 影响分析"
-
-#: ../../08-build.md:140
+"[https://walterfan.github.io/lazy-todo-app](https://walterfan.github.io"
+"/lazy-todo-app)"
+msgstr ""
+
+#: ../../08-build.md:140 644d09a7e20945c2a57abd4964e35eb1
 msgid "PKB Advisory Check Pipeline"
 msgstr "PKB 告警检查流水线"
 
-#: ../../08-build.md:142
-msgid "`/.github/workflows/pkb-check.yml` runs an advisory-only PKB freshness check."
+#: ../../08-build.md:142 daeafb12e4e44987a0155cbfde8c25dd
+msgid ""
+"`/.github/workflows/pkb-check.yml` runs an advisory-only PKB freshness "
+"check."
 msgstr "`/.github/workflows/pkb-check.yml` 会运行一个只做告警、不阻塞流程的 PKB 新鲜度检查。"
 
-#: ../../08-build.md:146
+#: ../../08-build.md:146 9252fe7ca3da4d4a9d78f482c8c33feb
 msgid "Pull requests that touch source, workflow, or docs-related paths"
 msgstr "涉及源码、工作流或文档相关路径的 Pull Request"
 
-#: ../../08-build.md:147
+#: ../../08-build.md:147 b900a25b0a94476297a83492ab091496
 msgid "Pushes to `main` or `master`"
 msgstr "推送到 `main` 或 `master` 的提交"
 
-#: ../../08-build.md:152
+#: ../../08-build.md:152 094131bb48a94a42a4b90d6710b032c3
 msgid "Checks out the repo with git history"
 msgstr "带 git 历史记录检出仓库"
 
-#: ../../08-build.md:153
+#: ../../08-build.md:153 815ab7e8e625406092ba3e6e9d47104b
 msgid "Runs `python3 scripts/check_pkb_staleness.py`"
 msgstr "执行 `python3 scripts/check_pkb_staleness.py`"
 
-#: ../../08-build.md:154
+#: ../../08-build.md:154 cdd4450d625d411a874f43826102bb16
 msgid "Maps changed files to likely PKB pages"
 msgstr "将变更文件映射到可能受影响的 PKB 页面"
 
-#: ../../08-build.md:155
+#: ../../08-build.md:155 365bac9c0e2c465db0e5f70fce9288fe
 msgid "Reports whether those PKB pages were updated in the same diff"
 msgstr "报告这些 PKB 页面是否在同一个 diff 中被同步更新"
 
-#: ../../08-build.md:156
+#: ../../08-build.md:156 6eed8f88a8bd42b1b36d187dcdab533f
 msgid "Writes a GitHub Actions job summary with suggested next steps"
 msgstr "在 GitHub Actions job summary 中写入建议的后续步骤"
 
-#: ../../08-build.md:158
+#: ../../08-build.md:158 97cbf35c6bbc460385ef08962d6aa869
 msgid ""
-"This workflow is intentionally non-blocking. It warns about likely stale PKB "
-"docs but does not fail the build just because docs were not updated yet."
-msgstr ""
-"这个工作流被刻意设计为非阻塞。它会提示哪些 PKB 文档可能已经过期，但不会因为"
-"文档尚未更新就直接让构建失败。"
+"This workflow is intentionally non-blocking. It warns about likely stale "
+"PKB docs but does not fail the build just because docs were not updated "
+"yet."
+msgstr "这个工作流被刻意设计为非阻塞。它会提示哪些 PKB 文档可能已经过期，但不会因为文档尚未更新就直接让构建失败。"
 
-#: ../../08-build.md:160
+#: ../../08-build.md:160 6253325838284217985553e64730724b
 msgid "Local PKB Advisory Check"
 msgstr "本地 PKB 告警检查"
 
-#: ../../08-build.md:162
+#: ../../08-build.md:162 c988d45c58084b0ba31ea2a86e0b6cf0
 msgid "Run the same advisory analysis locally:"
 msgstr "在本地运行同样的告警分析："
 
-#: ../../08-build.md:168
+#: ../../08-build.md:168 ef3c590b681e44438d688579a9d9cdd6
 msgid "Use this when:"
 msgstr "适用场景："
 
-#: ../../08-build.md:170
+#: ../../08-build.md:170 c2f4a0731d814256b68fc5b265a3594d
 msgid "a feature changed but you are not sure which PKB pages to refresh"
 msgstr "某个功能发生了变化，但你不确定该刷新哪些 PKB 页面"
 
-#: ../../08-build.md:171
+#: ../../08-build.md:171 dd55e5ea9a224dc089dae911ad0a227c
 msgid "a PR changes commands, workflows, tray behavior, settings, or build files"
 msgstr "某个 PR 修改了命令、工作流、托盘行为、设置或构建文件"
 
-#: ../../08-build.md:172
+#: ../../08-build.md:172 5f53ce17a9794184ba80e0ee1a02274d
 msgid "you want to review likely doc impact before pushing"
 msgstr "你希望在推送前先检查可能受影响的文档"
 
-#: ../../08-build.md:186
+#: ../../08-build.md:174 00b0b65a966a41d3adb1240d8a232c97
+msgid "Release Process"
+msgstr "发布流程"
+
+#: ../../08-build.md:176 b4624f613d9641feb16dff08b369aed2
+msgid "Step 1: Update Version Fields"
+msgstr "步骤 1：更新版本号字段"
+
+#: ../../08-build.md:178 357bc60f11d24f7ab704f1301425ffd1
+msgid "Before creating a new release, keep the version aligned in these files:"
+msgstr "在创建新版本前，请保持以下文件中的版本号一致："
+
+#: ../../08-build.md:180 876a39186b9f4777ad68bb2faed45501
+msgid "`package.json`"
+msgstr "`package.json`"
+
+#: ../../08-build.md:181 b692b0a4a07e4d48b03760355c18849e
+msgid "`src-tauri/tauri.conf.json`"
+msgstr "`src-tauri/tauri.conf.json`"
+
+#: ../../08-build.md:182 eb4853a5f37b4b6fa92cc92e752c7340
+msgid "`src-tauri/Cargo.toml`"
+msgstr "`src-tauri/Cargo.toml`"
+
+#: ../../08-build.md:184 12263cb06b9245fe91e54f1f8a58973f
+msgid "Example: change all three from `0.1.0` to `0.1.1`."
+msgstr "例如：将这三个文件中的版本都从 `0.1.0` 改为 `0.1.1`。"
+
+#: ../../08-build.md:186 ea636fb6f7ff488ba2b52c88bce0acf2
 msgid "Release helper script:"
 msgstr "发布辅助脚本："
 
-#: ../../08-build.md:192
+#: ../../08-build.md:192 f3a2088dbe8244c9b7d79d49144d6671
 msgid "Or through npm:"
 msgstr "或者通过 npm："
 
-#: ../../08-build.md:198
+#: ../../08-build.md:198 c8fc9a8ca5a8469ea12921b43a72f6a4
 msgid "This helper:"
 msgstr "这个辅助脚本会："
 
-#: ../../08-build.md:200
+#: ../../08-build.md:200 9402f5fc9ede41d998cedf971f87cc91
 msgid ""
-"Uses `sed` to update the version in `package.json`, `src-tauri/tauri.conf."
-"json`, and `src-tauri/Cargo.toml`"
+"Uses `sed` to update the version in `package.json`, `src-"
+"tauri/tauri.conf.json`, and `src-tauri/Cargo.toml`"
 msgstr ""
-"使用 `sed` 更新 `package.json`、`src-tauri/tauri.conf.json` 和 `src-tauri/"
-"Cargo.toml` 中的版本号"
+"使用 `sed` 更新 `package.json`、`src-tauri/tauri.conf.json` 和 `src-"
+"tauri/Cargo.toml` 中的版本号"
 
-#: ../../08-build.md:201
+#: ../../08-build.md:201 f7bccdf10a45422eadc2e33a3ef627c9
 msgid "Creates a commit like `release: v0.1.1`"
 msgstr "创建类似 `release: v0.1.1` 的提交"
 
-#: ../../08-build.md:202
+#: ../../08-build.md:202 46729fad491d49f6a100551d5df05cb9
 msgid "Pushes the current branch"
 msgstr "推送当前分支"
 
-#: ../../08-build.md:203
+#: ../../08-build.md:203 856322d57f424d5297cf06bb324e3503
 msgid "Creates the git tag `v0.1.1`"
 msgstr "创建 git 标签 `v0.1.1`"
 
-#: ../../08-build.md:204
+#: ../../08-build.md:204 8bc707eafa7f47eda70ae8de1732b6f1
 msgid "Pushes the tag to `origin`"
 msgstr "将标签推送到 `origin`"
 
-#: ../../08-build.md:206
+#: ../../08-build.md:206 168a106af9ff4c69b63fbd37604dc279
 msgid "For safety, the script requires a clean working tree before it runs."
 msgstr "为保证安全，脚本要求工作区是干净的，然后才会执行。"
 
-#: ../../08-build.md:237
-msgid "If you use `./scripts/release_version.sh v0.1.1`, this step is handled automatically."
+#: ../../08-build.md:208 f8dadb67b9964b9c95f8851dd1e0c5f2
+msgid "Step 2: Validate Locally"
+msgstr "步骤 2：本地验证"
+
+#: ../../08-build.md:210 0c8e76a1dcfb405288114ecab61f733d
+msgid "Recommended checks before tagging:"
+msgstr "建议在打标签前执行以下检查："
+
+#: ../../08-build.md:220 5fbaf8dcbfe04094b06ec08dd3e70dde
+msgid "If you changed docs, also run:"
+msgstr "如果你修改了文档，也请执行："
+
+#: ../../08-build.md:227 d0fe21bee5494ec393cf0ca8f70391a9
+msgid "Step 3: Commit and Push"
+msgstr "步骤 3：提交并推送"
+
+#: ../../08-build.md:229 d34abdd3df7343c7a695e994d10c991b
+msgid "Example:"
+msgstr "示例："
+
+#: ../../08-build.md:237 9835bf98b040475c84ad01881ac00782
+msgid ""
+"If you use `./scripts/release_version.sh v0.1.1`, this step is handled "
+"automatically."
 msgstr "如果你使用 `./scripts/release_version.sh v0.1.1`，这一步会自动完成。"
 
-#: ../../08-build.md:248
-msgid "If you use `./scripts/release_version.sh v0.1.1`, this step is also handled automatically."
+#: ../../08-build.md:239 05bc722b6254439f9db7259a45747f28
+msgid "Step 4: Create and Push the Release Tag"
+msgstr "步骤 4：创建并推送发布标签"
+
+#: ../../08-build.md:241 3dd9b1f32d864fd6b84a98860ec0232d
+msgid ""
+"The release workflow does not trigger from a normal branch push. It "
+"triggers from a tag push such as `v0.1.1`."
+msgstr "发布流水线不会因为普通分支推送而触发，它会在推送如 `v0.1.1` 这类标签时触发。"
+
+#: ../../08-build.md:248 3c40f8760af04247acaaa97a9b751c8d
+msgid ""
+"If you use `./scripts/release_version.sh v0.1.1`, this step is also "
+"handled automatically."
 msgstr "如果你使用 `./scripts/release_version.sh v0.1.1`，这一步也会自动完成。"
 
-#: ../../08-build.md:330
+#: ../../08-build.md:250 4d359fbfa01d47078f3f5e0afefd58f4
+msgid "Step 5: Verify the GitHub Release"
+msgstr "步骤 5：验证 GitHub Release"
+
+#: ../../08-build.md:252 15707b566ff04d03a00fa2af5724d175
+msgid "After the tag push:"
+msgstr "推送标签后："
+
+#: ../../08-build.md:254 3c8e294017e1401fa2bf0fa3194cb8db
+msgid "Open the GitHub repository"
+msgstr "打开 GitHub 仓库"
+
+#: ../../08-build.md:255 ../../08-build.md:285 3011fe8f2df64ed3bc82c6b57654d895
+#: 5d563a9636bc404f97dd1e0aa9f36ce7
+msgid "Go to `Actions`"
+msgstr "进入 `Actions`"
+
+#: ../../08-build.md:256 75ff9511d8e34a6c9b2c76c3a36e70e1
+msgid "Open the `publish` workflow run"
+msgstr "打开 `publish` 工作流运行记录"
+
+#: ../../08-build.md:257 ce82b471ef1943ffb298a305d59a2fcd
+msgid "Wait for all matrix jobs to finish"
+msgstr "等待所有矩阵任务执行完成"
+
+#: ../../08-build.md:258 23f51b9cfb764ae098632cd091d4977f
+msgid "Open `Releases` and confirm that the new assets are attached"
+msgstr "打开 `Releases`，确认新的构建产物已附加到发布中"
+
+#: ../../08-build.md:260 fb36a0babaa047218c3c2d80e5c53c32
+msgid "Publishing Documentation"
+msgstr "发布文档"
+
+#: ../../08-build.md:262 8059711f67784f268093d2d7715e01fd
+msgid "Automatic Publish"
+msgstr "自动发布"
+
+#: ../../08-build.md:264 3bc8e0ca19eb41699033504c1aae4631
+msgid ""
+"The docs site is published automatically when documentation-related files"
+" are pushed to `main` or `master`."
+msgstr "当与文档相关的文件被推送到 `main` 或 `master` 时，文档站点会自动发布。"
+
+#: ../../08-build.md:266 420e7e38dd484afaac0e324f6c945b02
+msgid "Typical flow:"
+msgstr "典型流程："
+
+#: ../../08-build.md:274 89629978f8954362a03d187d0790e58f
+msgid "Then verify:"
+msgstr "然后验证："
+
+#: ../../08-build.md:276 6d8ba8a4d7fa4f25a3fcb8eb13ea4d3a
+msgid "Open GitHub `Actions`"
+msgstr "打开 GitHub `Actions`"
+
+#: ../../08-build.md:277 a0348f0ec67f4e84a13f2990772a3988
+msgid "Inspect the `docs` workflow run"
+msgstr "检查 `docs` 工作流运行记录"
+
+#: ../../08-build.md:278 8662a91db0784ac6b5e2fffbf0259361
+msgid "Open the GitHub Pages URL after deployment finishes"
+msgstr "部署完成后打开 GitHub Pages 链接"
+
+#: ../../08-build.md:280 f53477062d78479e84228e6b9b1a4366
+msgid "Manual Publish"
+msgstr "手动发布"
+
+#: ../../08-build.md:282 abb5e6253de24e7ea76c7b7a929a9632
+msgid "Both workflows support manual execution from the GitHub UI:"
+msgstr "两个工作流都支持从 GitHub UI 手动执行："
+
+#: ../../08-build.md:284 1f91b854bfe541dd84d2ae0de2a44bbd
+msgid "Open the repository on GitHub"
+msgstr "在 GitHub 上打开该仓库"
+
+#: ../../08-build.md:286 ffc400c4b61342fbbc9d3b5934fe5b8a
+msgid "Select `publish` or `docs`"
+msgstr "选择 `publish` 或 `docs`"
+
+#: ../../08-build.md:287 8494bfb789444da6bc34a0b8d16bd174
+msgid "Click `Run workflow`"
+msgstr "点击 `Run workflow`"
+
+#: ../../08-build.md:289 a6280b135d2a421fac842ff0b05b4fb6
+msgid "Manual execution is useful when:"
+msgstr "以下场景适合手动执行："
+
+#: ../../08-build.md:291 3d312e485a6646958794ed6912d084ee
+msgid "A previous run failed due to transient CI issues"
+msgstr "上一次运行因临时性的 CI 问题失败"
+
+#: ../../08-build.md:292 3f6819e34b75426ca8ad86a5e264d2a6
+msgid "You want to rebuild without creating a new commit"
+msgstr "你希望不创建新提交就重新构建"
+
+#: ../../08-build.md:293 1432397b681a4366b10b4ddeeaf2b5d7
+msgid "You want to confirm a workflow fix before the next full release"
+msgstr "你希望在下一次完整发布前先验证工作流修复是否有效"
+
+#: ../../08-build.md:295 3f75449cc6d8407e81d3594f9043c8a2
+msgid "Re-running Failed Builds"
+msgstr "重新运行失败构建"
+
+#: ../../08-build.md:297 3f27ce12333843968ba3ecf2df0d2d11
+msgid "Re-run a Failed Release Job"
+msgstr "重新运行失败的发布任务"
+
+#: ../../08-build.md:299 13693e7a11d94979845b41b4aa818cf6
+msgid ""
+"If the source code and tag are already correct, you do not need a new "
+"commit just to retry CI."
+msgstr "如果源码和标签本身没有问题，仅仅为了重试 CI 并不需要创建新的提交。"
+
+#: ../../08-build.md:301 9df7d40f67b7465e8487ce25a7129b04
+msgid "Use GitHub:"
+msgstr "在 GitHub 中操作："
+
+#: ../../08-build.md:303 d837371e5277409b88c6f38742dd2966
+msgid "Open the failed workflow run in `Actions`"
+msgstr "在 `Actions` 中打开失败的工作流运行记录"
+
+#: ../../08-build.md:304 dc89379ee3ca4e0d97d74b5eff1ca1eb
+msgid "Click `Re-run failed jobs` or `Re-run all jobs`"
+msgstr "点击 `Re-run failed jobs` 或 `Re-run all jobs`"
+
+#: ../../08-build.md:306 068715a906e4481ab39c3ae848435f5b
+msgid "When You Do Need a New Release Tag"
+msgstr "何时需要新的发布标签"
+
+#: ../../08-build.md:308 437cb879d41044508e1d1483205807ad
+msgid "Create a new version and a new tag when:"
+msgstr "在以下情况下，应创建新版本和新标签："
+
+#: ../../08-build.md:310 40bb5f5b7ae24cb6af92875cbcc116b6
+msgid "The code or build configuration changed"
+msgstr "代码或构建配置发生了变化"
+
+#: ../../08-build.md:311 d84c55b85f9b443bae896adacbf6357f
+msgid "A packaging asset was missing"
+msgstr "缺少某个打包资源"
+
+#: ../../08-build.md:312 e81eccb26dab42fda732474bcfafca1d
+msgid "Version fields were wrong"
+msgstr "版本号字段设置错误"
+
+#: ../../08-build.md:313 95fc56686fc64cbabf86bfbfff6ad00c
+msgid "The previous release artifacts should not be reused"
+msgstr "之前的发布产物不应继续复用"
+
+#: ../../08-build.md:315 052f621eed184a68acdbe10319b5854d
+msgid "In that case:"
+msgstr "此时应当："
+
+#: ../../08-build.md:317 b0a829f3d14d471383d65dc3717a5ce8
+msgid "Fix the code or config"
+msgstr "修复代码或配置"
+
+#: ../../08-build.md:318 d9dbaf3daad3499a886f533b90af26b3
+msgid "Bump the version in the tracked version files"
+msgstr "在受版本跟踪的文件中提升版本号"
+
+#: ../../08-build.md:319 739a2b5794b742e0891483f43e4c4d89
+msgid "Commit and push"
+msgstr "提交并推送"
+
+#: ../../08-build.md:320 a88cf1d8c1604237a6911bb52e56ee37
+msgid "Push a new tag such as `v0.1.2`"
+msgstr "推送一个新的标签，例如 `v0.1.2`"
+
+#: ../../08-build.md:322 cbe16e730dbf46e4adf5ded220850503
+msgid "Common Build and Publish Failures"
+msgstr "常见构建与发布故障"
+
+#: ../../08-build.md b34d2391756b466c9ddff33566f392d3
+msgid "Symptom"
+msgstr "现象"
+
+#: ../../08-build.md db821124f72b43858c256235d9759c48
+msgid "Likely Cause"
+msgstr "可能原因"
+
+#: ../../08-build.md e6eb8c4b7dee4a7b9767511d3b6b0446
+msgid "Fix"
+msgstr "修复方法"
+
+#: ../../08-build.md 9ebc86dfb2884bbb935ee0eaf3c673eb
+msgid "Windows bundle fails with `Couldn't find a .ico icon`"
+msgstr "Windows 打包失败并提示 `Couldn't find a .ico icon`"
+
+#: ../../08-build.md b79cd2c89c33461390106d0489a1c297
+msgid "`src-tauri/tauri.conf.json` does not list `icons/icon.ico`"
+msgstr "`src-tauri/tauri.conf.json` 未列出 `icons/icon.ico`"
+
+#: ../../08-build.md b3323b649a564317ad9f7ebc409fd04f
+msgid "Add `\"icons/icon.ico\"` to `bundle.icon` and re-run release"
+msgstr "将 `\"icons/icon.ico\"` 添加到 `bundle.icon` 中，然后重新执行发布"
+
+#: ../../08-build.md 2b8bd0a2f4e04fb8aff27110f28be462
+msgid "Release workflow did not start"
+msgstr "发布工作流没有启动"
+
+#: ../../08-build.md 8dc803d568f74260840f65b9b89dbf89
+msgid "Only a branch was pushed, no `v*` tag was pushed"
+msgstr "只推送了分支，没有推送 `v*` 标签"
+
+#: ../../08-build.md fda2512530664e64bad8937176c3fd3c
+msgid "Create and push a release tag such as `v0.1.1`"
+msgstr "创建并推送一个发布标签，例如 `v0.1.1`"
+
+#: ../../08-build.md a2256e75be804fb4bc473cc6372223ac
+msgid "Release has the wrong version name"
+msgstr "发布版本名称错误"
+
+#: ../../08-build.md 8158b0d4a48c4f1a9b1fb4a14bd4993a
+msgid "Version fields are inconsistent across config files"
+msgstr "各配置文件中的版本号不一致"
+
+#: ../../08-build.md 902475ab57ba4c82af2b1c26f11723a9
+msgid ""
+"Keep `package.json`, `src-tauri/tauri.conf.json`, and `src-"
+"tauri/Cargo.toml` aligned"
+msgstr ""
+"保持 `package.json`、`src-tauri/tauri.conf.json` 和 `src-tauri/Cargo.toml` "
+"中的版本号一致"
+
+#: ../../08-build.md 91e387e41c2e4a478223878065a4b96f
+msgid "Docs workflow did not start"
+msgstr "文档工作流没有启动"
+
+#: ../../08-build.md ec155d2351e44f56adcacb2e87ed915d
+msgid "The commit did not change tracked docs paths"
+msgstr "该提交没有修改被跟踪的文档路径"
+
+#: ../../08-build.md 5f6e6e3c68884e66a9e92d4cae0d622c
+msgid "Push changes to `doc/**`, `README.md`, or run the workflow manually"
+msgstr "推送 `doc/**`、`README.md` 的变更，或手动运行工作流"
+
+#: ../../08-build.md bce46659e3e74c668623824daee7d1ac
 msgid "PKB advisory workflow flags likely stale docs"
 msgstr "PKB 告警工作流提示文档可能已过期"
 
-#: ../../08-build.md:330
+#: ../../08-build.md 66f049849e574582a00b2bf328547f47
 msgid "Source changed but corresponding PKB pages were not updated"
 msgstr "源码已经变化，但对应的 PKB 页面没有同步更新"
 
-#: ../../08-build.md:330
-msgid "Run `npm run pkb:check`, refresh the suggested English PKB pages, then rebuild docs"
+#: ../../08-build.md c8717715db3f47c18716f3102d50e607
+msgid ""
+"Run `npm run pkb:check`, refresh the suggested English PKB pages, then "
+"rebuild docs"
 msgstr "运行 `npm run pkb:check`，刷新建议更新的英文 PKB 页面，然后重新构建文档"
+
+#: ../../08-build.md 67c01aca8a124de2a155443539f70de9
+msgid "GitHub Pages deploy succeeds but site is unavailable"
+msgstr "GitHub Pages 部署成功，但站点不可访问"
+
+#: ../../08-build.md 7693bd19563a421f967a5d815a095957
+msgid "GitHub Pages source is not set to Actions"
+msgstr "GitHub Pages 的来源未设置为 Actions"
+
+#: ../../08-build.md 2e24b33b3c1d4874ab367e993b23a8e2
+msgid "In repo settings, set `Pages -> Source` to `GitHub Actions`"
+msgstr "在仓库设置中，将 `Pages -> Source` 设置为 `GitHub Actions`"
+
+#: ../../08-build.md 4923daf1fe294a278fbdbe8ae61a0934
+msgid "Docs build fails after adding Mermaid diagrams"
+msgstr "添加 Mermaid 图后文档构建失败"
+
+#: ../../08-build.md bbc051dd92de4e35aee61535aeead7fd
+msgid "Mermaid source contains parser-sensitive labels"
+msgstr "Mermaid 源内容中包含对解析器敏感的标签"
+
+#: ../../08-build.md 44a68245b7de43bbb26ef91af4b30e9d
+#, python-brace-format
+msgid ""
+"Prefer quoted labels and avoid raw query strings or `{}` in flowchart "
+"node text"
+msgstr "优先使用带引号的标签，并避免在 flowchart 节点文本中直接写查询字符串或 `{}`"
+
+#: ../../08-build.md:334 219f3ca23db041cbbee3315651a4c19a
+msgid "Suggested Release Checklist"
+msgstr "建议的发布检查清单"
+
+#: ../../08-build.md:336 fad8aa9ea2c7493c990435985ed375fc
+msgid "Use this checklist before publishing:"
+msgstr "发布前可使用以下检查清单："
+
+#: ../../08-build.md:338 4d0d8255bcf04b238318953a78a2b952
+msgid ""
+"Version fields updated in `package.json`, `src-tauri/tauri.conf.json`, "
+"and `src-tauri/Cargo.toml`"
+msgstr ""
+"已更新 `package.json`、`src-tauri/tauri.conf.json` 和 `src-tauri/Cargo.toml` "
+"中的版本号"
+
+#: ../../08-build.md:339 0795d1c34f174c71821840bcdebbeaf3
+msgid "Desktop app builds locally with `npm run tauri build`"
+msgstr "桌面应用已可通过 `npm run tauri build` 在本地构建"
+
+#: ../../08-build.md:340 b83b0dcff204429197cd4414ecd24d78
+msgid "Docs build locally with `poetry run make html` when docs changed"
+msgstr "当文档发生变化时，已通过 `poetry run make html` 在本地验证文档构建"
+
+#: ../../08-build.md:341 1652476a104d471e8a52b1ae405679a5
+msgid "Release notes or README updates are committed if needed"
+msgstr "如有需要，Release 说明或 README 更新已提交"
+
+#: ../../08-build.md:342 56a5813f5fb94ba39a31b57b08493254
+msgid "Main branch is pushed"
+msgstr "主分支已推送"
+
+#: ../../08-build.md:343 9904481c317e42eeab6550702d362f18
+msgid "Release tag is pushed"
+msgstr "发布标签已推送"
+
+#: ../../08-build.md:344 9daf913beb9b4efab6804cf841469e4e
+msgid "GitHub `publish` workflow finishes successfully"
+msgstr "GitHub `publish` 工作流已成功完成"
+
+#: ../../08-build.md:345 b45e98aa2f5349fd940bcabbe6f427ac
+msgid "GitHub Release assets can be downloaded"
+msgstr "GitHub Release 产物可正常下载"
+
+#: ../../08-build.md:346 5afe29ef3f254055892b2210ef29dedc
+msgid "GitHub Pages site loads correctly after docs updates"
+msgstr "文档更新后，GitHub Pages 站点可正常访问"
+

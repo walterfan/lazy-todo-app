@@ -1,0 +1,326 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Walter Fan
+# This file is distributed under the same license as the Lazy Todo App
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Lazy Todo App 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-13 17:25+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_CN\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../appendix-02-glossary.md:1 9767db4367b1400cb133372f32f84425
+msgid "Appendix B — Glossary"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 05526298bd824221a2688f1512523283
+#: 9b4076c8f86a45d3ab6a39dfa74875ce
+msgid "Term"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 30fd4cef976f40ed92e9a0a7b4790fd5
+#: 6128a0da6db54f3499ef32a8bd48f959
+msgid "Definition"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 4c809b89ee774321a1613c470cd1eb1e
+msgid "**AppImage**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 6e77aa520c0f428e8c7e0058f129ac04
+msgid ""
+"A portable Linux application format that runs without installation. The "
+"app ships as a single executable file."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 273c71d54f9b4c2eaced14ad49e3990c
+msgid "**Cargo**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md d00f4f33ab6847e5b12c964a4392e505
+msgid ""
+"The Rust package manager and build system. Manages dependencies declared "
+"in `Cargo.toml` and compiles Rust code."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 4a7b98d42e954a9ba1704cb97cfd60f0
+msgid "**CI / CD**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 77c3662f80264dd1bb293a47f0a53348
+msgid ""
+"**Continuous Integration / Continuous Delivery**. Automated pipelines "
+"that build, test, and release software on every code change. This project"
+" uses GitHub Actions."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 6c66cfdc242547f196d1018a7fcbc33c
+msgid "**Crate**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 0d133a283d9d4181b4e871799465622c
+msgid ""
+"A Rust package or library. External crates are pulled from "
+"[crates.io](https://crates.io)."
+msgstr ""
+
+#: ../../appendix-02-glossary.md dbd1fc92cf8645069f78fc31653f96d8
+msgid "**DMG**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 8dc201199a5547f28ab4a6ac68ea6213
+msgid ""
+"Apple Disk Image — the standard macOS distribution format for desktop "
+"applications."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 7b6c1669da4841ab8102988292b80a98
+msgid "**ESLint**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 1e4e232eebfa4142a23d988bd1878e6a
+msgid ""
+"A JavaScript/TypeScript linter used to enforce code style and catch "
+"errors statically."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 3292420316584f1d8e9dc428bd0ae8db
+msgid "**GitHub Actions**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 87aa512076704a5c9a0fff22767fe698
+msgid ""
+"GitHub's built-in CI/CD platform. Workflows are defined in "
+"`.github/workflows/*.yml`."
+msgstr ""
+
+#: ../../appendix-02-glossary.md d7b715ca0a5d41e89f180a18c4d98067
+msgid "**HMR**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 55823f9235c84ec2b4c4c9f6d3550c30
+msgid ""
+"**Hot Module Replacement**. A Vite feature that updates the browser in "
+"real-time when source files change, without a full page reload."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 6f444fe831e340d789c195bb4998f40d
+msgid "**IPC**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md fed019a49ccf416cae1a4d3ff3248531
+msgid ""
+"**Inter-Process Communication**. In Tauri, the mechanism by which the "
+"frontend (WebView) calls Rust backend functions via `invoke()`."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 894c4799dd0d4ef8af14f77b965e874b
+msgid "**MSI**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 9b2320bf214e42d989e9301844b612cf
+msgid "Microsoft Installer — a Windows installer package format."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 022d61887d7e4eb1b7306827e69d26e7
+msgid "**NSIS**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 18cea8ddff664f5f8a780ba6ad89719f
+msgid ""
+"**Nullsoft Scriptable Install System**. An alternative Windows installer "
+"format supported by Tauri, producing `.exe` installers."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 44c6c27056c84f409da3efea5b272ceb
+msgid "**Offline-first**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 01a51211c2e44459b6ac31833f0d1626
+msgid ""
+"A design philosophy where the app works fully without network "
+"connectivity. Data is stored locally and optionally synced later."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 9eb12c04fb52460a875cb1479894b4fd
+msgid "**pnpm**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md f8ac7fb120504725896639915af40c25
+msgid ""
+"A fast, disk-efficient Node.js package manager. The project standard; "
+"uses `pnpm-lock.yaml` as the lock file."
+msgstr ""
+
+#: ../../appendix-02-glossary.md cbae4b10950d4fd9b8a173a4840e5bef
+msgid "**React**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 2ac872441cae4deba376c7cf684a1f1b
+msgid ""
+"A JavaScript library for building user interfaces using a component-based"
+" architecture. The frontend framework of this project."
+msgstr ""
+
+#: ../../appendix-02-glossary.md b240e3aad70144d8953d20e1def3cfe1
+msgid "**Rust**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 6e09e7d048a8411b9a4b532c5dfe813a
+msgid ""
+"A systems programming language focused on safety, speed, and concurrency."
+" Powers the Tauri backend of this app."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 4e61401e2cfc48bc833ed227db47e6ef
+msgid "**sccache**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 45e98eed6e534541839a3cc22a28a147
+msgid ""
+"A compiler cache for Rust (and C/C++). Speeds up repeated builds by "
+"caching compilation artifacts."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 28e91a9ebaf94e48a1d8d298aa69f22a
+msgid "**SQLite**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 6b68887aa65a47898f94feb8c2bfccb4
+msgid ""
+"A lightweight, file-based relational database engine. Used as the local "
+"data store for tasks and settings."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 027db9ceb1034fa3b785aaac4a09f168
+msgid "**Tauri**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md d98f19e7f3604083af62f26023af9bfe
+msgid ""
+"An open-source framework for building lightweight desktop applications "
+"with a web frontend and a Rust backend. This project uses **Tauri v2**."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 2e681224398041ca9d1e0d2fe71d7715
+msgid "**Tauri Command**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 564ee7ab34044113b31e7bf92675733c
+msgid ""
+"A Rust function annotated with `#[tauri::command]` that can be called "
+"from the frontend via `invoke()`."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 5d110e084c0243bca10073810cda6af7
+msgid "**TypeScript**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md d5ebddc9cc8b4305828cad1de99d2d12
+msgid ""
+"A typed superset of JavaScript that compiles to plain JS. Used for all "
+"frontend source code in this project."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 08421f7e15ef4b9ea3abb19a670134cf
+msgid "**Vite**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 04f65054cf07413ca261e50cd0b77ab4
+msgid ""
+"A fast frontend build tool that provides instant dev server startup and "
+"HMR. Used as the bundler for the React frontend."
+msgstr ""
+
+#: ../../appendix-02-glossary.md f9becf3969e941cf90de0ed6c26ef996
+msgid "**WebKitGTK**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 1de259112be2494c8a3d4c97edf734d0
+msgid ""
+"The Linux WebView engine used by Tauri to render the frontend UI. Must be"
+" installed as a system dependency on Linux."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 78086b1d19294345a7a40eb642fb6ab0
+msgid "**WebView**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md d4210ef0ee6d43439aafcff1b4de53ce
+msgid ""
+"An embedded browser component that renders the frontend HTML/CSS/JS "
+"inside the native Tauri window."
+msgstr ""
+
+#: ../../appendix-02-glossary.md:33 7c3d880a395044adb2c7153125a1bc71
+msgid "Project-Specific Terms"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 2f6fa4c7fdaa4545a431730ee426ba49
+msgid "**Lazy Todo**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md fe11ffafdcb54d4587f0a7a9826ff7c0
+msgid ""
+"The application name. \"Lazy\" refers to the low-friction, minimal-effort"
+" UX philosophy."
+msgstr ""
+
+#: ../../appendix-02-glossary.md c64b77b48ac54e378136562483f672f0
+msgid "**Task**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md dd3171bcde2f4d1fa07f8c70b3116ed9
+msgid ""
+"The core data entity — a to-do item with properties like title, "
+"description, priority, status, due date, etc."
+msgstr ""
+
+#: ../../appendix-02-glossary.md 4660d51a7cd44199a0bd5768752c1fbf
+msgid "**Quick Capture**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md af2ec369cbb84dca8f83a55223919bfc
+msgid ""
+"A UX pattern allowing users to create a task with minimal input (e.g., "
+"just a title), with smart defaults filling in the rest."
+msgstr ""
+
+#: ../../appendix-02-glossary.md d835869699084e37a1765da5e57e8025
+msgid "**Migration**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 5856be6086a1411f9fc7f0c289d5d792
+msgid ""
+"A versioned SQL script that evolves the SQLite database schema. "
+"Migrations run automatically on app startup."
+msgstr ""
+
+#: ../../appendix-02-glossary.md f7c21d9b3b824282ae14e7177efa9531
+msgid "**Release Script**"
+msgstr ""
+
+#: ../../appendix-02-glossary.md 39b8f3437cc043c6b8afe9743398aa70
+msgid ""
+"`scripts/release_version.sh` — automates version bumping, tagging, and "
+"triggering the CI release pipeline."
+msgstr ""
+
+#: ../../appendix-02-glossary.md:45 f5108ebb8f814e3586bdc999e07ff7db
+msgid ""
+"💡 For architecture-level concepts, see "
+"[02-architecture.md](02-architecture.md).   For API and data model "
+"details, see [05-data-and-api.md](05-data-and-api.md)."
+msgstr ""
+

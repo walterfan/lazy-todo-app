@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Lazy Todo App 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-12 20:24+0800\n"
-"PO-Revision-Date: 2026-04-12 23:10+0800\n"
+"PO-Revision-Date: 2026-04-13 00:20+0800\n"
 "Last-Translator: human+ai\n"
 "Language: zh_CN\n"
 "Language-Team: zh_CN\n"
@@ -32,22 +32,30 @@ msgid "Start with `00-overview.md` for product scope and deployment model."
 msgstr "先阅读 `00-overview.md`，了解产品范围和部署模型。"
 
 #: ../../ai-guide.md:8 fad4558761cd4a6b9df8177336f73f1a
-msgid "Read `01-repo-map.md` to locate entry points and important directories."
-msgstr "接着阅读 `01-repo-map.md`，定位入口文件和关键目录。"
+msgid "Read `04-repo-map.md` to locate entry points and important directories."
+msgstr "接着阅读 `04-repo-map.md`，定位入口文件和关键目录。"
 
 #: ../../ai-guide.md:9 6bbfdb9fe336428289db08286d61a6ec
-msgid "Use `02-architecture.md` and `03-workflows.md` for cross-cutting behavior."
-msgstr "对于跨模块行为和整体运行机制，请阅读 `02-architecture.md` 与 `03-workflows.md`。"
+msgid "Use `02-architecture.md` and `06-workflows.md` for cross-cutting behavior."
+msgstr "对于跨模块行为和整体运行机制，请阅读 `02-architecture.md` 与 `06-workflows.md`。"
 
 #: ../../ai-guide.md:10 d84b6df44d8f49f2b99402dedc85b9d7
 msgid ""
-"Check `04-data-and-api.md` before touching the database, Tauri commands, "
+"Check `05-data-and-api.md` before touching the database, Tauri commands, "
 "or shared types."
-msgstr "在修改数据库、Tauri 命令或共享类型之前，请先查看 `04-data-and-api.md`。"
+msgstr "在修改数据库、Tauri 命令或共享类型之前，请先查看 `05-data-and-api.md`。"
 
 #: ../../ai-guide.md:11 3408dba5d6e5412d81943cf8bbe91af2
-msgid "Use `06-runbook.md` and `07-testing.md` before validating changes."
-msgstr "在验证变更之前，请阅读 `06-runbook.md` 与 `07-testing.md`。"
+msgid "Use `10-runbook.md` and `09-testing.md` before validating changes."
+msgstr "在验证变更之前，请阅读 `10-runbook.md` 与 `09-testing.md`。"
+
+#: ../../ai-guide.md:12
+msgid "Use `08-build.md` when the change affects releases, GitHub Actions, or docs publishing."
+msgstr "当变更涉及发布、GitHub Actions 或文档发布时，请阅读 `08-build.md`。"
+
+#: ../../ai-guide.md:13
+msgid "Use `12-document.md` when generating, updating, translating, or maintaining the PKB itself."
+msgstr "当需要生成、更新、翻译或维护 PKB 本身时，请阅读 `12-document.md`。"
 
 #: ../../ai-guide.md:13 50475d4c00174336a86f2d714dced9f4
 msgid "Project Rules Worth Preserving"
