@@ -5,6 +5,7 @@
   "windows": ["main", "note-*"],
   "permissions": [
     "core:default",
+    "core:window:allow-set-always-on-top",
     "shell:allow-open",
     "core:tray:default",
     "core:menu:default",

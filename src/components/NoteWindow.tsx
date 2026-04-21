@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import type { StickyNote, NoteColor } from "../types/note";
 import { MarkdownPreview } from "./MarkdownPreview";
+import { useAlwaysOnTop } from "../hooks/useAlwaysOnTop";
 
 const COLORS: NoteColor[] = ["yellow", "green", "blue", "pink", "purple", "orange"];
 
@@ -17,6 +18,7 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
   const [content, setContent] = useState("");
   const [color, setColor] = useState<NoteColor>("yellow");
   const [error, setError] = useState("");
+  const { pinned, toggle: togglePinned } = useAlwaysOnTop();
 
   const loadNote = useCallback(async () => {
     try {
@@ -83,11 +85,21 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
             />
           ))}
         </div>
-        {!editing && (
-          <button className="note-window-edit-btn" onClick={() => setEditing(true)}>
-            ✏️ Edit
+        <div className="note-window-toolbar-actions">
+          <button
+            className={`note-window-pin-btn ${pinned ? "active" : ""}`}
+            onClick={togglePinned}
+            title={pinned ? "Unpin (Cmd/Ctrl+Shift+T)" : "Always on top (Cmd/Ctrl+Shift+T)"}
+            aria-pressed={pinned}
+          >
+            {pinned ? "📌" : "📍"}
           </button>
-        )}
+          {!editing && (
+            <button className="note-window-edit-btn" onClick={() => setEditing(true)}>
+              ✏️ Edit
+            </button>
+          )}
+        </div>
       </div>
 
       {editing ? (

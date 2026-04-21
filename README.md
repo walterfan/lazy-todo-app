@@ -28,6 +28,14 @@ This project also serves as a practical [Harness Engineering](https://www.fanyam
 - **Milestones and stats**: supports milestone tracking, daily completions, and 7-day stats.
 - **Alerts**: supports window alerts, sound cues, and native notifications.
 
+### Toolbox
+
+- **Conversion**: Base64, Hex ↔ ASCII, URL, HTML escape, number base, timestamp (seconds / milliseconds, batch input), and JWT encode/decode (HS256).
+- **Checksum**: MD5, SHA-1, SHA-256, SHA-384, SHA-512 via Web Crypto.
+- **Generation**: UUID v4, random strings with configurable charset, strong passwords.
+- **Encryption**: AES-GCM / AES-CBC (128/192/256-bit keys) plus ROT13, Caesar, Atbash.
+- **Fully client-side**: inputs and outputs never leave the app — no persistence, no network.
+
 ### Settings and Desktop Experience
 
 - **App settings**: supports page size, todo/note display modes, note templates, and note folder labels.

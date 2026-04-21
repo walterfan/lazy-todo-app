@@ -53,7 +53,9 @@ Important frontend files:
 - `src/main.tsx`: bootstraps the UI and decides whether to render the main app or a dedicated note window
 - `src/App.tsx`: main application shell
 - `src/components/`: reusable UI pieces such as todo lists, note cards, and pomodoro panels
+- `src/components/toolbox/`: the Toolbox tab — a fully client-side suite of utility tools (conversion, checksum, generation, encryption) built on the Web Crypto API
 - `src/hooks/`: logic reuse for countdowns, pomodoro state, settings, and data access
+- `src/utils/`: shared frontend utilities; `crypto.ts` powers the Toolbox with Web Crypto helpers and a built-in MD5
 - `src/types/`: shared TypeScript types used by the frontend
 
 ### Why TypeScript Matters

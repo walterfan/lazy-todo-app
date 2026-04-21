@@ -78,12 +78,33 @@ function formatRemainingDays(deadline: string): string {
   return `${overdueDays} day${overdueDays === 1 ? "" : "s"} overdue`;
 }
 
+function statusRank(status: PomodoroMilestoneStatus): number {
+  switch (status) {
+    case "active":
+      return 0;
+    case "completed":
+      return 1;
+    case "cancelled":
+      return 2;
+  }
+}
+
+function formatMilestoneStatus(milestone: PomodoroMilestone): string {
+  switch (milestone.status) {
+    case "completed":
+      return "Completed";
+    case "cancelled":
+      return "Cancelled";
+    default:
+      return formatRemainingDays(milestone.deadline);
+  }
+}
+
 export function PomodoroMilestones({ milestones, onToggleStatus }: PomodoroMilestonesProps) {
   const visibleMilestones = milestones
     .map((milestone, index) => ({ ...milestone, index }))
-    .filter((milestone) => milestone.name && milestone.deadline && milestone.status !== "completed")
-    .sort((a, b) => a.deadline.localeCompare(b.deadline))
-    .slice(0, 3);
+    .filter((milestone) => milestone.name && milestone.deadline)
+    .sort((a, b) => statusRank(a.status) - statusRank(b.status) || a.deadline.localeCompare(b.deadline));
 
   return (
     <div className="pomo-milestones">
@@ -94,22 +115,10 @@ export function PomodoroMilestones({ milestones, onToggleStatus }: PomodoroMiles
             <div className={`pomo-milestone-card pomo-milestone-card-${milestone.status}`} key={`${milestone.name}-${milestone.deadline}-${milestone.index}`}>
               <div className="pomo-milestone-line">
                 <div className="pomo-milestone-name">{milestone.name}</div>
-                <div className="pomo-milestone-days">{formatRemainingDays(milestone.deadline)}</div>
+                <div className="pomo-milestone-days">{formatMilestoneStatus(milestone)}</div>
                 <div className="pomo-milestone-deadline">{milestone.deadline}</div>
                 <div className="pomo-milestone-actions">
-                  {milestone.status === "cancelled" ? (
-                    <button
-                      className="pomo-milestone-action pomo-milestone-action-restore"
-                      type="button"
-                      title="Restore milestone"
-                      aria-label="Restore milestone"
-                      onClick={() => {
-                        void onToggleStatus(milestone.index, "active");
-                      }}
-                    >
-                      <RestoreIcon />
-                    </button>
-                  ) : (
+                  {milestone.status === "active" ? (
                     <>
                       <button
                         className="pomo-milestone-action pomo-milestone-action-complete"
@@ -134,6 +143,18 @@ export function PomodoroMilestones({ milestones, onToggleStatus }: PomodoroMiles
                         <CancelIcon />
                       </button>
                     </>
+                  ) : (
+                    <button
+                      className="pomo-milestone-action pomo-milestone-action-restore"
+                      type="button"
+                      title="Restore milestone"
+                      aria-label="Restore milestone"
+                      onClick={() => {
+                        void onToggleStatus(milestone.index, "active");
+                      }}
+                    >
+                      <RestoreIcon />
+                    </button>
                   )}
                 </div>
               </div>
@@ -141,7 +162,7 @@ export function PomodoroMilestones({ milestones, onToggleStatus }: PomodoroMiles
           ))}
         </div>
       ) : (
-        <div className="pomo-milestones-empty">No active milestones. Add or update them in settings.</div>
+        <div className="pomo-milestones-empty">No milestones configured. Add or update them in settings.</div>
       )}
     </div>
   );

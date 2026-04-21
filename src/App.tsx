@@ -4,15 +4,17 @@ import { invoke } from "@tauri-apps/api/core";
 import { useTodos } from "./hooks/useTodos";
 import { useNotes } from "./hooks/useNotes";
 import { useSettings } from "./hooks/useSettings";
+import { useAlwaysOnTop } from "./hooks/useAlwaysOnTop";
 import { AddTodo } from "./components/AddTodo";
 import { TodoList } from "./components/TodoList";
 import { NoteEditor } from "./components/NoteEditor";
 import { NoteList } from "./components/NoteList";
 import { PomodoroPanel } from "./components/PomodoroPanel";
+import { ToolboxPanel } from "./components/toolbox/ToolboxPanel";
 import { SettingsPanel } from "./components/SettingsPanel";
 import "./App.css";
 
-type Tab = "todos" | "notes" | "pomodoro" | "settings";
+type Tab = "todos" | "notes" | "pomodoro" | "toolbox" | "settings";
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>("todos");
@@ -22,6 +24,7 @@ function App() {
   const { todos, loading: todosLoading, addTodo, toggleTodo, updateTodo, deleteTodo } = useTodos();
   const { notes, loading: notesLoading, addNote, updateNote, deleteNote } = useNotes();
   const { settings, updateSettings } = useSettings();
+  const { pinned, toggle: togglePinned } = useAlwaysOnTop();
   const activeTodos = useMemo(() => todos.filter((t) => !t.completed), [todos]);
 
   const filteredTodos = useMemo(() => {
@@ -65,6 +68,7 @@ function App() {
     { key: "todos", icon: "✅", label: "Todos" },
     { key: "notes", icon: "📝", label: "Notes" },
     { key: "pomodoro", icon: "🍅", label: "Pomodoro" },
+    { key: "toolbox", icon: "🧰", label: "Toolbox" },
   ];
 
   const handleQuit = () => invoke("quit_app");
@@ -87,6 +91,15 @@ function App() {
           ))}
         </nav>
         <div className="sidebar-bottom">
+          <button
+            className={`nav-item nav-pin ${pinned ? "active" : ""}`}
+            onClick={togglePinned}
+            title={pinned ? "Unpin window (Cmd/Ctrl+Shift+T)" : "Always on top (Cmd/Ctrl+Shift+T)"}
+            aria-pressed={pinned}
+          >
+            <span className="nav-icon">{pinned ? "📌" : "📍"}</span>
+            <span className="nav-label">{pinned ? "Pinned" : "Pin"}</span>
+          </button>
           <button
             className={`nav-item ${activeTab === "settings" ? "active" : ""}`}
             onClick={() => setActiveTab("settings")}
@@ -185,6 +198,10 @@ function App() {
 
           <div style={{ display: activeTab === "pomodoro" ? "block" : "none" }}>
             <PomodoroPanel />
+          </div>
+
+          <div style={{ display: activeTab === "toolbox" ? "block" : "none" }}>
+            <ToolboxPanel />
           </div>
 
           {activeTab === "settings" && (
