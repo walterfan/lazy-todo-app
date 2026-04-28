@@ -12,9 +12,10 @@ import { NoteList } from "./components/NoteList";
 import { PomodoroPanel } from "./components/PomodoroPanel";
 import { ToolboxPanel } from "./components/toolbox/ToolboxPanel";
 import { SettingsPanel } from "./components/SettingsPanel";
+import { SecretaryPanel } from "./components/SecretaryPanel";
 import "./App.css";
 
-type Tab = "todos" | "notes" | "pomodoro" | "toolbox" | "settings";
+type Tab = "todos" | "notes" | "pomodoro" | "toolbox" | "secretary" | "settings";
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>("todos");
@@ -69,6 +70,7 @@ function App() {
     { key: "notes", icon: "📝", label: "Notes" },
     { key: "pomodoro", icon: "🍅", label: "Pomodoro" },
     { key: "toolbox", icon: "🧰", label: "Toolbox" },
+    { key: "secretary", icon: "🗂️", label: "Secretary" },
   ];
 
   const handleQuit = () => invoke("quit_app");
@@ -202,6 +204,10 @@ function App() {
 
           <div style={{ display: activeTab === "toolbox" ? "block" : "none" }}>
             <ToolboxPanel />
+          </div>
+
+          <div style={{ display: activeTab === "secretary" ? "block" : "none" }}>
+            <SecretaryPanel />
           </div>
 
           {activeTab === "settings" && (

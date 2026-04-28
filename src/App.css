@@ -2009,3 +2009,311 @@ body {
   padding: 20px;
   text-align: center;
 }
+
+/* Secretary */
+.secretary-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 10px;
+  height: calc(100vh - 76px);
+  min-height: 0;
+}
+
+.secretary-main {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.secretary-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 2px;
+}
+
+.secretary-identity,
+.secretary-panel,
+.secretary-proposal,
+.secretary-note-edit,
+.secretary-composer {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.secretary-identity {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+}
+
+.secretary-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.secretary-subtitle,
+.secretary-message-meta,
+.secretary-env,
+.secretary-list-item,
+.secretary-status {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.secretary-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.secretary-status span,
+.secretary-env span {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.secretary-transcript {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 220px;
+  padding-right: 2px;
+}
+
+.secretary-message {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: var(--surface);
+}
+
+.secretary-message-assistant {
+  border-color: rgba(79, 195, 247, 0.45);
+}
+
+.secretary-message-user {
+  background: var(--surface-hover);
+}
+
+.secretary-message-pending,
+.secretary-message-streaming {
+  box-shadow: 0 0 0 1px rgba(79, 195, 247, 0.08);
+}
+
+.secretary-message-streaming .secretary-message-body::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 1em;
+  margin-left: 3px;
+  vertical-align: -2px;
+  background: var(--accent);
+  animation: secretary-caret 1s steps(2, start) infinite;
+}
+
+@keyframes secretary-caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+.secretary-message-body {
+  margin-top: 4px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.86rem;
+}
+
+.secretary-empty {
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.secretary-composer {
+  padding: 8px;
+}
+
+.secretary-composer textarea,
+.secretary-panel textarea,
+.secretary-panel input:not([type="checkbox"]),
+.secretary-note-diff textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 7px 8px;
+  font-size: 0.82rem;
+  outline: none;
+}
+
+.secretary-composer textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+.secretary-panel textarea {
+  min-height: 58px;
+  resize: vertical;
+}
+
+.secretary-composer textarea:focus,
+.secretary-panel textarea:focus,
+.secretary-panel input:not([type="checkbox"]):focus,
+.secretary-note-diff textarea:focus {
+  border-color: var(--accent);
+}
+
+.secretary-composer-actions,
+.secretary-actions,
+.secretary-role-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.secretary-shell button {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 5px 9px;
+  cursor: pointer;
+  font-size: 0.78rem;
+}
+
+.secretary-shell button:hover:not(:disabled),
+.secretary-shell button.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.secretary-shell button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.secretary-panel {
+  padding: 9px;
+}
+
+.secretary-panel h3 {
+  font-size: 0.8rem;
+  margin-bottom: 7px;
+  color: var(--accent);
+}
+
+.secretary-panel input:not([type="checkbox"]),
+.secretary-panel textarea {
+  margin-bottom: 6px;
+}
+
+.secretary-panel input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 1px 0 0;
+}
+
+.secretary-panel label {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  font-size: 0.78rem;
+  color: var(--text);
+  margin-bottom: 5px;
+  overflow-wrap: anywhere;
+}
+
+.secretary-context-list,
+.secretary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 6px;
+}
+
+.secretary-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  border-top: 1px solid var(--border);
+  padding-top: 5px;
+}
+
+.secretary-list-item span {
+  overflow-wrap: anywhere;
+}
+
+.secretary-proposal,
+.secretary-note-edit {
+  padding: 9px;
+}
+
+.secretary-proposal p {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  margin: 4px 0 7px;
+  overflow-wrap: anywhere;
+}
+
+.secretary-note-edit-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  margin-bottom: 7px;
+}
+
+.secretary-note-diff {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.secretary-note-diff textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.secretary-error {
+  grid-column: 1 / -1;
+  border: 1px solid rgba(239, 83, 80, 0.55);
+  background: rgba(239, 83, 80, 0.1);
+  color: var(--danger);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.82rem;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 860px) {
+  .secretary-shell {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .secretary-side {
+    overflow: visible;
+  }
+}
