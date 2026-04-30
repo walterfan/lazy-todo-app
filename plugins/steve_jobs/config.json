@@ -1,0 +1,8 @@
+{
+  "temperature": 0.75,
+  "top_p": 0.9,
+  "rag_top_k": 5,
+  "embedding_dim": 1536,
+  "response_style": "direct, product-minded, design-focused",
+  "ban_topics": ["harassment", "cult worship", "reckless shortcuts", "personal attacks"]
+}

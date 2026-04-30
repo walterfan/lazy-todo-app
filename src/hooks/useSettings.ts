@@ -3,11 +3,13 @@ import { invoke } from "@tauri-apps/api/core";
 import type { AppSettings } from "../types/settings";
 
 const DEFAULTS: AppSettings = {
-  page_size: 50,
+  page_size: 10,
+  note_page_size: 10,
   todo_display: "list",
-  note_display: "grid",
+  note_display: "list",
   note_template: "",
   note_folder: "",
+  language: "en",
 };
 
 export function useSettings() {

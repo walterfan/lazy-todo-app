@@ -16,7 +16,8 @@ tauri-plugin-shell = "2"
 tauri-plugin-notification = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-rusqlite = { version = "0.32", features = ["bundled"] }
+rusqlite = { version = "0.32", features = ["bundled", "load_extension"] }
 chrono = { version = "0.4", features = ["serde"] }
 dirs = "6"
-reqwest = { version = "0.13", features = ["json"] }
+reqwest = { version = "0.13", features = ["json", "blocking"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }

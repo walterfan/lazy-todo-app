@@ -5,6 +5,7 @@ export interface StickyNote {
   title: string;
   content: string;
   color: NoteColor;
+  pinned: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -20,4 +21,9 @@ export interface UpdateNote {
   title?: string;
   content?: string;
   color?: NoteColor;
+}
+
+export interface ExportNotesResult {
+  folder: string;
+  files: string[];
 }

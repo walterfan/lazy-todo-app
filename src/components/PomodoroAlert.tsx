@@ -1,9 +1,11 @@
 import { useEffect, useRef } from "react";
+import type { Translator } from "../i18n";
 import type { TimerPhase } from "../types/pomodoro";
 
 interface PomodoroAlertProps {
   completedPhase: TimerPhase;
   onDismiss: () => void;
+  t: Translator;
 }
 
 function playChime() {
@@ -56,25 +58,25 @@ function playChime() {
   }
 }
 
-const MESSAGES: Record<TimerPhase, { emoji: string; title: string; body: string }> = {
+const MESSAGES: Record<TimerPhase, { emoji: string; titleKey: string; bodyKey: string }> = {
   work: {
     emoji: "🍅",
-    title: "Pomodoro Complete!",
-    body: "Great work! Time to take a break and recharge.",
+    titleKey: "pomodoroComplete",
+    bodyKey: "pomodoroCompleteBody",
   },
   short_break: {
     emoji: "☕",
-    title: "Break Over!",
-    body: "Feeling refreshed? Let's get back to work!",
+    titleKey: "breakOver",
+    bodyKey: "breakOverBody",
   },
   long_break: {
     emoji: "🎉",
-    title: "Long Break Over!",
-    body: "Well rested? A new cycle awaits!",
+    titleKey: "longBreakOver",
+    bodyKey: "longBreakOverBody",
   },
 };
 
-export function PomodoroAlert({ completedPhase, onDismiss }: PomodoroAlertProps) {
+export function PomodoroAlert({ completedPhase, onDismiss, t }: PomodoroAlertProps) {
   const played = useRef(false);
 
   useEffect(() => {
@@ -90,10 +92,10 @@ export function PomodoroAlert({ completedPhase, onDismiss }: PomodoroAlertProps)
     <div className="pomo-alert-overlay" onClick={onDismiss}>
       <div className="pomo-alert" onClick={(e) => e.stopPropagation()}>
         <div className="pomo-alert-emoji">{msg.emoji}</div>
-        <h2 className="pomo-alert-title">{msg.title}</h2>
-        <p className="pomo-alert-body">{msg.body}</p>
+        <h2 className="pomo-alert-title">{t(msg.titleKey)}</h2>
+        <p className="pomo-alert-body">{t(msg.bodyKey)}</p>
         <button className="pomo-btn pomo-btn-start" onClick={onDismiss}>
-          OK
+          {t("ok")}
         </button>
       </div>
     </div>

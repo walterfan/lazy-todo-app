@@ -315,3 +315,5 @@ export function useSecretary() {
     saveTranscript,
   };
 }
+
+export type SecretaryController = ReturnType<typeof useSecretary>;

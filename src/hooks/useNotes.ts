@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import type { StickyNote, CreateNote, UpdateNote } from "../types/note";
+import type { StickyNote, CreateNote, UpdateNote, ExportNotesResult } from "../types/note";
 
 export function useNotes() {
   const [notes, setNotes] = useState<StickyNote[]>([]);
@@ -36,5 +36,16 @@ export function useNotes() {
     await refresh();
   };
 
-  return { notes, loading, addNote, updateNote, deleteNote, refresh };
+  const setNotePinned = async (id: number, pinned: boolean) => {
+    await invoke("set_note_pinned", { id, pinned });
+    await refresh();
+  };
+
+  const exportNotes = async (noteIds: number[]) => {
+    return invoke<ExportNotesResult>("export_notes_to_folder", {
+      input: { note_ids: noteIds },
+    });
+  };
+
+  return { notes, loading, addNote, updateNote, deleteNote, setNotePinned, exportNotes, refresh };
 }

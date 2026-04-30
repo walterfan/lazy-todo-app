@@ -3,21 +3,25 @@ import { ConversionTools } from "./ConversionTools";
 import { ChecksumTools } from "./ChecksumTools";
 import { GenerationTools } from "./GenerationTools";
 import { EncryptionTools } from "./EncryptionTools";
+import { DatabaseTools } from "./DatabaseTools";
 import { ToolsHelp } from "./ToolsHelp";
+import { useTranslation } from "react-i18next";
 
-type InnerTab = "conversion" | "checksum" | "generation" | "encryption" | "help";
+type InnerTab = "conversion" | "checksum" | "generation" | "encryption" | "database" | "help";
 
-const TABS: { key: InnerTab; icon: string; label: string }[] = [
-  { key: "conversion", icon: "🔄", label: "Conversion" },
-  { key: "checksum", icon: "🔏", label: "Checksum" },
-  { key: "generation", icon: "✨", label: "Generation" },
-  { key: "encryption", icon: "🔐", label: "Encryption" },
-  { key: "help", icon: "❔", label: "Help" },
+const TABS: { key: InnerTab; icon: string; labelKey: string }[] = [
+  { key: "conversion", icon: "🔄", labelKey: "conversion" },
+  { key: "checksum", icon: "🔏", labelKey: "checksum" },
+  { key: "generation", icon: "✨", labelKey: "generation" },
+  { key: "encryption", icon: "🔐", labelKey: "encryption" },
+  { key: "database", icon: "🗄️", labelKey: "database" },
+  { key: "help", icon: "❔", labelKey: "help" },
 ];
 
 export function ToolboxPanel() {
   const [active, setActive] = useState<InnerTab>("conversion");
   const btnRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const { t } = useTranslation();
 
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
     const currentIdx = TABS.findIndex((t) => t.key === active);
@@ -38,7 +42,7 @@ export function ToolboxPanel() {
       <div
         className="toolbox-tabs"
         role="tablist"
-        aria-label="Toolbox categories"
+        aria-label={t("toolboxCategories")}
         onKeyDown={onKey}
       >
         {TABS.map((tab, i) => (
@@ -55,7 +59,7 @@ export function ToolboxPanel() {
             type="button"
           >
             <span className="toolbox-tab-icon">{tab.icon}</span>
-            <span className="toolbox-tab-label">{tab.label}</span>
+            <span className="toolbox-tab-label">{t(tab.labelKey)}</span>
           </button>
         ))}
       </div>
@@ -72,6 +76,9 @@ export function ToolboxPanel() {
         </div>
         <div style={{ display: active === "encryption" ? "block" : "none" }}>
           <EncryptionTools />
+        </div>
+        <div style={{ display: active === "database" ? "block" : "none" }}>
+          <DatabaseTools />
         </div>
         <div style={{ display: active === "help" ? "block" : "none" }}>
           <ToolsHelp />

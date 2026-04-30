@@ -12,6 +12,8 @@ This project also serves as a practical [Harness Engineering](https://www.fanyam
 
 - **Todo CRUD**: add, edit, complete, and delete tasks.
 - **Priority and deadlines**: supports high/medium/low priority plus live countdowns.
+- **Recurring tasks**: daily, weekly, monthly, and yearly tasks advance to the next due occurrence when completed.
+- **Local reminders**: reminder lead times surface in the list and can trigger desktop notifications while the app is running.
 - **Search and display modes**: task search plus list/grid rendering modes.
 
 ### Sticky Notes

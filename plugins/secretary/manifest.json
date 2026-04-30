@@ -1,0 +1,13 @@
+{
+  "plugin_id": "secretary",
+  "plugin_name": "Personal Secretary",
+  "plugin_version": "1.1.0",
+  "author": "Lazy Todo App",
+  "description": "A discreet personal secretary that remembers user preferences, reads app context, asks useful questions, and helps keep work moving.",
+  "tags": ["productivity", "memory", "planning", "personal"],
+  "create_time": "2026-04-29",
+  "update_time": "2026-04-29",
+  "min_app_version": "1.0.0",
+  "rag_enabled": true,
+  "is_multi_agent_supported": true
+}

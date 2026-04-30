@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSecretary } from "../hooks/useSecretary";
+import type { SecretaryController } from "../hooks/useSecretary";
 import type {
   ProposedNoteEdit,
   SaveSecretaryMemory,
@@ -24,13 +24,13 @@ function sqlDateTime(value: string) {
   return value ? value.replace("T", " ") + ":00" : "";
 }
 
-export function SecretaryPanel() {
-  const secretary = useSecretary();
+interface SecretaryPanelProps {
+  secretary: SecretaryController;
+}
+
+export function SecretaryPanel({ secretary }: SecretaryPanelProps) {
   const [message, setMessage] = useState("");
   const [settingsDraft, setSettingsDraft] = useState({
-    base_url: "",
-    model: "",
-    api_key: "",
     skill_folder: "",
     conversation_folder: "",
   });
@@ -53,9 +53,6 @@ export function SecretaryPanel() {
   useEffect(() => {
     if (!secretary.settings) return;
     setSettingsDraft({
-      base_url: secretary.settings.saved.base_url,
-      model: secretary.settings.saved.model,
-      api_key: "",
       skill_folder: secretary.settings.saved.skill_folder,
       conversation_folder: secretary.settings.saved.conversation_folder,
     });
@@ -101,8 +98,10 @@ export function SecretaryPanel() {
 
   const saveSettings = async () => {
     await secretary.saveSettings({
-      ...settingsDraft,
-      api_key: settingsDraft.api_key || undefined,
+      base_url: secretary.settings?.saved.base_url ?? "",
+      model: secretary.settings?.saved.model ?? "",
+      skill_folder: settingsDraft.skill_folder,
+      conversation_folder: settingsDraft.conversation_folder,
       active_persona_id: secretary.activePersona?.id ?? null,
       active_profile_id: secretary.activeProfile?.id ?? null,
     });
@@ -264,19 +263,6 @@ export function SecretaryPanel() {
 
       <aside className="secretary-side">
         <section className="secretary-panel">
-          <h3>LLM</h3>
-          <input value={settingsDraft.base_url} onChange={(e) => setSettingsDraft({ ...settingsDraft, base_url: e.target.value })} placeholder="LLM base URL" />
-          <input value={settingsDraft.model} onChange={(e) => setSettingsDraft({ ...settingsDraft, model: e.target.value })} placeholder="Model" />
-          <input value={settingsDraft.api_key} onChange={(e) => setSettingsDraft({ ...settingsDraft, api_key: e.target.value })} placeholder={secretary.settings?.has_api_key ? "API key saved or from env" : "API key"} type="password" />
-          <div className="secretary-env">
-            {secretary.settings?.base_url_from_env && <span>base URL from env</span>}
-            {secretary.settings?.model_from_env && <span>model from env</span>}
-            {secretary.settings?.api_key_from_env && <span>key from env</span>}
-          </div>
-          <button onClick={() => void saveSettings()}>Save Config</button>
-        </section>
-
-        <section className="secretary-panel">
           <h3>Persona</h3>
           <input value={personaDraft.name} onChange={(e) => setPersonaDraft({ ...personaDraft, name: e.target.value })} placeholder="Name" />
           <input value={personaDraft.voice} onChange={(e) => setPersonaDraft({ ...personaDraft, voice: e.target.value })} placeholder="Voice" />
@@ -302,30 +288,6 @@ export function SecretaryPanel() {
             ))}
           </div>
           <button onClick={() => saveProfile()}>Save Profile</button>
-        </section>
-
-        <section className="secretary-panel">
-          <h3>Context</h3>
-          <label><input type="checkbox" checked={secretary.selectedContext.include_todos} onChange={(e) => secretary.setSelectedContext({ ...secretary.selectedContext, include_todos: e.target.checked })} /> Todos</label>
-          <label><input type="checkbox" checked={secretary.selectedContext.include_milestones} onChange={(e) => secretary.setSelectedContext({ ...secretary.selectedContext, include_milestones: e.target.checked })} /> Milestones</label>
-          <label><input type="checkbox" checked={secretary.selectedContext.include_notes} onChange={(e) => secretary.setSelectedContext({ ...secretary.selectedContext, include_notes: e.target.checked })} /> Notes</label>
-          <div className="secretary-context-list">
-            {secretary.appContext.notes.slice(0, 8).map((note) => (
-              <label key={note.id}>
-                <input
-                  type="checkbox"
-                  checked={secretary.selectedContext.note_ids.includes(note.id)}
-                  onChange={(e) => {
-                    const next = e.target.checked
-                      ? [...secretary.selectedContext.note_ids, note.id]
-                      : secretary.selectedContext.note_ids.filter((id) => id !== note.id);
-                    secretary.setSelectedContext({ ...secretary.selectedContext, include_notes: next.length > 0 || secretary.selectedContext.include_notes, note_ids: next });
-                  }}
-                />
-                {note.title || `Note #${note.id}`}
-              </label>
-            ))}
-          </div>
         </section>
 
         <section className="secretary-panel">

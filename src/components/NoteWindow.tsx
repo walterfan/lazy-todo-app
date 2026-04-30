@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { useTranslation } from "react-i18next";
 import type { StickyNote, NoteColor } from "../types/note";
 import { MarkdownPreview } from "./MarkdownPreview";
 import { useAlwaysOnTop } from "../hooks/useAlwaysOnTop";
+import { useSettings } from "../hooks/useSettings";
+import "../i18n";
 
 const COLORS: NoteColor[] = ["yellow", "green", "blue", "pink", "purple", "orange"];
 
@@ -12,6 +15,8 @@ interface NoteWindowProps {
 }
 
 export function NoteWindow({ noteId }: NoteWindowProps) {
+  const { t, i18n } = useTranslation();
+  const { settings } = useSettings();
   const [note, setNote] = useState<StickyNote | null>(null);
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
@@ -19,6 +24,10 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
   const [color, setColor] = useState<NoteColor>("yellow");
   const [error, setError] = useState("");
   const { pinned, toggle: togglePinned } = useAlwaysOnTop();
+
+  useEffect(() => {
+    void i18n.changeLanguage(settings.language || "en");
+  }, [i18n, settings.language]);
 
   const loadNote = useCallback(async () => {
     try {
@@ -30,12 +39,12 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
         setContent(found.content);
         setColor(found.color);
       } else {
-        setError("Note not found");
+        setError(t("noteNotFound"));
       }
     } catch (err) {
       setError(String(err));
     }
-  }, [noteId]);
+  }, [noteId, t]);
 
   useEffect(() => {
     loadNote();
@@ -65,7 +74,7 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
   }
 
   if (!note) {
-    return <div className="note-window note-color-yellow"><p>Loading...</p></div>;
+    return <div className="note-window note-color-yellow"><p>{t("loading")}</p></div>;
   }
 
   return (
@@ -89,14 +98,14 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
           <button
             className={`note-window-pin-btn ${pinned ? "active" : ""}`}
             onClick={togglePinned}
-            title={pinned ? "Unpin (Cmd/Ctrl+Shift+T)" : "Always on top (Cmd/Ctrl+Shift+T)"}
+            title={pinned ? t("unpinShortcut") : t("alwaysOnTop")}
             aria-pressed={pinned}
           >
             {pinned ? "📌" : "📍"}
           </button>
           {!editing && (
             <button className="note-window-edit-btn" onClick={() => setEditing(true)}>
-              ✏️ Edit
+              ✏️ {t("edit")}
             </button>
           )}
         </div>
@@ -108,25 +117,25 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
             className="note-window-title-input"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title"
+            placeholder={t("title")}
             autoFocus
           />
           <textarea
             className="note-window-content-input"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Write your note in Markdown..."
+            placeholder={t("writeNoteMarkdown")}
           />
           <div className="note-window-actions">
-            <button className="btn-cancel" onClick={handleCancel}>Cancel</button>
-            <button className="btn-save" onClick={handleSave}>Save</button>
+            <button className="btn-cancel" onClick={handleCancel}>{t("cancel")}</button>
+            <button className="btn-save" onClick={handleSave}>{t("save")}</button>
           </div>
         </div>
       ) : (
         <div className="note-window-view" onClick={() => setEditing(true)}>
           {note.title && <h2 className="note-window-title">{note.title}</h2>}
           <div className="note-window-content">
-            <MarkdownPreview content={note.content || "*Empty note — click to edit*"} />
+            <MarkdownPreview content={note.content || t("emptyNoteEdit")} />
           </div>
         </div>
       )}

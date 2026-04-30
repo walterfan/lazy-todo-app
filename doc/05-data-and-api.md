@@ -19,7 +19,23 @@
 | `priority` | INTEGER | `2` | `1=high`, `2=medium`, `3=low` |
 | `completed` | INTEGER | `0` | Boolean flag |
 | `deadline` | TEXT | NULL | ISO 8601 datetime |
+| `recurrence` | TEXT | `'none'` | `none`, `daily`, `weekly`, `monthly`, or `yearly` |
+| `recurrence_anchor` | TEXT | NULL | Original due timestamp used for calendar-safe monthly/yearly recurrence |
+| `reminder_minutes_before` | INTEGER | NULL | Lead time before `deadline` for local reminders |
+| `last_reminded_at` | TEXT | NULL | Last local reminder delivery attempt |
+| `last_reminded_deadline` | TEXT | NULL | Deadline occurrence that was last reminded |
 | `created_at` | TEXT | `datetime('now')` | UTC timestamp |
+
+### Table: `todo_occurrences`
+
+Completion history for recurring todo occurrences.
+
+| Column | Type | Default | Notes |
+|--------|------|---------|-------|
+| `id` | INTEGER | AUTOINCREMENT | Primary key |
+| `todo_id` | INTEGER | — | Parent todo row |
+| `due_at` | TEXT | — | Due timestamp that was completed |
+| `completed_at` | TEXT | `datetime('now')` | Completion timestamp |
 
 ### Table: `sticky_notes`
 
@@ -76,9 +92,11 @@ All commands are called from the frontend through `invoke()` and return `Result<
 |---------|-------|--------|-------------|
 | `list_todos` | — | `Todo[]` | Returns todos ordered by completion, priority, then deadline |
 | `add_todo` | `CreateTodo` | `Todo` | Inserts a new todo |
-| `toggle_todo` | `id` | `Todo` | Flips the completed flag |
+| `toggle_todo` | `id` | `Todo` | Completes one-off todos or advances recurring todos to the next due occurrence |
 | `update_todo` | `UpdateTodo` | `Todo` | Applies partial updates |
 | `delete_todo` | `id` | `()` | Deletes the row |
+| `list_due_todo_reminders` | — | `Todo[]` | Returns due or overdue reminders not yet delivered for the current occurrence |
+| `mark_todo_reminded` | `id` | `Todo` | Records reminder delivery for the current todo occurrence |
 
 ### Note Commands
 
@@ -109,6 +127,14 @@ All commands are called from the frontend through `invoke()` and return `Result<
 | `save_app_settings` | `AppSettings` | `()` | Persists preferences |
 | `quit_app` | — | `()` | Exits the application |
 | `open_note_window` | `note_id`, `title` | `()` | Creates or focuses a note-specific webview |
+
+### Agent Built-In Tools
+
+Agent built-in tools are exposed to the LLM as OpenAI-style function schemas and are executed through `src-tauri/src/commands/agents.rs`. Read tools complete immediately and are audited; write tools create pending actions that require user confirmation.
+
+| Tool | Input | Output | Description |
+|------|-------|--------|-------------|
+| `web_fetch` | `url`, optional `max_chars` | Page metadata and extracted text | Fetches public HTTP/HTTPS text-like web pages for Agent translation, analysis, or summarization. Blocks credentials, localhost/private/link-local targets, non-text responses, oversized responses, and unsafe redirects. |
 
 ## Shared Types
 
@@ -144,7 +170,7 @@ pub struct PomodoroMilestone {
 
 ---
 <!-- PKB-metadata
-last_updated: 2026-04-12
-commit: f9ba186
-updated_by: human+ai
+last_updated: 2026-04-30
+commit: local
+updated_by: codex
 -->

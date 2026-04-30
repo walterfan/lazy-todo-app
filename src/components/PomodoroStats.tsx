@@ -1,8 +1,10 @@
+import type { Translator } from "../i18n";
 import type { DayStat } from "../types/pomodoro";
 
 interface PomodoroStatsProps {
   todayCount: number;
   weeklyStats: DayStat[];
+  t: Translator;
 }
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -16,7 +18,7 @@ const BAR_WIDTH = 28;
 const BAR_GAP = 8;
 const CHART_HEIGHT = 60;
 
-export function PomodoroStats({ todayCount, weeklyStats }: PomodoroStatsProps) {
+export function PomodoroStats({ todayCount, weeklyStats, t }: PomodoroStatsProps) {
   const maxCount = Math.max(1, ...weeklyStats.map((s) => s.count));
   const chartWidth = weeklyStats.length * (BAR_WIDTH + BAR_GAP) - BAR_GAP;
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -24,7 +26,7 @@ export function PomodoroStats({ todayCount, weeklyStats }: PomodoroStatsProps) {
   return (
     <div className="pomo-stats">
       <div className="pomo-stats-today">
-        Today: <strong>{todayCount}</strong> 🍅
+        {t("today")}: <strong>{todayCount}</strong> 🍅
       </div>
       {weeklyStats.length > 0 && (
         <div className="pomo-stats-chart">

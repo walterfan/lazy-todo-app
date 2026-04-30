@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { sendNotification, isPermissionGranted, requestPermission } from "@tauri-apps/plugin-notification";
 import type { Todo, CreateTodo, UpdateTodo } from "../types/todo";
 
 export function useTodos() {
@@ -20,6 +21,47 @@ export function useTodos() {
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  const notifyReminder = useCallback(async (todo: Todo) => {
+    try {
+      let granted = await isPermissionGranted();
+      if (!granted) {
+        const permission = await requestPermission();
+        granted = permission === "granted";
+      }
+      if (granted) {
+        const state = todo.reminder_state === "overdue" ? "Overdue" : "Reminder";
+        sendNotification({
+          title: `${state}: ${todo.title}`,
+          body: todo.deadline ? `Due ${new Date(todo.deadline).toLocaleString()}` : todo.description || "Todo reminder",
+        });
+      }
+    } catch {
+      // Notification support can be unavailable; in-app reminder state still updates.
+    }
+  }, []);
+
+  const checkDueReminders = useCallback(async () => {
+    try {
+      const dueTodos = await invoke<Todo[]>("list_due_todo_reminders");
+      if (dueTodos.length === 0) return;
+      for (const todo of dueTodos) {
+        await notifyReminder(todo);
+        await invoke("mark_todo_reminded", { id: todo.id });
+      }
+      await refresh();
+    } catch (err) {
+      console.error("Failed to check todo reminders:", err);
+    }
+  }, [notifyReminder, refresh]);
+
+  useEffect(() => {
+    void checkDueReminders();
+    const timer = window.setInterval(() => {
+      void checkDueReminders();
+    }, 60_000);
+    return () => window.clearInterval(timer);
+  }, [checkDueReminders]);
 
   const addTodo = async (input: CreateTodo) => {
     await invoke("add_todo", { input });

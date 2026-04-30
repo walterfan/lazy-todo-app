@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { copyText, HashAlgorithm, InputTooLargeError, sha } from "../../utils/crypto";
 
 const ALGORITHMS: HashAlgorithm[] = ["MD5", "SHA-1", "SHA-256", "SHA-384", "SHA-512"];
@@ -13,6 +14,7 @@ function showToast(msg: string) {
 }
 
 export function ChecksumTools() {
+  const { t } = useTranslation();
   const [algo, setAlgo] = useState<HashAlgorithm>("SHA-256");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
@@ -43,13 +45,13 @@ export function ChecksumTools() {
 
   const copy = async () => {
     const ok = await copyText(output);
-    showToast(ok ? "Copied!" : "Copy failed");
+    showToast(ok ? t("copiedBang") : t("copyFailedBare"));
   };
 
   return (
     <div className="tool-group">
       <div className="tool-group-header">
-        <label htmlFor="algo">Algorithm:</label>
+        <label htmlFor="algo">{t("algorithm")}:</label>
         <select
           id="algo"
           className="tool-select"
@@ -69,7 +71,7 @@ export function ChecksumTools() {
 
       <div className="tool-io-grid">
         <div className="tool-io-col">
-          <label>Input</label>
+          <label>{t("input")}</label>
           <textarea
             className="tool-textarea"
             value={input}
@@ -78,18 +80,18 @@ export function ChecksumTools() {
           />
           <div className="tool-actions">
             <button className="tool-btn primary" onClick={compute} disabled={loading}>
-              {loading ? "Computing…" : "Compute"}
+              {loading ? t("computing") : t("compute")}
             </button>
-            <button className="tool-btn danger" onClick={clear}>Clear</button>
+            <button className="tool-btn danger" onClick={clear}>{t("clear")}</button>
           </div>
         </div>
         <div className="tool-io-col">
-          <label>Hex digest</label>
+          <label>{t("hexDigest")}</label>
           <div className="tool-output-box" style={{ minHeight: 60 }}>
-            {loading ? "Computing…" : output || "—"}
+            {loading ? t("computing") : output || "—"}
           </div>
           <div className="tool-actions">
-            <button className="tool-btn" onClick={copy} disabled={!output || loading}>Copy</button>
+            <button className="tool-btn" onClick={copy} disabled={!output || loading}>{t("copyToClipboard")}</button>
           </div>
         </div>
       </div>

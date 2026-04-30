@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { aesDecrypt, aesEncrypt, AesMode, copyText, InputTooLargeError } from "../../utils/crypto";
 
 type Mode = AesMode | "ROT13" | "Caesar" | "Atbash";
@@ -11,9 +12,9 @@ function showToast(msg: string) {
   setTimeout(() => el.remove(), 1600);
 }
 
-async function doCopy(text: string) {
+async function doCopy(text: string, copied: string, failed: string) {
   const ok = await copyText(text);
-  showToast(ok ? "Copied!" : "Copy failed");
+  showToast(ok ? copied : failed);
 }
 
 function rot13(s: string): string {
@@ -44,6 +45,7 @@ function handleErr(e: unknown): string {
 }
 
 export function EncryptionTools() {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>("AES-GCM");
 
   // AES state
@@ -99,7 +101,7 @@ export function EncryptionTools() {
   return (
     <div className="tool-group">
       <div className="tool-group-header">
-        <label htmlFor="enc-mode">Mode:</label>
+        <label htmlFor="enc-mode">{t("mode")}:</label>
         <select
           id="enc-mode"
           className="tool-select"
@@ -112,13 +114,13 @@ export function EncryptionTools() {
           <option value="Caesar">Caesar</option>
           <option value="Atbash">Atbash</option>
         </select>
-        <button className="tool-btn danger" onClick={clearAll}>Clear all</button>
+        <button className="tool-btn danger" onClick={clearAll}>{t("clearAll")}</button>
       </div>
 
       {isAes && (
         <>
           <div className="tool-field-row">
-            <label style={{ minWidth: 80 }}>Key (hex)</label>
+            <label style={{ minWidth: 80 }}>{t("keyHex")}</label>
             <input
               className="tool-input"
               value={aesKey}
@@ -128,7 +130,7 @@ export function EncryptionTools() {
             />
           </div>
           <div className="tool-field-row">
-            <label style={{ minWidth: 80 }}>IV (hex)</label>
+            <label style={{ minWidth: 80 }}>{t("ivHex")}</label>
             <input
               className="tool-input"
               value={aesIv}
@@ -140,7 +142,7 @@ export function EncryptionTools() {
 
           <div className="tool-io-grid">
             <div className="tool-io-col">
-              <label>Plaintext</label>
+              <label>{t("plaintext")}</label>
               <textarea
                 className="tool-textarea"
                 value={aesPlain}
@@ -148,12 +150,12 @@ export function EncryptionTools() {
                 placeholder="Text to encrypt…"
               />
               <div className="tool-actions">
-                <button className="tool-btn primary" onClick={encrypt}>Encrypt →</button>
-                <button className="tool-btn" onClick={() => doCopy(aesPlain)}>Copy</button>
+                <button className="tool-btn primary" onClick={encrypt}>{t("encrypt")} →</button>
+                <button className="tool-btn" onClick={() => doCopy(aesPlain, t("copiedBang"), t("copyFailedBare"))}>{t("copyToClipboard")}</button>
               </div>
             </div>
             <div className="tool-io-col">
-              <label>Ciphertext (Base64)</label>
+              <label>{t("ciphertextBase64")}</label>
               <textarea
                 className="tool-textarea"
                 value={aesCipher}
@@ -161,8 +163,8 @@ export function EncryptionTools() {
                 placeholder="Base64 ciphertext…"
               />
               <div className="tool-actions">
-                <button className="tool-btn primary" onClick={decrypt}>← Decrypt</button>
-                <button className="tool-btn" onClick={() => doCopy(aesCipher)}>Copy</button>
+                <button className="tool-btn primary" onClick={decrypt}>← {t("decrypt")}</button>
+                <button className="tool-btn" onClick={() => doCopy(aesCipher, t("copiedBang"), t("copyFailedBare"))}>{t("copyToClipboard")}</button>
               </div>
             </div>
           </div>
@@ -176,7 +178,7 @@ export function EncryptionTools() {
         <>
           {mode === "Caesar" && (
             <div className="tool-field-row">
-              <label style={{ minWidth: 80 }}>Shift</label>
+              <label style={{ minWidth: 80 }}>{t("shift")}</label>
               <input
                 type="number"
                 min={-25}
@@ -190,7 +192,7 @@ export function EncryptionTools() {
           )}
           <div className="tool-io-grid">
             <div className="tool-io-col">
-              <label>Input</label>
+              <label>{t("input")}</label>
               <textarea
                 className="tool-textarea"
                 value={classicIn}
@@ -198,15 +200,15 @@ export function EncryptionTools() {
                 placeholder="Text…"
               />
               <div className="tool-actions">
-                <button className="tool-btn primary" onClick={applyClassical}>Apply {mode}</button>
-                <button className="tool-btn danger" onClick={() => { setClassicIn(""); setClassicOut(""); }}>Clear</button>
+                <button className="tool-btn primary" onClick={applyClassical}>{t("applyMode", { mode })}</button>
+                <button className="tool-btn danger" onClick={() => { setClassicIn(""); setClassicOut(""); }}>{t("clear")}</button>
               </div>
             </div>
             <div className="tool-io-col">
-              <label>Output</label>
+              <label>{t("output")}</label>
               <textarea className="tool-textarea" value={classicOut} readOnly />
               <div className="tool-actions">
-                <button className="tool-btn" onClick={() => doCopy(classicOut)}>Copy</button>
+                <button className="tool-btn" onClick={() => doCopy(classicOut, t("copiedBang"), t("copyFailedBare"))}>{t("copyToClipboard")}</button>
               </div>
             </div>
           </div>

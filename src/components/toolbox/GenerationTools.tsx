@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { copyText } from "../../utils/crypto";
 
 type Mode = "uuid" | "random" | "password";
@@ -30,12 +31,13 @@ function showToast(msg: string) {
   setTimeout(() => el.remove(), 1600);
 }
 
-async function doCopy(text: string) {
+async function doCopy(text: string, copied: string, failed: string) {
   const ok = await copyText(text);
-  showToast(ok ? "Copied!" : "Copy failed");
+  showToast(ok ? copied : failed);
 }
 
 export function GenerationTools() {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<Mode>("uuid");
 
   // UUID
@@ -95,11 +97,11 @@ export function GenerationTools() {
   return (
     <div className="tool-group">
       <div className="tool-group-header">
-        <label htmlFor="gen-mode">Generator:</label>
+        <label htmlFor="gen-mode">{t("generator")}:</label>
         <select id="gen-mode" className="tool-select" value={mode} onChange={(e) => setMode(e.target.value as Mode)}>
           <option value="uuid">UUID v4</option>
-          <option value="random">Random String</option>
-          <option value="password">Password</option>
+          <option value="random">{t("randomString")}</option>
+          <option value="password">{t("password")}</option>
         </select>
       </div>
 
@@ -107,15 +109,15 @@ export function GenerationTools() {
         <div className="tool-io-grid">
           <div className="tool-io-col">
             <div className="tool-actions">
-              <button className="tool-btn primary" onClick={generateUuid}>Generate UUID</button>
-              <button className="tool-btn danger" onClick={() => setUuidOut("")}>Clear</button>
+              <button className="tool-btn primary" onClick={generateUuid}>{t("generateUuid")}</button>
+              <button className="tool-btn danger" onClick={() => setUuidOut("")}>{t("clear")}</button>
             </div>
           </div>
           <div className="tool-io-col">
-            <label>Result</label>
+            <label>{t("result")}</label>
             <div className="tool-output-box">{uuidOut || "—"}</div>
             <div className="tool-actions">
-              <button className="tool-btn" onClick={() => doCopy(uuidOut)} disabled={!uuidOut}>Copy</button>
+              <button className="tool-btn" onClick={() => doCopy(uuidOut, t("copiedBang"), t("copyFailedBare"))} disabled={!uuidOut}>{t("copyToClipboard")}</button>
             </div>
           </div>
         </div>
@@ -124,7 +126,7 @@ export function GenerationTools() {
       {mode === "random" && (
         <div className="tool-io-grid">
           <div className="tool-io-col">
-            <label>Length</label>
+            <label>{t("length")}</label>
             <input
               type="number"
               min={1}
@@ -135,25 +137,25 @@ export function GenerationTools() {
             />
             <div className="tool-field-row">
               <label className="tool-checkbox">
-                <input type="checkbox" checked={rsLetters} onChange={(e) => setRsLetters(e.target.checked)} /> Letters
+                <input type="checkbox" checked={rsLetters} onChange={(e) => setRsLetters(e.target.checked)} /> {t("letters")}
               </label>
               <label className="tool-checkbox">
-                <input type="checkbox" checked={rsDigits} onChange={(e) => setRsDigits(e.target.checked)} /> Digits
+                <input type="checkbox" checked={rsDigits} onChange={(e) => setRsDigits(e.target.checked)} /> {t("digits")}
               </label>
               <label className="tool-checkbox">
-                <input type="checkbox" checked={rsSymbols} onChange={(e) => setRsSymbols(e.target.checked)} /> Symbols
+                <input type="checkbox" checked={rsSymbols} onChange={(e) => setRsSymbols(e.target.checked)} /> {t("symbols")}
               </label>
             </div>
             <div className="tool-actions">
-              <button className="tool-btn primary" onClick={generateRandom}>Generate</button>
-              <button className="tool-btn danger" onClick={() => setRsOut("")}>Clear</button>
+              <button className="tool-btn primary" onClick={generateRandom}>{t("generate")}</button>
+              <button className="tool-btn danger" onClick={() => setRsOut("")}>{t("clear")}</button>
             </div>
           </div>
           <div className="tool-io-col">
-            <label>Result</label>
+            <label>{t("result")}</label>
             <div className="tool-output-box">{rsOut || "—"}</div>
             <div className="tool-actions">
-              <button className="tool-btn" onClick={() => doCopy(rsOut)} disabled={!rsOut}>Copy</button>
+              <button className="tool-btn" onClick={() => doCopy(rsOut, t("copiedBang"), t("copyFailedBare"))} disabled={!rsOut}>{t("copyToClipboard")}</button>
             </div>
           </div>
         </div>
@@ -162,7 +164,7 @@ export function GenerationTools() {
       {mode === "password" && (
         <div className="tool-io-grid">
           <div className="tool-io-col">
-            <label>Length: {pwLen}</label>
+            <label>{t("length")}: {pwLen}</label>
             <input
               type="range"
               min={8}
@@ -172,25 +174,25 @@ export function GenerationTools() {
             />
             <div className="tool-field-row">
               <label className="tool-checkbox">
-                <input type="checkbox" checked={pwUpper} onChange={(e) => setPwUpper(e.target.checked)} /> Uppercase
+                <input type="checkbox" checked={pwUpper} onChange={(e) => setPwUpper(e.target.checked)} /> {t("uppercase")}
               </label>
               <label className="tool-checkbox">
-                <input type="checkbox" checked={pwDigits} onChange={(e) => setPwDigits(e.target.checked)} /> Digits
+                <input type="checkbox" checked={pwDigits} onChange={(e) => setPwDigits(e.target.checked)} /> {t("digits")}
               </label>
               <label className="tool-checkbox">
-                <input type="checkbox" checked={pwSymbols} onChange={(e) => setPwSymbols(e.target.checked)} /> Symbols
+                <input type="checkbox" checked={pwSymbols} onChange={(e) => setPwSymbols(e.target.checked)} /> {t("symbols")}
               </label>
             </div>
             <div className="tool-actions">
-              <button className="tool-btn primary" onClick={generatePassword}>Generate Password</button>
-              <button className="tool-btn danger" onClick={() => setPwOut("")}>Clear</button>
+              <button className="tool-btn primary" onClick={generatePassword}>{t("generatePassword")}</button>
+              <button className="tool-btn danger" onClick={() => setPwOut("")}>{t("clear")}</button>
             </div>
           </div>
           <div className="tool-io-col">
-            <label>Result</label>
+            <label>{t("result")}</label>
             <div className="tool-output-box">{pwOut || "—"}</div>
             <div className="tool-actions">
-              <button className="tool-btn" onClick={() => doCopy(pwOut)} disabled={!pwOut}>Copy</button>
+              <button className="tool-btn" onClick={() => doCopy(pwOut, t("copiedBang"), t("copyFailedBare"))} disabled={!pwOut}>{t("copyToClipboard")}</button>
             </div>
           </div>
         </div>

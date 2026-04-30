@@ -1,6 +1,6 @@
-use tauri::{AppHandle, State};
 use crate::db::Database;
-use crate::models::pomodoro::{PomodoroSettings, DayStat};
+use crate::models::pomodoro::{DayStat, PomodoroSettings};
+use tauri::{AppHandle, State};
 
 #[tauri::command]
 pub fn get_pomodoro_settings(db: State<'_, Database>) -> Result<PomodoroSettings, String> {
@@ -8,13 +8,18 @@ pub fn get_pomodoro_settings(db: State<'_, Database>) -> Result<PomodoroSettings
 }
 
 #[tauri::command]
-pub fn save_pomodoro_settings(db: State<'_, Database>, settings: PomodoroSettings) -> Result<(), String> {
-    db.save_pomodoro_settings(&settings).map_err(|e| e.to_string())
+pub fn save_pomodoro_settings(
+    db: State<'_, Database>,
+    settings: PomodoroSettings,
+) -> Result<(), String> {
+    db.save_pomodoro_settings(&settings)
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub fn record_pomodoro_session(db: State<'_, Database>, duration_min: i64) -> Result<(), String> {
-    db.record_pomodoro_session(duration_min).map_err(|e| e.to_string())
+    db.record_pomodoro_session(duration_min)
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]

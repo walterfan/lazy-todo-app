@@ -1,0 +1,8 @@
+{
+  "temperature": 0.5,
+  "top_p": 0.8,
+  "rag_top_k": 5,
+  "embedding_dim": 1536,
+  "response_style": "concise practical secretary",
+  "ban_topics": ["privacy invasion", "unsafe automation", "unconfirmed destructive action"]
+}

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { assertInputSize, bytesToBase64, copyText, hmacSha256Base64Url, InputTooLargeError } from "../../utils/crypto";
 
 type Tool =
@@ -27,9 +28,9 @@ function showToast(msg: string) {
   setTimeout(() => el.remove(), 1600);
 }
 
-async function doCopy(text: string) {
+async function doCopy(text: string, copied: string, failed: string) {
   const ok = await copyText(text);
-  showToast(ok ? "Copied!" : "Copy failed");
+  showToast(ok ? copied : failed);
 }
 
 function handleSizeError(err: unknown): string {
@@ -48,6 +49,7 @@ function base64ToUtf8(s: string): string {
 }
 
 export function ConversionTools() {
+  const { t } = useTranslation();
   const [tool, setTool] = useState<Tool>("base64");
 
   // Base64
@@ -278,7 +280,7 @@ export function ConversionTools() {
   const copyBatch = async () => {
     if (tsRows.length === 0) return;
     const tsv = tsRows.map((r) => `${r.input}\t${r.local}\t${r.iso}`).join("\n");
-    await doCopy(tsv);
+    await doCopy(tsv, t("copiedBang"), t("copyFailedBare"));
   };
 
   const clearTimestamps = () => {
@@ -357,39 +359,39 @@ export function ConversionTools() {
   return (
     <div className="tool-group">
       <div className="tool-group-header">
-        <label htmlFor="conv-tool">Tool:</label>
+        <label htmlFor="conv-tool">{t("tool")}:</label>
         <select
           id="conv-tool"
           className="tool-select"
           value={tool}
           onChange={(e) => setTool(e.target.value as Tool)}
         >
-          <option value="base64">Base64 Encode/Decode</option>
+          <option value="base64">Base64 {t("encode")}/{t("decode")}</option>
           <option value="hex-ascii">Hex ↔ ASCII</option>
-          <option value="url">URL Encode/Decode</option>
-          <option value="html">HTML Escape/Unescape</option>
-          <option value="number">Number Base Conversion</option>
+          <option value="url">URL {t("encode")}/{t("decode")}</option>
+          <option value="html">HTML {t("escape")}/{t("unescape")}</option>
+          <option value="number">{t("fromBase")} {t("conversion")}</option>
           <option value="timestamp">Timestamp ↔ Datetime</option>
-          <option value="jwt">JWT Encode/Decode</option>
+          <option value="jwt">JWT {t("encode")}/{t("decode")}</option>
         </select>
       </div>
 
       {tool === "base64" && (
         <div className="tool-io-grid">
           <div className="tool-io-col">
-            <label>Input</label>
+            <label>{t("input")}</label>
             <textarea className="tool-textarea" value={b64In} onChange={(e) => setB64In(e.target.value)} placeholder="Enter text…" />
             <div className="tool-actions">
-              <button className="tool-btn primary" onClick={encodeBase64}>Encode</button>
-              <button className="tool-btn" onClick={decodeBase64}>Decode</button>
-              <button className="tool-btn danger" onClick={() => { setB64In(""); setB64Out(""); }}>Clear</button>
+              <button className="tool-btn primary" onClick={encodeBase64}>{t("encode")}</button>
+              <button className="tool-btn" onClick={decodeBase64}>{t("decode")}</button>
+              <button className="tool-btn danger" onClick={() => { setB64In(""); setB64Out(""); }}>{t("clear")}</button>
             </div>
           </div>
           <div className="tool-io-col">
-            <label>Output</label>
+            <label>{t("output")}</label>
             <textarea className="tool-textarea" value={b64Out} readOnly placeholder="Result…" />
             <div className="tool-actions">
-              <button className="tool-btn" onClick={() => doCopy(b64Out)}>Copy</button>
+              <button className="tool-btn" onClick={() => doCopy(b64Out, t("copiedBang"), t("copyFailedBare"))}>{t("copyToClipboard")}</button>
             </div>
           </div>
         </div>
@@ -398,19 +400,19 @@ export function ConversionTools() {
       {tool === "hex-ascii" && (
         <div className="tool-io-grid">
           <div className="tool-io-col">
-            <label>Input</label>
+            <label>{t("input")}</label>
             <textarea className="tool-textarea" value={hexIn} onChange={(e) => setHexIn(e.target.value)} placeholder="Text or hex…" />
             <div className="tool-actions">
               <button className="tool-btn primary" onClick={textToHex}>Text → Hex</button>
               <button className="tool-btn" onClick={hexToText}>Hex → Text</button>
-              <button className="tool-btn danger" onClick={() => { setHexIn(""); setHexOut(""); }}>Clear</button>
+              <button className="tool-btn danger" onClick={() => { setHexIn(""); setHexOut(""); }}>{t("clear")}</button>
             </div>
           </div>
           <div className="tool-io-col">
-            <label>Output</label>
+            <label>{t("output")}</label>
             <textarea className="tool-textarea" value={hexOut} readOnly />
             <div className="tool-actions">
-              <button className="tool-btn" onClick={() => doCopy(hexOut)}>Copy</button>
+              <button className="tool-btn" onClick={() => doCopy(hexOut, t("copiedBang"), t("copyFailedBare"))}>{t("copyToClipboard")}</button>
             </div>
           </div>
         </div>
@@ -419,19 +421,19 @@ export function ConversionTools() {
       {tool === "url" && (
         <div className="tool-io-grid">
           <div className="tool-io-col">
-            <label>Input</label>
+            <label>{t("input")}</label>
             <textarea className="tool-textarea" value={urlIn} onChange={(e) => setUrlIn(e.target.value)} placeholder="URL or component…" />
             <div className="tool-actions">
-              <button className="tool-btn primary" onClick={encodeUrl}>Encode</button>
-              <button className="tool-btn" onClick={decodeUrl}>Decode</button>
-              <button className="tool-btn danger" onClick={() => { setUrlIn(""); setUrlOut(""); }}>Clear</button>
+              <button className="tool-btn primary" onClick={encodeUrl}>{t("encode")}</button>
+              <button className="tool-btn" onClick={decodeUrl}>{t("decode")}</button>
+              <button className="tool-btn danger" onClick={() => { setUrlIn(""); setUrlOut(""); }}>{t("clear")}</button>
             </div>
           </div>
           <div className="tool-io-col">
-            <label>Output</label>
+            <label>{t("output")}</label>
             <textarea className="tool-textarea" value={urlOut} readOnly />
             <div className="tool-actions">
-              <button className="tool-btn" onClick={() => doCopy(urlOut)}>Copy</button>
+              <button className="tool-btn" onClick={() => doCopy(urlOut, t("copiedBang"), t("copyFailedBare"))}>{t("copyToClipboard")}</button>
             </div>
           </div>
         </div>
@@ -440,19 +442,19 @@ export function ConversionTools() {
       {tool === "html" && (
         <div className="tool-io-grid">
           <div className="tool-io-col">
-            <label>Input</label>
+            <label>{t("input")}</label>
             <textarea className="tool-textarea" value={htmlIn} onChange={(e) => setHtmlIn(e.target.value)} placeholder="HTML fragment…" />
             <div className="tool-actions">
-              <button className="tool-btn primary" onClick={escapeHtml}>Escape</button>
-              <button className="tool-btn" onClick={unescapeHtml}>Unescape</button>
-              <button className="tool-btn danger" onClick={() => { setHtmlIn(""); setHtmlOut(""); }}>Clear</button>
+              <button className="tool-btn primary" onClick={escapeHtml}>{t("escape")}</button>
+              <button className="tool-btn" onClick={unescapeHtml}>{t("unescape")}</button>
+              <button className="tool-btn danger" onClick={() => { setHtmlIn(""); setHtmlOut(""); }}>{t("clear")}</button>
             </div>
           </div>
           <div className="tool-io-col">
-            <label>Output</label>
+            <label>{t("output")}</label>
             <textarea className="tool-textarea" value={htmlOut} readOnly />
             <div className="tool-actions">
-              <button className="tool-btn" onClick={() => doCopy(htmlOut)}>Copy</button>
+              <button className="tool-btn" onClick={() => doCopy(htmlOut, t("copiedBang"), t("copyFailedBare"))}>{t("copyToClipboard")}</button>
             </div>
           </div>
         </div>
@@ -461,27 +463,27 @@ export function ConversionTools() {
       {tool === "number" && (
         <div className="tool-io-grid">
           <div className="tool-io-col">
-            <label>Input</label>
+            <label>{t("input")}</label>
             <input className="tool-input" value={numIn} onChange={(e) => setNumIn(e.target.value)} placeholder="e.g. 255" />
-            <label>From base</label>
+            <label>{t("fromBase")}</label>
             <select className="tool-select" value={fromBase} onChange={(e) => setFromBase(e.target.value)}>
-              <option value="2">Binary (2)</option>
-              <option value="8">Octal (8)</option>
-              <option value="10">Decimal (10)</option>
-              <option value="16">Hexadecimal (16)</option>
+              <option value="2">{t("binary")} (2)</option>
+              <option value="8">{t("octal")} (8)</option>
+              <option value="10">{t("decimal")} (10)</option>
+              <option value="16">{t("hex")} (16)</option>
             </select>
             <div className="tool-actions">
-              <button className="tool-btn primary" onClick={convertNumber}>Convert</button>
-              <button className="tool-btn danger" onClick={() => { setNumIn(""); setNumResult({ bin: "", oct: "", dec: "", hex: "" }); }}>Clear</button>
+              <button className="tool-btn primary" onClick={convertNumber}>{t("convert")}</button>
+              <button className="tool-btn danger" onClick={() => { setNumIn(""); setNumResult({ bin: "", oct: "", dec: "", hex: "" }); }}>{t("clear")}</button>
             </div>
           </div>
           <div className="tool-io-col">
-            <label>Results</label>
+            <label>{t("results")}</label>
             <div className="tool-results-panel">
-              <span className="k">Binary (2):</span><span className="v">{numResult.bin}</span>
-              <span className="k">Octal (8):</span><span className="v">{numResult.oct}</span>
-              <span className="k">Decimal (10):</span><span className="v">{numResult.dec}</span>
-              <span className="k">Hex (16):</span><span className="v">{numResult.hex}</span>
+              <span className="k">{t("binary")} (2):</span><span className="v">{numResult.bin}</span>
+              <span className="k">{t("octal")} (8):</span><span className="v">{numResult.oct}</span>
+              <span className="k">{t("decimal")} (10):</span><span className="v">{numResult.dec}</span>
+              <span className="k">{t("hex")} (16):</span><span className="v">{numResult.hex}</span>
             </div>
           </div>
         </div>
@@ -490,7 +492,7 @@ export function ConversionTools() {
       {tool === "timestamp" && (
         <div className="tool-group">
           <div className="tool-group-header">
-            <label>Unit:</label>
+            <label>{t("unit")}:</label>
             <select className="tool-select" value={tsUnit} onChange={(e) => changeUnit(e.target.value as TimestampUnit)}>
               <option value="s">Seconds (s)</option>
               <option value="ms">Milliseconds (ms)</option>
@@ -499,7 +501,7 @@ export function ConversionTools() {
           </div>
           <div className="tool-io-grid">
             <div className="tool-io-col">
-              <label>Timestamp(s)</label>
+              <label>{t("timestampInput")}</label>
               <textarea
                 className="tool-textarea"
                 value={tsIn}
@@ -507,14 +509,14 @@ export function ConversionTools() {
                 placeholder={"e.g.\n1700000000\n1700003600, 1700007200"}
               />
               <div className="tool-actions">
-                <button className="tool-btn primary" onClick={convertTimestamps}>Convert</button>
-                <button className="tool-btn" onClick={currentTimestamp}>Current</button>
-                <button className="tool-btn" onClick={copyBatch} disabled={tsRows.length === 0}>Copy all (TSV)</button>
-                <button className="tool-btn danger" onClick={clearTimestamps}>Clear</button>
+                <button className="tool-btn primary" onClick={convertTimestamps}>{t("convert")}</button>
+                <button className="tool-btn" onClick={currentTimestamp}>{t("current")}</button>
+                <button className="tool-btn" onClick={copyBatch} disabled={tsRows.length === 0}>{t("copyAllTsv")}</button>
+                <button className="tool-btn danger" onClick={clearTimestamps}>{t("clear")}</button>
               </div>
             </div>
             <div className="tool-io-col">
-              <label>Datetime picker → timestamp</label>
+              <label>{t("datetimePickerToTimestamp")}</label>
               <input
                 type="datetime-local"
                 className="tool-input"
@@ -522,7 +524,7 @@ export function ConversionTools() {
                 onChange={(e) => setTsDateInput(e.target.value)}
               />
               <div className="tool-actions">
-                <button className="tool-btn primary" onClick={dateToTimestamp}>To Timestamp</button>
+                <button className="tool-btn primary" onClick={dateToTimestamp}>{t("toTimestamp")}</button>
               </div>
               <div className="tool-output-box">{tsDateOut || "—"}</div>
             </div>
@@ -532,7 +534,7 @@ export function ConversionTools() {
             <table className="tool-table">
               <thead>
                 <tr>
-                  <th>Input</th>
+                  <th>{t("input")}</th>
                   <th>Local Datetime</th>
                   <th>ISO 8601</th>
                 </tr>
@@ -555,32 +557,32 @@ export function ConversionTools() {
         <div className="tool-group">
           <div className="tool-io-grid">
             <div className="tool-io-col">
-              <label>JWT token (to decode)</label>
+              <label>{t("jwtTokenToDecode")}</label>
               <textarea className="tool-textarea" value={jwtIn} onChange={(e) => setJwtIn(e.target.value)} placeholder="eyJhbGciOi…" />
               <div className="tool-actions">
-                <button className="tool-btn primary" onClick={decodeJwt}>Decode</button>
-                <button className="tool-btn danger" onClick={() => { setJwtIn(""); setJwtHeader(""); setJwtPayload(""); setJwtInfo(null); }}>Clear</button>
+                <button className="tool-btn primary" onClick={decodeJwt}>{t("decode")}</button>
+                <button className="tool-btn danger" onClick={() => { setJwtIn(""); setJwtHeader(""); setJwtPayload(""); setJwtInfo(null); }}>{t("clear")}</button>
               </div>
             </div>
             <div className="tool-io-col">
-              <label>Header</label>
+              <label>{t("header")}</label>
               <textarea className="tool-textarea" value={jwtHeader} readOnly />
-              <label>Payload</label>
+              <label>{t("payload")}</label>
               <textarea className="tool-textarea" value={jwtPayload} readOnly />
               <div className="tool-actions">
-                <button className="tool-btn" onClick={() => doCopy(jwtHeader)}>Copy header</button>
-                <button className="tool-btn" onClick={() => doCopy(jwtPayload)}>Copy payload</button>
+                <button className="tool-btn" onClick={() => doCopy(jwtHeader, t("copiedBang"), t("copyFailedBare"))}>{t("copyHeader")}</button>
+                <button className="tool-btn" onClick={() => doCopy(jwtPayload, t("copiedBang"), t("copyFailedBare"))}>{t("copyPayload")}</button>
               </div>
             </div>
           </div>
 
           {jwtStatus && (
             <div className="tool-results-panel">
-              <span className="k">Issued At:</span><span className="v">{jwtStatus.iat}</span>
-              <span className="k">Expires At:</span><span className="v">{jwtStatus.exp}</span>
-              <span className="k">Status:</span>
+              <span className="k">{t("issuedAt")}:</span><span className="v">{jwtStatus.iat}</span>
+              <span className="k">{t("expiresAt")}:</span><span className="v">{jwtStatus.exp}</span>
+              <span className="k">{t("status")}:</span>
               <span className="v" style={{ color: jwtStatus.expired ? "var(--danger)" : "var(--success)" }}>
-                {jwtStatus.expired ? "Expired" : "Valid"}
+                {jwtStatus.expired ? t("expired") : t("valid")}
               </span>
             </div>
           )}
@@ -589,22 +591,22 @@ export function ConversionTools() {
 
           <div className="tool-io-grid">
             <div className="tool-io-col">
-              <label>Header JSON</label>
+              <label>{t("headerJson")}</label>
               <textarea className="tool-textarea" value={jwtEncHeader} onChange={(e) => setJwtEncHeader(e.target.value)} />
-              <label>Payload JSON</label>
+              <label>{t("payloadJson")}</label>
               <textarea className="tool-textarea" value={jwtEncPayload} onChange={(e) => setJwtEncPayload(e.target.value)} />
-              <label>Secret (HS256)</label>
+              <label>{t("secretHs256")}</label>
               <input className="tool-input" type="password" value={jwtSecret} onChange={(e) => setJwtSecret(e.target.value)} />
               <div className="tool-actions">
-                <button className="tool-btn primary" onClick={encodeJwt}>Encode</button>
-                <button className="tool-btn danger" onClick={() => { setJwtEncHeader('{"alg":"HS256","typ":"JWT"}'); setJwtEncPayload('{"sub":"1234567890","name":"walter fan","iat":1516239022}'); setJwtSecret(""); setJwtEncOut(""); }}>Reset</button>
+                <button className="tool-btn primary" onClick={encodeJwt}>{t("encode")}</button>
+                <button className="tool-btn danger" onClick={() => { setJwtEncHeader('{"alg":"HS256","typ":"JWT"}'); setJwtEncPayload('{"sub":"1234567890","name":"walter fan","iat":1516239022}'); setJwtSecret(""); setJwtEncOut(""); }}>{t("reset")}</button>
               </div>
             </div>
             <div className="tool-io-col">
-              <label>Encoded JWT</label>
+              <label>{t("encodedJwt")}</label>
               <textarea className="tool-textarea" value={jwtEncOut} readOnly />
               <div className="tool-actions">
-                <button className="tool-btn" onClick={() => doCopy(jwtEncOut)}>Copy</button>
+                <button className="tool-btn" onClick={() => doCopy(jwtEncOut, t("copiedBang"), t("copyFailedBare"))}>{t("copyToClipboard")}</button>
               </div>
             </div>
           </div>

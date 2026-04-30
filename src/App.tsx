@@ -4,6 +4,8 @@ import { invoke } from "@tauri-apps/api/core";
 import { useTodos } from "./hooks/useTodos";
 import { useNotes } from "./hooks/useNotes";
 import { useSettings } from "./hooks/useSettings";
+import { useSecretary } from "./hooks/useSecretary";
+import { useAgents } from "./hooks/useAgents";
 import { useAlwaysOnTop } from "./hooks/useAlwaysOnTop";
 import { AddTodo } from "./components/AddTodo";
 import { TodoList } from "./components/TodoList";
@@ -12,20 +14,28 @@ import { NoteList } from "./components/NoteList";
 import { PomodoroPanel } from "./components/PomodoroPanel";
 import { ToolboxPanel } from "./components/toolbox/ToolboxPanel";
 import { SettingsPanel } from "./components/SettingsPanel";
-import { SecretaryPanel } from "./components/SecretaryPanel";
+import { AgentsPanel } from "./components/AgentsPanel";
+import { useTranslation } from "react-i18next";
+import "./i18n";
 import "./App.css";
 
-type Tab = "todos" | "notes" | "pomodoro" | "toolbox" | "secretary" | "settings";
+type Tab = "todos" | "notes" | "pomodoro" | "toolbox" | "agents" | "settings";
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>("todos");
   const [noteAutoFocus, setNoteAutoFocus] = useState(false);
   const [dbPath, setDbPath] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [notePage, setNotePage] = useState(1);
+  const [selectedNoteIds, setSelectedNoteIds] = useState<Set<number>>(() => new Set());
+  const [noteExportStatus, setNoteExportStatus] = useState("");
   const { todos, loading: todosLoading, addTodo, toggleTodo, updateTodo, deleteTodo } = useTodos();
-  const { notes, loading: notesLoading, addNote, updateNote, deleteNote } = useNotes();
+  const { notes, loading: notesLoading, addNote, updateNote, deleteNote, setNotePinned, exportNotes } = useNotes();
   const { settings, updateSettings } = useSettings();
+  const secretary = useSecretary();
+  const agents = useAgents();
   const { pinned, toggle: togglePinned } = useAlwaysOnTop();
+  const { t, i18n } = useTranslation();
   const activeTodos = useMemo(() => todos.filter((t) => !t.completed), [todos]);
 
   const filteredTodos = useMemo(() => {
@@ -48,6 +58,13 @@ function App() {
     );
   }, [notes, searchQuery]);
 
+  const notePageSize = Math.max(1, Math.min(200, Number(settings.note_page_size) || 10));
+  const notePageCount = Math.max(1, Math.ceil(filteredNotes.length / notePageSize));
+  const paginatedNotes = useMemo(() => {
+    const start = (notePage - 1) * notePageSize;
+    return filteredNotes.slice(start, start + notePageSize);
+  }, [filteredNotes, notePage, notePageSize]);
+
   useEffect(() => {
     invoke<string>("get_db_path").then(setDbPath).catch(() => {});
   }, []);
@@ -65,20 +82,85 @@ function App() {
     setSearchQuery("");
   }, [activeTab]);
 
+  useEffect(() => {
+    setNotePage(1);
+  }, [activeTab, searchQuery, notePageSize]);
+
+  useEffect(() => {
+    setNotePage((current) => Math.min(current, notePageCount));
+  }, [notePageCount]);
+
+  useEffect(() => {
+    void i18n.changeLanguage(settings.language || "en");
+  }, [i18n, settings.language]);
+
+  const visibleSelectedNoteIds = useMemo(
+    () => paginatedNotes.filter((note) => selectedNoteIds.has(note.id)).map((note) => note.id),
+    [paginatedNotes, selectedNoteIds]
+  );
+
   const NAV_ITEMS: { key: Tab; icon: string; label: string }[] = [
-    { key: "todos", icon: "✅", label: "Todos" },
-    { key: "notes", icon: "📝", label: "Notes" },
-    { key: "pomodoro", icon: "🍅", label: "Pomodoro" },
-    { key: "toolbox", icon: "🧰", label: "Toolbox" },
-    { key: "secretary", icon: "🗂️", label: "Secretary" },
+    { key: "todos", icon: "✅", label: t("todos") },
+    { key: "notes", icon: "📝", label: t("notes") },
+    { key: "pomodoro", icon: "🍅", label: t("pomodoro") },
+    { key: "toolbox", icon: "🧰", label: t("toolbox") },
+    { key: "agents", icon: "🗂️", label: t("agents") },
   ];
 
   const handleQuit = () => invoke("quit_app");
 
+  const setNoteSelected = (id: number, selected: boolean) => {
+    setSelectedNoteIds((current) => {
+      const next = new Set(current);
+      if (selected) {
+        next.add(id);
+      } else {
+        next.delete(id);
+      }
+      return next;
+    });
+    setNoteExportStatus("");
+  };
+
+  const selectVisibleNotes = () => {
+    setSelectedNoteIds((current) => {
+      const next = new Set(current);
+      paginatedNotes.forEach((note) => next.add(note.id));
+      return next;
+    });
+    setNoteExportStatus("");
+  };
+
+  const clearSelectedNotes = () => {
+    setSelectedNoteIds(new Set());
+    setNoteExportStatus("");
+  };
+
+  const handleDeleteNote = async (id: number) => {
+    await deleteNote(id);
+    setSelectedNoteIds((current) => {
+      const next = new Set(current);
+      next.delete(id);
+      return next;
+    });
+  };
+
+  const saveSelectedNotes = async () => {
+    const ids = Array.from(selectedNoteIds);
+    if (ids.length === 0) return;
+    setNoteExportStatus(t("savingSelectedNotes"));
+    try {
+      const result = await exportNotes(ids);
+      setNoteExportStatus(t("savedNoteFiles", { count: result.files.length, plural: result.files.length === 1 ? "" : "s", folder: result.folder }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setNoteExportStatus(t("saveFailed", { message }));
+    }
+  };
+
   return (
     <div className="app-layout">
       <aside className="sidebar">
-        <div className="sidebar-brand">📋</div>
         <nav className="sidebar-nav">
           {NAV_ITEMS.map((item) => (
             <button
@@ -100,23 +182,23 @@ function App() {
             aria-pressed={pinned}
           >
             <span className="nav-icon">{pinned ? "📌" : "📍"}</span>
-            <span className="nav-label">{pinned ? "Pinned" : "Pin"}</span>
+            <span className="nav-label">{pinned ? t("pinned") : t("pin")}</span>
           </button>
           <button
             className={`nav-item ${activeTab === "settings" ? "active" : ""}`}
             onClick={() => setActiveTab("settings")}
-            title="Settings"
+            title={t("settings")}
           >
             <span className="nav-icon">⚙️</span>
-            <span className="nav-label">Settings</span>
+            <span className="nav-label">{t("settings")}</span>
           </button>
           <button
             className="nav-item nav-quit"
             onClick={handleQuit}
-            title="Quit"
+            title={t("quit")}
           >
             <span className="nav-icon">🚪</span>
-            <span className="nav-label">Quit</span>
+            <span className="nav-label">{t("quit")}</span>
           </button>
         </div>
       </aside>
@@ -124,7 +206,7 @@ function App() {
       <div className="content-area">
         <header className="content-header">
           <h2 className="content-title">
-            {activeTab === "settings" ? "⚙️ Settings" : (
+            {activeTab === "settings" ? `⚙️ ${t("settings")}` : (
               <>
                 {NAV_ITEMS.find((i) => i.key === activeTab)?.icon}{" "}
                 {NAV_ITEMS.find((i) => i.key === activeTab)?.label}
@@ -137,7 +219,7 @@ function App() {
               <input
                 type="text"
                 className="search-input"
-                placeholder={activeTab === "todos" ? "Search tasks..." : "Search notes..."}
+                placeholder={activeTab === "todos" ? t("searchTasks") : t("searchNotes")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -153,14 +235,14 @@ function App() {
         <main className="content-main">
           {activeTab === "todos" && (
             <>
-              <AddTodo onAdd={addTodo} />
+              <AddTodo onAdd={addTodo} t={t} />
               {todosLoading ? (
-                <div className="loading">Loading...</div>
+                <div className="loading">{t("loading")}</div>
               ) : (
                 <>
                   {searchQuery && (
                     <div className="search-result-count">
-                      Found {filteredTodos.length} of {activeTodos.length} active tasks
+                      {t("foundTasks", { count: filteredTodos.length, total: activeTodos.length })}
                     </div>
                   )}
                   <TodoList
@@ -169,6 +251,7 @@ function App() {
                     onUpdate={updateTodo}
                     onDelete={deleteTodo}
                     displayStyle={settings.todo_display}
+                    t={t}
                   />
                 </>
               )}
@@ -177,22 +260,69 @@ function App() {
 
           {activeTab === "notes" && (
             <>
-              <NoteEditor onAdd={addNote} autoFocus={noteAutoFocus} template={settings.note_template} />
+              <NoteEditor onAdd={addNote} autoFocus={noteAutoFocus} template={settings.note_template} t={t} />
               {notesLoading ? (
-                <div className="loading">Loading...</div>
+                <div className="loading">{t("loading")}</div>
               ) : (
                 <>
                   {searchQuery && (
                     <div className="search-result-count">
-                      Found {filteredNotes.length} of {notes.length} notes
+                      {t("foundNotes", { count: filteredNotes.length, total: notes.length })}
                     </div>
                   )}
+                  <div className="note-selection-toolbar">
+                    <div>
+                      <strong>{selectedNoteIds.size}</strong> {t("selected")}
+                      {visibleSelectedNoteIds.length !== selectedNoteIds.size && selectedNoteIds.size > 0 && (
+                        <span> · {visibleSelectedNoteIds.length} {t("visible")}</span>
+                      )}
+                    </div>
+                    <div className="note-selection-actions">
+                      <button
+                        type="button"
+                        onClick={selectVisibleNotes}
+                        disabled={paginatedNotes.length === 0 || visibleSelectedNoteIds.length === paginatedNotes.length}
+                      >
+                        {t("selectVisible")}
+                      </button>
+                      <button type="button" onClick={clearSelectedNotes} disabled={selectedNoteIds.size === 0}>
+                        {t("clear")}
+                      </button>
+                      <button type="button" onClick={saveSelectedNotes} disabled={selectedNoteIds.size === 0}>
+                        {t("saveToFolder")}
+                      </button>
+                    </div>
+                  </div>
+                  {noteExportStatus && <div className="note-export-status">{noteExportStatus}</div>}
                   <NoteList
-                    notes={filteredNotes}
+                    notes={paginatedNotes}
                     onUpdate={updateNote}
-                    onDelete={deleteNote}
-                    displayStyle={settings.note_display}
+                    onDelete={handleDeleteNote}
+                    onPinChange={setNotePinned}
+                    displayStyle="list"
+                    selectedNoteIds={selectedNoteIds}
+                    onSelectionChange={setNoteSelected}
+                    t={t}
                   />
+                  <div className="note-pagination">
+                    <span>
+                      {t("notePageStatus", { page: notePage, pages: notePageCount, total: filteredNotes.length })}
+                    </span>
+                    <div className="note-pagination-actions">
+                      <button type="button" onClick={() => setNotePage(1)} disabled={notePage <= 1}>
+                        {t("firstPage")}
+                      </button>
+                      <button type="button" onClick={() => setNotePage((page) => Math.max(1, page - 1))} disabled={notePage <= 1}>
+                        {t("previousPage")}
+                      </button>
+                      <button type="button" onClick={() => setNotePage((page) => Math.min(notePageCount, page + 1))} disabled={notePage >= notePageCount}>
+                        {t("nextPage")}
+                      </button>
+                      <button type="button" onClick={() => setNotePage(notePageCount)} disabled={notePage >= notePageCount}>
+                        {t("lastPage")}
+                      </button>
+                    </div>
+                  </div>
                 </>
               )}
             </>
@@ -206,12 +336,16 @@ function App() {
             <ToolboxPanel />
           </div>
 
-          <div style={{ display: activeTab === "secretary" ? "block" : "none" }}>
-            <SecretaryPanel />
+          <div style={{ display: activeTab === "agents" ? "block" : "none" }}>
+            <AgentsPanel
+              agents={agents}
+              onRecordMessageToNote={(content, title) => addNote({ title, content, color: "blue" })}
+              t={t}
+            />
           </div>
 
           {activeTab === "settings" && (
-            <SettingsPanel settings={settings} dbPath={dbPath} onUpdate={updateSettings} />
+            <SettingsPanel settings={settings} dbPath={dbPath} agents={agents} secretary={secretary} onUpdate={updateSettings} t={t} />
           )}
         </main>
       </div>

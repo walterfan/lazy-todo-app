@@ -1,0 +1,13 @@
+{
+  "plugin_id": "steve_jobs",
+  "plugin_name": "Steve Jobs",
+  "plugin_version": "1.1.0",
+  "author": "Lazy Todo App",
+  "description": "A product-focused virtual human inspired by Steve Jobs, helping the user simplify ideas, sharpen taste, and connect technology with human experience.",
+  "tags": ["product", "design", "innovation", "leadership"],
+  "create_time": "2026-04-29",
+  "update_time": "2026-04-29",
+  "min_app_version": "1.0.0",
+  "rag_enabled": true,
+  "is_multi_agent_supported": true
+}

@@ -12,9 +12,8 @@ use crate::models::secretary::{
     MilestoneContext, NoteContext, ProposedNoteEdit, SaveSecretaryMemory, SaveSecretaryPersona,
     SaveSecretaryProfile, SaveSecretaryReminder, SaveSecretarySettings, SecretaryAppContext,
     SecretaryConversation, SecretaryMemory, SecretaryMessage, SecretaryPersona, SecretaryProfile,
-    SecretaryReminder, SecretarySkill, SelectedAppContext,
-    SendSecretaryMessageInput, SendSecretaryMessageResult, SkillScanResult, TodoContext,
-    UsedContextMetadata,
+    SecretaryReminder, SecretarySkill, SelectedAppContext, SendSecretaryMessageInput,
+    SendSecretaryMessageResult, SkillScanResult, TodoContext, UsedContextMetadata,
 };
 
 const MAX_SKILL_BYTES: u64 = 128 * 1024;
@@ -58,7 +57,8 @@ pub fn save_secretary_settings(
     db: State<'_, Database>,
     input: SaveSecretarySettings,
 ) -> Result<MaskedSecretarySettings, String> {
-    db.save_secretary_settings(&input).map_err(|e| e.to_string())?;
+    db.save_secretary_settings(&input)
+        .map_err(|e| e.to_string())?;
     get_secretary_settings(db)
 }
 
@@ -143,7 +143,11 @@ pub fn refresh_secretary_skills(db: State<'_, Database>) -> Result<SkillScanResu
         if !path.is_file() {
             continue;
         }
-        let ext = path.extension().and_then(|v| v.to_str()).unwrap_or("").to_lowercase();
+        let ext = path
+            .extension()
+            .and_then(|v| v.to_str())
+            .unwrap_or("")
+            .to_lowercase();
         if !matches!(ext.as_str(), "md" | "txt" | "skill") {
             skipped.push(format!("{}: unsupported extension", path.display()));
             continue;
@@ -176,7 +180,9 @@ pub fn refresh_secretary_skills(db: State<'_, Database>) -> Result<SkillScanResu
             updated_at: String::new(),
         });
     }
-    let skills = db.replace_secretary_skills(&scanned).map_err(|e| e.to_string())?;
+    let skills = db
+        .replace_secretary_skills(&scanned)
+        .map_err(|e| e.to_string())?;
     Ok(SkillScanResult { skills, skipped })
 }
 
@@ -213,7 +219,8 @@ pub fn save_secretary_reminder(
     db: State<'_, Database>,
     input: SaveSecretaryReminder,
 ) -> Result<SecretaryReminder, String> {
-    db.save_secretary_reminder(&input).map_err(|e| e.to_string())
+    db.save_secretary_reminder(&input)
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -223,12 +230,15 @@ pub fn delete_secretary_reminder(db: State<'_, Database>, id: i64) -> Result<(),
 
 #[tauri::command]
 pub fn get_secretary_app_context(db: State<'_, Database>) -> Result<SecretaryAppContext, String> {
-    build_app_context(&db, &SelectedAppContext {
-        include_todos: true,
-        include_milestones: true,
-        include_notes: true,
-        ..Default::default()
-    })
+    build_app_context(
+        &db,
+        &SelectedAppContext {
+            include_todos: true,
+            include_milestones: true,
+            include_notes: true,
+            ..Default::default()
+        },
+    )
 }
 
 #[tauri::command]
@@ -240,7 +250,10 @@ pub fn confirm_secretary_note_edit(
         if let Some(id) = input.conversation_id {
             append_conversation_event(&db, id, "system", "Secretary note edit rejected.")?;
         }
-        return Ok(ConfirmNoteEditResult { accepted: false, note: None });
+        return Ok(ConfirmNoteEditResult {
+            accepted: false,
+            note: None,
+        });
     }
 
     let note = db
@@ -256,10 +269,16 @@ pub fn confirm_secretary_note_edit(
             &db,
             id,
             "system",
-            &format!("Secretary note edit accepted for note #{}.", input.edit.note_id),
+            &format!(
+                "Secretary note edit accepted for note #{}.",
+                input.edit.note_id
+            ),
         )?;
     }
-    Ok(ConfirmNoteEditResult { accepted: true, note: Some(note) })
+    Ok(ConfirmNoteEditResult {
+        accepted: true,
+        note: Some(note),
+    })
 }
 
 #[tauri::command]
@@ -278,7 +297,8 @@ pub fn start_secretary_conversation(
         created_at: now.clone(),
         updated_at: now,
     };
-    db.save_secretary_conversation(&conversation).map_err(|e| e.to_string())
+    db.save_secretary_conversation(&conversation)
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -288,7 +308,11 @@ pub async fn send_secretary_message(
 ) -> Result<SendSecretaryMessageResult, String> {
     validate_secretary_config(db.clone())?;
     let effective = resolve_effective_llm_settings(&db)?;
-    let profile_id = input.profile_id.or_else(|| db.get_secretary_settings().ok().and_then(|s| s.active_profile_id));
+    let profile_id = input.profile_id.or_else(|| {
+        db.get_secretary_settings()
+            .ok()
+            .and_then(|s| s.active_profile_id)
+    });
     let profile = match profile_id {
         Some(id) => Some(db.get_secretary_profile(id).map_err(|e| e.to_string())?),
         None => None,
@@ -298,7 +322,11 @@ pub async fn send_secretary_message(
         None => None,
     };
     let memories = db
-        .relevant_secretary_memories(profile_id, profile.as_ref().map(|p| p.domain.as_str()).unwrap_or(""), 6)
+        .relevant_secretary_memories(
+            profile_id,
+            profile.as_ref().map(|p| p.domain.as_str()).unwrap_or(""),
+            6,
+        )
         .map_err(|e| e.to_string())?;
     let app_context = build_app_context(&db, &input.selected_context)?;
     let used_context = UsedContextMetadata {
@@ -309,7 +337,9 @@ pub async fn send_secretary_message(
     };
 
     let mut conversation = match input.conversation_id {
-        Some(id) => db.get_secretary_conversation(id).map_err(|e| e.to_string())?,
+        Some(id) => db
+            .get_secretary_conversation(id)
+            .map_err(|e| e.to_string())?,
         None => start_secretary_conversation(db.clone(), profile_id)?,
     };
     let user_message = SecretaryMessage {
@@ -319,7 +349,8 @@ pub async fn send_secretary_message(
     };
     conversation.messages.push(user_message.clone());
 
-    let system_prompt = build_system_prompt(persona.as_ref(), profile.as_ref(), &memories, &app_context);
+    let system_prompt =
+        build_system_prompt(persona.as_ref(), profile.as_ref(), &memories, &app_context);
     let assistant_content = call_llm(&effective, &system_prompt, &conversation.messages).await?;
     let assistant_message = SecretaryMessage {
         role: "assistant".to_string(),
@@ -328,12 +359,16 @@ pub async fn send_secretary_message(
     };
     conversation.messages.push(assistant_message.clone());
     conversation.updated_at = now_string();
-    if conversation.title.starts_with("Secretary conversation ") && !input.message.trim().is_empty() {
+    if conversation.title.starts_with("Secretary conversation ") && !input.message.trim().is_empty()
+    {
         conversation.title = input.message.trim().chars().take(48).collect();
     }
-    conversation = db.save_secretary_conversation(&conversation).map_err(|e| e.to_string())?;
+    conversation = db
+        .save_secretary_conversation(&conversation)
+        .map_err(|e| e.to_string())?;
 
-    let proposed_note_edit = propose_note_edit(&input.message, &assistant_content, &app_context.notes);
+    let proposed_note_edit =
+        propose_note_edit(&input.message, &assistant_content, &app_context.notes);
     let conversation_id = conversation.id;
     Ok(SendSecretaryMessageResult {
         conversation,
@@ -358,17 +393,23 @@ pub async fn send_secretary_message_stream(
     let result = send_secretary_message_stream_inner(&app, db, input, &stream_id).await;
     match result {
         Ok(result) => {
-            let _ = app.emit("secretary-stream-finish", SecretaryStreamFinish {
-                stream_id,
-                result: result.clone(),
-            });
+            let _ = app.emit(
+                "secretary-stream-finish",
+                SecretaryStreamFinish {
+                    stream_id,
+                    result: result.clone(),
+                },
+            );
             Ok(result)
         }
         Err(error) => {
-            let _ = app.emit("secretary-stream-error", SecretaryStreamError {
-                stream_id,
-                error: error.clone(),
-            });
+            let _ = app.emit(
+                "secretary-stream-error",
+                SecretaryStreamError {
+                    stream_id,
+                    error: error.clone(),
+                },
+            );
             Err(error)
         }
     }
@@ -382,7 +423,11 @@ async fn send_secretary_message_stream_inner(
 ) -> Result<SendSecretaryMessageResult, String> {
     validate_secretary_config(db.clone())?;
     let effective = resolve_effective_llm_settings(&db)?;
-    let profile_id = input.profile_id.or_else(|| db.get_secretary_settings().ok().and_then(|s| s.active_profile_id));
+    let profile_id = input.profile_id.or_else(|| {
+        db.get_secretary_settings()
+            .ok()
+            .and_then(|s| s.active_profile_id)
+    });
     let profile = match profile_id {
         Some(id) => Some(db.get_secretary_profile(id).map_err(|e| e.to_string())?),
         None => None,
@@ -392,7 +437,11 @@ async fn send_secretary_message_stream_inner(
         None => None,
     };
     let memories = db
-        .relevant_secretary_memories(profile_id, profile.as_ref().map(|p| p.domain.as_str()).unwrap_or(""), 6)
+        .relevant_secretary_memories(
+            profile_id,
+            profile.as_ref().map(|p| p.domain.as_str()).unwrap_or(""),
+            6,
+        )
         .map_err(|e| e.to_string())?;
     let app_context = build_app_context(&db, &input.selected_context)?;
     let used_context = UsedContextMetadata {
@@ -403,7 +452,9 @@ async fn send_secretary_message_stream_inner(
     };
 
     let mut conversation = match input.conversation_id {
-        Some(id) => db.get_secretary_conversation(id).map_err(|e| e.to_string())?,
+        Some(id) => db
+            .get_secretary_conversation(id)
+            .map_err(|e| e.to_string())?,
         None => start_secretary_conversation(db.clone(), profile_id)?,
     };
     let user_message = SecretaryMessage {
@@ -413,8 +464,16 @@ async fn send_secretary_message_stream_inner(
     };
     conversation.messages.push(user_message);
 
-    let system_prompt = build_system_prompt(persona.as_ref(), profile.as_ref(), &memories, &app_context);
-    let assistant_content = call_llm_stream(&effective, &system_prompt, &conversation.messages, app, stream_id).await?;
+    let system_prompt =
+        build_system_prompt(persona.as_ref(), profile.as_ref(), &memories, &app_context);
+    let assistant_content = call_llm_stream(
+        &effective,
+        &system_prompt,
+        &conversation.messages,
+        app,
+        stream_id,
+    )
+    .await?;
     let assistant_message = SecretaryMessage {
         role: "assistant".to_string(),
         content: assistant_content.clone(),
@@ -422,11 +481,15 @@ async fn send_secretary_message_stream_inner(
     };
     conversation.messages.push(assistant_message.clone());
     conversation.updated_at = now_string();
-    if conversation.title.starts_with("Secretary conversation ") && !input.message.trim().is_empty() {
+    if conversation.title.starts_with("Secretary conversation ") && !input.message.trim().is_empty()
+    {
         conversation.title = input.message.trim().chars().take(48).collect();
     }
-    conversation = db.save_secretary_conversation(&conversation).map_err(|e| e.to_string())?;
-    let proposed_note_edit = propose_note_edit(&input.message, &assistant_content, &app_context.notes);
+    conversation = db
+        .save_secretary_conversation(&conversation)
+        .map_err(|e| e.to_string())?;
+    let proposed_note_edit =
+        propose_note_edit(&input.message, &assistant_content, &app_context.notes);
     let conversation_id = conversation.id;
     Ok(SendSecretaryMessageResult {
         conversation,
@@ -439,12 +502,17 @@ async fn send_secretary_message_stream_inner(
 }
 
 #[tauri::command]
-pub fn list_secretary_conversations(db: State<'_, Database>) -> Result<Vec<SecretaryConversation>, String> {
+pub fn list_secretary_conversations(
+    db: State<'_, Database>,
+) -> Result<Vec<SecretaryConversation>, String> {
     db.list_secretary_conversations().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-pub fn load_secretary_conversation(db: State<'_, Database>, id: i64) -> Result<SecretaryConversation, String> {
+pub fn load_secretary_conversation(
+    db: State<'_, Database>,
+    id: i64,
+) -> Result<SecretaryConversation, String> {
     db.get_secretary_conversation(id).map_err(|e| e.to_string())
 }
 
@@ -458,7 +526,9 @@ pub fn save_secretary_transcript(
     if folder.is_empty() {
         return Err("Conversation folder is not configured.".to_string());
     }
-    let mut conversation = db.get_secretary_conversation(id).map_err(|e| e.to_string())?;
+    let mut conversation = db
+        .get_secretary_conversation(id)
+        .map_err(|e| e.to_string())?;
     fs::create_dir_all(folder).map_err(|e| e.to_string())?;
     let file_base = sanitize_filename(&format!("{}-{}", conversation.id, conversation.title));
     let md_path = Path::new(folder).join(format!("{file_base}.md"));
@@ -467,7 +537,8 @@ pub fn save_secretary_transcript(
     let json = serde_json::to_string_pretty(&conversation).map_err(|e| e.to_string())?;
     fs::write(json_path, json).map_err(|e| e.to_string())?;
     conversation.transcript_path = md_path.to_string_lossy().to_string();
-    db.save_secretary_conversation(&conversation).map_err(|e| e.to_string())
+    db.save_secretary_conversation(&conversation)
+        .map_err(|e| e.to_string())
 }
 
 fn resolve_effective_llm_settings(db: &Database) -> Result<EffectiveLlmSettings, String> {
@@ -479,10 +550,22 @@ fn resolve_effective_llm_settings(db: &Database) -> Result<EffectiveLlmSettings,
     let base_url_from_env = !env_base_url.trim().is_empty();
     let model_from_env = !env_model.trim().is_empty();
     let api_key_from_env = !env_api_key.trim().is_empty();
-    let api_key = if api_key_from_env { env_api_key } else { saved_api_key };
+    let api_key = if api_key_from_env {
+        env_api_key
+    } else {
+        saved_api_key
+    };
     Ok(EffectiveLlmSettings {
-        base_url: if base_url_from_env { env_base_url } else { saved.base_url },
-        model: if model_from_env { env_model } else { saved.model },
+        base_url: if base_url_from_env {
+            env_base_url
+        } else {
+            saved.base_url
+        },
+        model: if model_from_env {
+            env_model
+        } else {
+            saved.model
+        },
         has_api_key: !api_key.trim().is_empty(),
         api_key,
         base_url_from_env,
@@ -492,11 +575,21 @@ fn resolve_effective_llm_settings(db: &Database) -> Result<EffectiveLlmSettings,
 }
 
 fn skill_name_summary(path: &Path, content: &str) -> (String, String) {
-    let fallback = path.file_stem().and_then(|v| v.to_str()).unwrap_or("Skill").to_string();
+    let fallback = path
+        .file_stem()
+        .and_then(|v| v.to_str())
+        .unwrap_or("Skill")
+        .to_string();
     let mut name = fallback;
     let mut summary = String::new();
-    for line in content.lines().map(str::trim).filter(|line| !line.is_empty()) {
-        if line.starts_with('#') && name == path.file_stem().and_then(|v| v.to_str()).unwrap_or("Skill") {
+    for line in content
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty())
+    {
+        if line.starts_with('#')
+            && name == path.file_stem().and_then(|v| v.to_str()).unwrap_or("Skill")
+        {
             name = line.trim_start_matches('#').trim().to_string();
             continue;
         }
@@ -508,7 +601,10 @@ fn skill_name_summary(path: &Path, content: &str) -> (String, String) {
     (name, summary)
 }
 
-fn build_app_context(db: &Database, selected: &SelectedAppContext) -> Result<SecretaryAppContext, String> {
+fn build_app_context(
+    db: &Database,
+    selected: &SelectedAppContext,
+) -> Result<SecretaryAppContext, String> {
     let todos = if selected.include_todos {
         db.list_todos()
             .map_err(|e| e.to_string())?
@@ -525,7 +621,9 @@ fn build_app_context(db: &Database, selected: &SelectedAppContext) -> Result<Sec
             .milestones
             .into_iter()
             .enumerate()
-            .filter(|(index, _)| selected.milestone_indexes.is_empty() || selected.milestone_indexes.contains(index))
+            .filter(|(index, _)| {
+                selected.milestone_indexes.is_empty() || selected.milestone_indexes.contains(index)
+            })
             .map(|(index, milestone)| MilestoneContext::from_milestone(index, milestone))
             .collect()
     } else {
@@ -538,7 +636,12 @@ fn build_app_context(db: &Database, selected: &SelectedAppContext) -> Result<Sec
             .filter(|note| selected.note_ids.is_empty() || selected.note_ids.contains(&note.id))
             .map(|mut note| {
                 if note.content.chars().count() > MAX_NOTE_CHARS {
-                    note.content = note.content.chars().take(MAX_NOTE_CHARS).collect::<String>() + "...";
+                    note.content = note
+                        .content
+                        .chars()
+                        .take(MAX_NOTE_CHARS)
+                        .collect::<String>()
+                        + "...";
                 }
                 NoteContext::from(note)
             })
@@ -546,7 +649,11 @@ fn build_app_context(db: &Database, selected: &SelectedAppContext) -> Result<Sec
     } else {
         Vec::new()
     };
-    Ok(SecretaryAppContext { todos, milestones, notes })
+    Ok(SecretaryAppContext {
+        todos,
+        milestones,
+        notes,
+    })
 }
 
 fn build_system_prompt(
@@ -582,29 +689,50 @@ fn build_system_prompt(
         sections.push(format!("Relevant local memories:\n{text}"));
     }
     if !context.todos.is_empty() {
-        let text = context.todos.iter().map(|todo| {
-            format!(
-                "- #{} [{}] P{} {}{}: {}",
-                todo.id,
-                if todo.completed { "done" } else { "active" },
-                todo.priority,
-                todo.deadline.as_deref().unwrap_or("no deadline"),
-                if todo.description.is_empty() { "" } else { " " },
-                todo.title
-            )
-        }).collect::<Vec<_>>().join("\n");
+        let text = context
+            .todos
+            .iter()
+            .map(|todo| {
+                format!(
+                    "- #{} [{}] P{} {}{}: {}",
+                    todo.id,
+                    if todo.completed { "done" } else { "active" },
+                    todo.priority,
+                    todo.deadline.as_deref().unwrap_or("no deadline"),
+                    if todo.description.is_empty() { "" } else { " " },
+                    todo.title
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
         sections.push(format!("Todo context:\n{text}"));
     }
     if !context.milestones.is_empty() {
-        let text = context.milestones.iter().map(|m| {
-            format!("- #{} [{}] {} due {}", m.index, m.status, m.name, m.deadline)
-        }).collect::<Vec<_>>().join("\n");
+        let text = context
+            .milestones
+            .iter()
+            .map(|m| {
+                format!(
+                    "- #{} [{}] {} due {}",
+                    m.index, m.status, m.name, m.deadline
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
         sections.push(format!("Milestone context:\n{text}"));
     }
     if !context.notes.is_empty() {
-        let text = context.notes.iter().map(|note| {
-            format!("- Note #{} \"{}\" ({})\n{}", note.id, note.title, note.color, note.content)
-        }).collect::<Vec<_>>().join("\n\n");
+        let text = context
+            .notes
+            .iter()
+            .map(|note| {
+                format!(
+                    "- Note #{} \"{}\" ({})\n{}",
+                    note.id, note.title, note.color, note.content
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("\n\n");
         sections.push(format!("Sticky Note context:\n{text}"));
     }
     sections.join("\n\n")
@@ -631,8 +759,19 @@ async fn call_llm(
         format!("{base_url}/chat/completions")
     };
     let mut payload_messages = vec![json!({"role": "system", "content": system_prompt})];
-    for message in messages.iter().rev().take(12).collect::<Vec<_>>().into_iter().rev() {
-        let role = if message.role == "assistant" { "assistant" } else { "user" };
+    for message in messages
+        .iter()
+        .rev()
+        .take(12)
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
+    {
+        let role = if message.role == "assistant" {
+            "assistant"
+        } else {
+            "user"
+        };
         payload_messages.push(json!({"role": role, "content": message.content}));
     }
     let payload = json!({
@@ -648,7 +787,10 @@ async fn call_llm(
         .await
         .map_err(|e| format!("LLM request failed: {e}"))?;
     let status = response.status();
-    let body: serde_json::Value = response.json().await.map_err(|e| format!("Invalid LLM response: {e}"))?;
+    let body: serde_json::Value = response
+        .json()
+        .await
+        .map_err(|e| format!("Invalid LLM response: {e}"))?;
     if !status.is_success() {
         return Err(format!("LLM request failed with status {status}: {body}"));
     }
@@ -672,8 +814,19 @@ async fn call_llm_stream(
         format!("{base_url}/chat/completions")
     };
     let mut payload_messages = vec![json!({"role": "system", "content": system_prompt})];
-    for message in messages.iter().rev().take(12).collect::<Vec<_>>().into_iter().rev() {
-        let role = if message.role == "assistant" { "assistant" } else { "user" };
+    for message in messages
+        .iter()
+        .rev()
+        .take(12)
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
+    {
+        let role = if message.role == "assistant" {
+            "assistant"
+        } else {
+            "user"
+        };
         payload_messages.push(json!({"role": role, "content": message.content}));
     }
     let payload = json!({
@@ -692,7 +845,9 @@ async fn call_llm_stream(
     let status = response.status();
     if !status.is_success() {
         let body = response.text().await.unwrap_or_default();
-        return Err(format!("LLM stream request failed with status {status}: {body}"));
+        return Err(format!(
+            "LLM stream request failed with status {status}: {body}"
+        ));
     }
 
     let mut buffer = String::new();
@@ -708,20 +863,26 @@ async fn call_llm_stream(
             buffer = buffer[index + 1..].to_string();
             if let Some(delta) = parse_sse_delta(&line)? {
                 content.push_str(&delta);
-                let _ = app.emit("secretary-stream-chunk", SecretaryStreamChunk {
-                    stream_id: stream_id.to_string(),
-                    content: delta,
-                });
+                let _ = app.emit(
+                    "secretary-stream-chunk",
+                    SecretaryStreamChunk {
+                        stream_id: stream_id.to_string(),
+                        content: delta,
+                    },
+                );
             }
         }
     }
     let trailing = buffer.trim().to_string();
     if let Some(delta) = parse_sse_delta(&trailing)? {
         content.push_str(&delta);
-        let _ = app.emit("secretary-stream-chunk", SecretaryStreamChunk {
-            stream_id: stream_id.to_string(),
-            content: delta,
-        });
+        let _ = app.emit(
+            "secretary-stream-chunk",
+            SecretaryStreamChunk {
+                stream_id: stream_id.to_string(),
+                content: delta,
+            },
+        );
     }
     Ok(content)
 }
@@ -737,7 +898,8 @@ fn parse_sse_delta(line: &str) -> Result<Option<String>, String> {
     if data == "[DONE]" {
         return Ok(None);
     }
-    let value: serde_json::Value = serde_json::from_str(data).map_err(|e| format!("Invalid stream chunk: {e}"))?;
+    let value: serde_json::Value =
+        serde_json::from_str(data).map_err(|e| format!("Invalid stream chunk: {e}"))?;
     Ok(value
         .pointer("/choices/0/delta/content")
         .or_else(|| value.pointer("/choices/0/message/content"))
@@ -769,9 +931,19 @@ fn propose_reminder(message: &str, conversation_id: i64) -> Option<SaveSecretary
     })
 }
 
-fn propose_note_edit(message: &str, assistant: &str, notes: &[NoteContext]) -> Option<ProposedNoteEdit> {
+fn propose_note_edit(
+    message: &str,
+    assistant: &str,
+    notes: &[NoteContext],
+) -> Option<ProposedNoteEdit> {
     let lower = message.to_lowercase();
-    if notes.len() != 1 || !(lower.contains("note") && (lower.contains("update") || lower.contains("rewrite") || lower.contains("improve") || lower.contains("summarize"))) {
+    if notes.len() != 1
+        || !(lower.contains("note")
+            && (lower.contains("update")
+                || lower.contains("rewrite")
+                || lower.contains("improve")
+                || lower.contains("summarize")))
+    {
         return None;
     }
     let note = &notes[0];
@@ -786,21 +958,32 @@ fn propose_note_edit(message: &str, assistant: &str, notes: &[NoteContext]) -> O
     })
 }
 
-fn append_conversation_event(db: &Database, id: i64, role: &str, content: &str) -> Result<(), String> {
-    let mut conversation = db.get_secretary_conversation(id).map_err(|e| e.to_string())?;
+fn append_conversation_event(
+    db: &Database,
+    id: i64,
+    role: &str,
+    content: &str,
+) -> Result<(), String> {
+    let mut conversation = db
+        .get_secretary_conversation(id)
+        .map_err(|e| e.to_string())?;
     conversation.messages.push(SecretaryMessage {
         role: role.to_string(),
         content: content.to_string(),
         created_at: now_string(),
     });
-    db.save_secretary_conversation(&conversation).map_err(|e| e.to_string())?;
+    db.save_secretary_conversation(&conversation)
+        .map_err(|e| e.to_string())?;
     Ok(())
 }
 
 fn conversation_to_markdown(conversation: &SecretaryConversation) -> String {
     let mut out = format!("# {}\n\n", conversation.title);
     for message in &conversation.messages {
-        out.push_str(&format!("## {} · {}\n\n{}\n\n", message.role, message.created_at, message.content));
+        out.push_str(&format!(
+            "## {} · {}\n\n{}\n\n",
+            message.role, message.created_at, message.content
+        ));
     }
     out
 }
@@ -808,7 +991,13 @@ fn conversation_to_markdown(conversation: &SecretaryConversation) -> String {
 fn sanitize_filename(input: &str) -> String {
     let cleaned = input
         .chars()
-        .map(|c| if c.is_ascii_alphanumeric() || c == '-' || c == '_' { c } else { '-' })
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || c == '-' || c == '_' {
+                c
+            } else {
+                '-'
+            }
+        })
         .collect::<String>();
     cleaned.trim_matches('-').chars().take(80).collect()
 }

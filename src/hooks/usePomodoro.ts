@@ -46,9 +46,9 @@ function phaseMs(phase: TimerPhase, settings: PomodoroSettings): number {
 
 function phaseLabel(phase: TimerPhase): string {
   switch (phase) {
-    case "work": return "Working";
-    case "short_break": return "Short Break";
-    case "long_break": return "Long Break";
+    case "work": return "working";
+    case "short_break": return "shortBreakPhase";
+    case "long_break": return "longBreakPhase";
   }
 }
 

@@ -1,12 +1,14 @@
 import { useState } from "react";
-import type { Todo, UpdateTodo } from "../types/todo";
+import type { Recurrence, Todo, UpdateTodo } from "../types/todo";
 import { useCountdown } from "../hooks/useCountdown";
+import type { Translator } from "../i18n";
 
 interface Props {
   todo: Todo;
   onToggle: (id: number) => Promise<void>;
   onUpdate: (input: UpdateTodo) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
+  t: Translator;
 }
 
 const PRIORITY_LABELS: Record<number, { emoji: string; text: string }> = {
@@ -14,6 +16,35 @@ const PRIORITY_LABELS: Record<number, { emoji: string; text: string }> = {
   2: { emoji: "🟡", text: "Medium" },
   3: { emoji: "🟢", text: "Low" },
 };
+
+const RECURRENCE_LABEL_KEY: Record<Recurrence, string> = {
+  none: "repeatNone",
+  daily: "repeatDaily",
+  weekly: "repeatWeekly",
+  monthly: "repeatMonthly",
+  yearly: "repeatYearly",
+};
+
+const REMINDER_OPTIONS = [0, 5, 10, 15, 30, 60, 1440] as const;
+
+function reminderOptionLabel(minutes: number, t: Translator): string {
+  switch (minutes) {
+    case 5:
+      return t("reminder5m");
+    case 10:
+      return t("reminder10m");
+    case 15:
+      return t("reminder15m");
+    case 30:
+      return t("reminder30m");
+    case 60:
+      return t("reminder1h");
+    case 1440:
+      return t("reminder1d");
+    default:
+      return t("reminderNone");
+  }
+}
 
 function formatDeadline(deadline: string): string {
   const d = new Date(deadline);
@@ -39,7 +70,7 @@ function CompleteIcon() {
   );
 }
 
-export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
+export function TodoItem({ todo, onToggle, onUpdate, onDelete, t }: Props) {
   const countdown = useCountdown(todo.deadline);
   const pri = PRIORITY_LABELS[todo.priority] ?? PRIORITY_LABELS[2];
   const [editing, setEditing] = useState(false);
@@ -47,6 +78,8 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
   const [editDesc, setEditDesc] = useState(todo.description);
   const [editPriority, setEditPriority] = useState(todo.priority);
   const [editDeadline, setEditDeadline] = useState(todo.deadline ?? "");
+  const [editRecurrence, setEditRecurrence] = useState<Recurrence>(todo.recurrence);
+  const [editReminderMinutes, setEditReminderMinutes] = useState(todo.reminder_minutes_before ?? 0);
 
   const handleSave = async () => {
     await onUpdate({
@@ -55,6 +88,9 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
       description: editDesc.trim(),
       priority: editPriority,
       deadline: editDeadline || undefined,
+      clear_deadline: !editDeadline,
+      recurrence: editDeadline ? editRecurrence : "none",
+      reminder_minutes_before: editDeadline ? editReminderMinutes : 0,
     });
     setEditing(false);
   };
@@ -64,8 +100,13 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
     setEditDesc(todo.description);
     setEditPriority(todo.priority);
     setEditDeadline(todo.deadline ?? "");
+    setEditRecurrence(todo.recurrence);
+    setEditReminderMinutes(todo.reminder_minutes_before ?? 0);
     setEditing(false);
   };
+
+  const isRecurring = todo.recurrence !== "none";
+  const reminderActive = todo.reminder_state !== "none";
 
   if (editing) {
     return (
@@ -76,7 +117,7 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
             value={editTitle}
             onChange={(e) => setEditTitle(e.target.value)}
             className="edit-input"
-            placeholder="Task title"
+            placeholder={t("taskTitlePlaceholder")}
             autoFocus
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSave();
@@ -88,29 +129,57 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
             value={editDesc}
             onChange={(e) => setEditDesc(e.target.value)}
             className="edit-input edit-input-desc"
-            placeholder="Description (optional)"
+            placeholder={t("taskDescriptionPlaceholder")}
           />
           <div className="edit-options">
             <label>
-              Priority:
+              {t("priority")}:
               <select value={editPriority} onChange={(e) => setEditPriority(Number(e.target.value))}>
-                <option value={1}>🔴 High</option>
-                <option value={2}>🟡 Medium</option>
-                <option value={3}>🟢 Low</option>
+                <option value={1}>🔴 {t("high")}</option>
+                <option value={2}>🟡 {t("medium")}</option>
+                <option value={3}>🟢 {t("low")}</option>
               </select>
             </label>
             <label>
-              Deadline:
+              {t("deadline")}:
               <input
                 type="datetime-local"
                 value={editDeadline}
                 onChange={(e) => setEditDeadline(e.target.value)}
               />
             </label>
+            <label>
+              {t("repeat")}:
+              <select
+                value={editRecurrence}
+                onChange={(e) => setEditRecurrence(e.target.value as Recurrence)}
+                disabled={!editDeadline}
+              >
+                <option value="none">{t("repeatNone")}</option>
+                <option value="daily">{t("repeatDaily")}</option>
+                <option value="weekly">{t("repeatWeekly")}</option>
+                <option value="monthly">{t("repeatMonthly")}</option>
+                <option value="yearly">{t("repeatYearly")}</option>
+              </select>
+            </label>
+            <label>
+              {t("reminder")}:
+              <select
+                value={editReminderMinutes}
+                onChange={(e) => setEditReminderMinutes(Number(e.target.value))}
+                disabled={!editDeadline}
+              >
+                {REMINDER_OPTIONS.map((minutes) => (
+                  <option key={minutes} value={minutes}>
+                    {reminderOptionLabel(minutes, t)}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
           <div className="edit-actions">
-            <button onClick={handleSave} className="btn-save">Save</button>
-            <button onClick={handleCancel} className="btn-cancel">Cancel</button>
+            <button onClick={handleSave} className="btn-save">{t("save")}</button>
+            <button onClick={handleCancel} className="btn-cancel">{t("cancel")}</button>
           </div>
         </div>
       </div>
@@ -122,11 +191,31 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
       <div className="todo-left">
         <div className="todo-content">
           <div className="todo-title">
-            <span className="priority-badge" title={`优先级: ${pri.text}`}>
+            <span className="priority-badge" title={`${t("priority")}: ${pri.text}`}>
               {pri.emoji}
             </span>
             <span>{todo.title}</span>
           </div>
+          {(isRecurring || reminderActive) && (
+            <div className="todo-meta-row">
+              {isRecurring && (
+                <span className="todo-badge recurrence-badge">
+                  {t("repeats")} {t(RECURRENCE_LABEL_KEY[todo.recurrence])}
+                </span>
+              )}
+              {reminderActive && (
+                <span className={`todo-badge reminder-badge reminder-${todo.reminder_state}`}>
+                  {todo.reminder_state === "overdue"
+                    ? t("overdue")
+                    : todo.reminder_state === "due"
+                      ? t("reminderDue")
+                      : todo.reminder_state === "reminded"
+                        ? t("reminded")
+                        : t("reminderUpcoming")}
+                </span>
+              )}
+            </div>
+          )}
           {todo.description && (
             <div className="todo-desc">{todo.description}</div>
           )}
@@ -145,13 +234,18 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
         </div>
       </div>
       <div className="todo-actions">
-        <button onClick={() => onToggle(todo.id)} className="btn-complete" title="Complete" aria-label="Complete task">
+        <button
+          onClick={() => onToggle(todo.id)}
+          className="btn-complete"
+          title={isRecurring ? t("completeOccurrence") : t("completeTask")}
+          aria-label={isRecurring ? t("completeOccurrence") : t("completeTask")}
+        >
           <CompleteIcon />
         </button>
-        <button onClick={() => setEditing(true)} className="btn-edit" title="Edit">
+        <button onClick={() => setEditing(true)} className="btn-edit" title={t("editTask")}>
           ✎
         </button>
-        <button onClick={() => onDelete(todo.id)} className="btn-delete" title="Delete">
+        <button onClick={() => onDelete(todo.id)} className="btn-delete" title={t("deleteTask")}>
           ✕
         </button>
       </div>

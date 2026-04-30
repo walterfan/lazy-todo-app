@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import type { CreateNote, NoteColor } from "../types/note";
+import type { Translator } from "../i18n";
 
 const COLORS: NoteColor[] = ["yellow", "green", "blue", "pink", "purple", "orange"];
 
@@ -7,9 +8,10 @@ interface NoteEditorProps {
   onAdd: (input: CreateNote) => Promise<void>;
   autoFocus?: boolean;
   template?: string;
+  t: Translator;
 }
 
-export function NoteEditor({ onAdd, autoFocus, template = "" }: NoteEditorProps) {
+export function NoteEditor({ onAdd, autoFocus, template = "", t }: NoteEditorProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [color, setColor] = useState<NoteColor>("yellow");
@@ -42,7 +44,7 @@ export function NoteEditor({ onAdd, autoFocus, template = "" }: NoteEditorProps)
   if (!expanded) {
     return (
       <div className="note-editor-collapsed" onClick={handleExpand}>
-        <span className="note-editor-placeholder">+ New sticky note...</span>
+        <span className="note-editor-placeholder">{t("addNotePlaceholder")}</span>
       </div>
     );
   }
@@ -52,13 +54,13 @@ export function NoteEditor({ onAdd, autoFocus, template = "" }: NoteEditorProps)
       <input
         ref={titleRef}
         className="note-editor-title"
-        placeholder="Title (optional)"
+        placeholder={t("noteTitlePlaceholder")}
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
       <textarea
         className="note-editor-content"
-        placeholder="Write your memo in Markdown..."
+        placeholder={t("noteContentPlaceholder")}
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={6}
@@ -76,14 +78,14 @@ export function NoteEditor({ onAdd, autoFocus, template = "" }: NoteEditorProps)
         </div>
         <div className="note-editor-actions">
           <button className="btn-cancel" onClick={() => { setExpanded(false); setTitle(""); setContent(""); }}>
-            Cancel
+            {t("cancel")}
           </button>
           <button
             className="btn-add"
             onClick={handleSubmit}
             disabled={!content.trim() && !title.trim()}
           >
-            Add Note
+            {t("addNote")}
           </button>
         </div>
       </div>

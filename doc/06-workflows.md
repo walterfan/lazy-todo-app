@@ -11,6 +11,7 @@ stateDiagram-v2
     Active --> Editing: inline edit
     Editing --> Active: update_todo
     Active --> Completed: toggle_todo
+    Active --> Active: toggle_todo recurring occurrence
     Completed --> Active: toggle_todo
     Active --> Deleted: delete_todo
     Completed --> Deleted: delete_todo
@@ -24,6 +25,8 @@ stateDiagram-v2
 3. `commands/todo.rs` validates and forwards to `db.rs`.
 4. `TodoList.tsx` renders active tasks in list or grid mode based on `settings.todo_display`.
 5. `TodoItem.tsx` uses `useCountdown.ts` to show deadline status in real time.
+6. Recurring todos keep `deadline` as the next visible due occurrence; completing one records `todo_occurrences` history and advances the deadline.
+7. `useTodos.ts` checks due reminders while the app is running, marks delivered occurrences, and falls back to in-app reminder state if desktop notifications are unavailable.
 
 ## Workflow 2: Sticky Note Creation and Pop-Out
 

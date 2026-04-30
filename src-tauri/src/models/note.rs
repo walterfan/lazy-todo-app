@@ -6,6 +6,7 @@ pub struct StickyNote {
     pub title: String,
     pub content: String,
     pub color: String,
+    pub pinned: bool,
     pub created_at: String,
     pub updated_at: String,
 }
