@@ -26,6 +26,15 @@ const RECURRENCE_LABEL_KEY: Record<Recurrence, string> = {
 };
 
 const REMINDER_OPTIONS = [0, 5, 10, 15, 30, 60, 1440] as const;
+const WEEKDAY_OPTIONS = [
+  { value: 1, key: "weekdayMon" },
+  { value: 2, key: "weekdayTue" },
+  { value: 3, key: "weekdayWed" },
+  { value: 4, key: "weekdayThu" },
+  { value: 5, key: "weekdayFri" },
+  { value: 6, key: "weekdaySat" },
+  { value: 7, key: "weekdaySun" },
+] as const;
 
 function reminderOptionLabel(minutes: number, t: Translator): string {
   switch (minutes) {
@@ -55,6 +64,58 @@ function formatDeadline(deadline: string): string {
   return `${month}/${day} ${hour}:${min}`;
 }
 
+function dateFromLocalInput(value: string): Date | null {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function toLocalInputValue(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hour = String(date.getHours()).padStart(2, "0");
+  const minute = String(date.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hour}:${minute}`;
+}
+
+function weekdayFromDate(date: Date): number {
+  return date.getDay() === 0 ? 7 : date.getDay();
+}
+
+function lastDayOfMonth(year: number, monthIndex: number): number {
+  return new Date(year, monthIndex + 1, 0).getDate();
+}
+
+function withWeekday(value: string, weekday: number): string {
+  const date = dateFromLocalInput(value);
+  if (!date) return value;
+  const current = weekdayFromDate(date);
+  let days = (weekday - current + 7) % 7;
+  if (days === 0) days = 7;
+  date.setDate(date.getDate() + days);
+  return toLocalInputValue(date);
+}
+
+function withMonthDay(value: string, monthDay: number): string {
+  const date = dateFromLocalInput(value);
+  if (!date) return value;
+  const day = Math.max(1, Math.min(31, monthDay));
+  date.setDate(Math.min(day, lastDayOfMonth(date.getFullYear(), date.getMonth())));
+  return toLocalInputValue(date);
+}
+
+function scheduleLabel(todo: Todo, t: Translator): string {
+  if (todo.recurrence === "weekly" && todo.recurrence_weekday) {
+    const weekday = WEEKDAY_OPTIONS.find((day) => day.value === todo.recurrence_weekday);
+    return weekday ? `${t("on")} ${t(weekday.key)}` : "";
+  }
+  if (todo.recurrence === "monthly" && todo.recurrence_month_day) {
+    return `${t("onDay")} ${todo.recurrence_month_day}`;
+  }
+  return "";
+}
+
 function CompleteIcon() {
   return (
     <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -79,6 +140,12 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete, t }: Props) {
   const [editPriority, setEditPriority] = useState(todo.priority);
   const [editDeadline, setEditDeadline] = useState(todo.deadline ?? "");
   const [editRecurrence, setEditRecurrence] = useState<Recurrence>(todo.recurrence);
+  const [editRecurrenceWeekday, setEditRecurrenceWeekday] = useState(
+    todo.recurrence_weekday ?? (todo.deadline ? weekdayFromDate(new Date(todo.deadline)) : 1),
+  );
+  const [editRecurrenceMonthDay, setEditRecurrenceMonthDay] = useState(
+    todo.recurrence_month_day ?? (todo.deadline ? new Date(todo.deadline).getDate() : 1),
+  );
   const [editReminderMinutes, setEditReminderMinutes] = useState(todo.reminder_minutes_before ?? 0);
 
   const handleSave = async () => {
@@ -90,6 +157,8 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete, t }: Props) {
       deadline: editDeadline || undefined,
       clear_deadline: !editDeadline,
       recurrence: editDeadline ? editRecurrence : "none",
+      recurrence_weekday: editDeadline && editRecurrence === "weekly" ? editRecurrenceWeekday : undefined,
+      recurrence_month_day: editDeadline && editRecurrence === "monthly" ? editRecurrenceMonthDay : undefined,
       reminder_minutes_before: editDeadline ? editReminderMinutes : 0,
     });
     setEditing(false);
@@ -101,12 +170,19 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete, t }: Props) {
     setEditPriority(todo.priority);
     setEditDeadline(todo.deadline ?? "");
     setEditRecurrence(todo.recurrence);
+    setEditRecurrenceWeekday(
+      todo.recurrence_weekday ?? (todo.deadline ? weekdayFromDate(new Date(todo.deadline)) : 1),
+    );
+    setEditRecurrenceMonthDay(
+      todo.recurrence_month_day ?? (todo.deadline ? new Date(todo.deadline).getDate() : 1),
+    );
     setEditReminderMinutes(todo.reminder_minutes_before ?? 0);
     setEditing(false);
   };
 
   const isRecurring = todo.recurrence !== "none";
   const reminderActive = todo.reminder_state !== "none";
+  const recurringSchedule = scheduleLabel(todo, t);
 
   if (editing) {
     return (
@@ -145,14 +221,30 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete, t }: Props) {
               <input
                 type="datetime-local"
                 value={editDeadline}
-                onChange={(e) => setEditDeadline(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setEditDeadline(value);
+                  const date = dateFromLocalInput(value);
+                  if (date) {
+                    setEditRecurrenceWeekday(weekdayFromDate(date));
+                    setEditRecurrenceMonthDay(date.getDate());
+                  }
+                }}
               />
             </label>
             <label>
               {t("repeat")}:
               <select
                 value={editRecurrence}
-                onChange={(e) => setEditRecurrence(e.target.value as Recurrence)}
+                onChange={(e) => {
+                  const value = e.target.value as Recurrence;
+                  setEditRecurrence(value);
+                  const date = dateFromLocalInput(editDeadline);
+                  if (date) {
+                    setEditRecurrenceWeekday(weekdayFromDate(date));
+                    setEditRecurrenceMonthDay(date.getDate());
+                  }
+                }}
                 disabled={!editDeadline}
               >
                 <option value="none">{t("repeatNone")}</option>
@@ -162,6 +254,43 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete, t }: Props) {
                 <option value="yearly">{t("repeatYearly")}</option>
               </select>
             </label>
+            {editRecurrence === "weekly" && (
+              <label>
+                {t("repeatWeekday")}:
+                <select
+                  value={editRecurrenceWeekday}
+                  onChange={(e) => {
+                    const weekday = Number(e.target.value);
+                    setEditRecurrenceWeekday(weekday);
+                    setEditDeadline(withWeekday(editDeadline, weekday));
+                  }}
+                  disabled={!editDeadline}
+                >
+                  {WEEKDAY_OPTIONS.map((day) => (
+                    <option key={day.value} value={day.value}>
+                      {t(day.key)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {editRecurrence === "monthly" && (
+              <label>
+                {t("repeatMonthDay")}:
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  value={editRecurrenceMonthDay}
+                  onChange={(e) => {
+                    const day = Math.max(1, Math.min(31, Number(e.target.value) || 1));
+                    setEditRecurrenceMonthDay(day);
+                    setEditDeadline(withMonthDay(editDeadline, day));
+                  }}
+                  disabled={!editDeadline}
+                />
+              </label>
+            )}
             <label>
               {t("reminder")}:
               <select
@@ -201,6 +330,7 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete, t }: Props) {
               {isRecurring && (
                 <span className="todo-badge recurrence-badge">
                   {t("repeats")} {t(RECURRENCE_LABEL_KEY[todo.recurrence])}
+                  {recurringSchedule ? ` ${recurringSchedule}` : ""}
                 </span>
               )}
               {reminderActive && (

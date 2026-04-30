@@ -2,7 +2,7 @@
 
 [English Version](README.md) | [Chinese Version](README_zh.md)
 
-一个基于 **Tauri v2 + Rust + React + TypeScript** 的跨平台桌面效率应用，整合了 Todo 管理、桌面即时贴、番茄钟和应用设置。
+一个基于 **Tauri v2 + Rust + React + TypeScript** 的跨平台桌面效率应用，整合了 Todo 管理、桌面即时贴、番茄钟、开发者工具箱、本地 AI Agents 和应用设置。
 
 这个项目也是一个 [Harness Engineering](https://www.fanyamin.com/tech/harness-engineering.html) 的实战案例：通过明确的架构规则和约束，让 AI Agent 在可控边界内参与构建，而不是在没有边界的情况下自由生成代码。
 
@@ -12,7 +12,7 @@
 
 - **Todo CRUD**：添加、编辑、完成、删除任务。
 - **优先级与截止时间**：支持高/中/低优先级和实时倒计时。
-- **重复任务**：支持每天、每周、每月、每年重复，完成后自动推进到下一次到期时间。
+- **重复任务**：支持每天、每周、每月、每年重复，完成后自动推进到下一次到期时间，并支持显式选择每周星期几、每月第几天。
 - **本地提醒**：可设置提前提醒，在应用运行时显示状态并触发系统通知。
 - **搜索与显示模式**：支持任务搜索，以及列表/网格两种展示方式。
 
@@ -30,10 +30,27 @@
 - **里程碑与统计**：支持里程碑跟踪、今日完成数与 7 日统计。
 - **提醒能力**：支持窗口提醒、音效提示和系统通知。
 
+### 工具箱
+
+- **编码转换**：支持 Base64、Hex ↔ ASCII、URL、HTML 转义、进制、时间戳（秒/毫秒、批量输入）和 JWT HS256 编解码。
+- **校验摘要**：基于 Web Crypto 支持 MD5、SHA-1、SHA-256、SHA-384、SHA-512。
+- **随机生成**：支持 UUID v4、自定义字符集随机字符串和强密码生成。
+- **加密工具**：支持 AES-GCM / AES-CBC（128/192/256-bit key）以及 ROT13、Caesar、Atbash。
+- **完全本地**：输入和输出不离开应用，不持久化，也不走网络。
+
+### AI Agents
+
+- **Agent 对话**：可在桌面应用中与内置本地 Agent 对话，例如 Personal Secretary 和 Confucius。
+- **插件化人格**：Agent 来自静态插件目录，包含 manifest、prompt、config、avatar、README 和可选 RAG 知识文件。
+- **本地身份与记忆**：用户身份、长期记忆、记忆提案和历史会话召回都保存在本地 SQLite。
+- **RAG 知识**：每个 Agent 的 `rag_knowledge.md` 独立切块和检索，只会注入当前 Agent 的知识。
+- **安全工具动作**：Agent 可以提议 Todo、便签、里程碑、文件、记忆和外部 CLI 动作；写入或敏感操作必须经过应用确认流。
+- **插件管理**：可在 Settings 中刷新、启用、禁用、安装、查看、卸载插件，并重建 RAG 索引。
+
 ### 设置与桌面体验
 
 - **应用设置**：支持页面尺寸、Todo/Note 显示模式、便签模板和便签目录标签。
-- **SQLite 持久化**：todos、notes、pomodoro 和 app settings 都存储在本地 SQLite 中。
+- **SQLite 持久化**：todos、notes、pomodoro、Agents 数据和 app settings 都存储在本地 SQLite 中。
 - **数据库路径可配置**：支持环境变量和本地配置文件覆盖默认数据库目录。
 - **系统托盘行为**：关闭主窗口时隐藏到托盘，支持显示/隐藏和退出。
 
@@ -44,68 +61,11 @@
 | 桌面壳 | Tauri v2 | 原生窗口、系统托盘、插件接入 |
 | 前端 | React 18 + TypeScript | 主 UI、搜索、设置、倒计时、弹出便签窗口 |
 | 后端 | Rust | Tauri 命令、窗口管理、状态与数据库访问 |
-| 存储 | SQLite via `rusqlite` | 本地持久化 todos、sticky notes、pomodoro、settings |
+| 存储 | SQLite via `rusqlite` | 本地持久化 todos、sticky notes、Pomodoro、Agents、settings |
 | 通知 | `tauri-plugin-notification` | 原生系统提醒 |
 | 外链处理 | `@tauri-apps/plugin-shell` | 在系统浏览器中打开 HTTP 链接 |
 | Markdown | `react-markdown` + `remark-gfm` | 便签内容渲染 |
 | 构建 | Vite + Cargo | 前端打包与桌面应用构建 |
-
-## 项目结构
-
-```text
-lazy-todo-app/
-├── README.md
-├── README_zh.md
-├── CLAUDE.md                         # AI agent architecture rules
-├── package.json
-├── scripts/
-│   ├── check_pkb_staleness.py        # PKB 新鲜度告警检查器
-│   └── release_version.sh            # 更新版本、提交并推送发布标签
-├── src/                              # React frontend
-│   ├── App.tsx                       # Main shell: tabs, search, settings
-│   ├── main.tsx                      # Bootstrap: App vs NoteWindow
-│   ├── App.css
-│   ├── hooks/
-│   │   ├── useTodos.ts
-│   │   ├── useNotes.ts
-│   │   ├── usePomodoro.ts
-│   │   ├── usePomodoroStats.ts
-│   │   ├── useCountdown.ts
-│   │   └── useSettings.ts
-│   ├── components/
-│   │   ├── TodoList.tsx
-│   │   ├── NoteList.tsx
-│   │   ├── NoteWindow.tsx
-│   │   ├── PomodoroPanel.tsx
-│   │   ├── PomodoroMilestones.tsx
-│   │   └── SettingsPanel.tsx
-│   └── types/
-│       ├── todo.ts
-│       ├── note.ts
-│       ├── pomodoro.ts
-│       └── settings.ts
-├── src-tauri/                        # Rust backend
-│   ├── Cargo.toml
-│   ├── tauri.conf.json
-│   └── src/
-│       ├── lib.rs                    # Builder, tray, command registration
-│       ├── db.rs                     # SQLite schema and persistence
-│       ├── commands/
-│       │   ├── todo.rs
-│       │   ├── note.rs
-│       │   ├── pomodoro.rs
-│       │   └── app.rs
-│       └── models/
-│           ├── todo.rs
-│           ├── note.rs
-│           ├── pomodoro.rs
-│           └── settings.rs
-├── doc/                              # Bilingual PKB / Sphinx docs
-└── .github/workflows/
-    ├── release.yml                   # Build native binaries on tag push
-    ├── docs.yml                      # Publish bilingual docs to GitHub Pages
-    └── pkb-check.yml                 # PKB 新鲜度告警摘要
-```
 
 ## 快速开始
 
@@ -235,9 +195,9 @@ git push origin v0.1.1
 
 这个项目展示了如何通过规则、约束和自动化流程来“驯化” AI 编程，而不是让模型在没有边界的情况下自由生成代码。
 
-### `CLAUDE.md` 作为架构约束
+### `AGENTS.md` 作为架构约束
 
-`CLAUDE.md` 定义了命令放置位置、前后端调用边界、数据库访问规则和 Tauri 命令返回约定。
+`AGENTS.md` 定义了命令放置位置、前后端调用边界、数据库访问规则和 Tauri 命令返回约定。
 
 ### Pre-commit 检查
 
@@ -265,6 +225,8 @@ pre-commit install
 | Todo | `toggle_todo` | 切换完成状态 |
 | Todo | `update_todo` | 更新任务 |
 | Todo | `delete_todo` | 删除任务 |
+| Todo | `list_due_todo_reminders` | 查询到期和逾期任务提醒 |
+| Todo | `mark_todo_reminded` | 标记任务提醒已送达 |
 | Notes | `list_notes` | 查询便签 |
 | Notes | `add_note` | 新建便签 |
 | Notes | `update_note` | 更新便签 |
@@ -275,6 +237,17 @@ pre-commit install
 | Pomodoro | `get_today_pomodoro_count` | 获取今日统计 |
 | Pomodoro | `get_weekly_pomodoro_stats` | 获取 7 日统计 |
 | Pomodoro | `update_tray_tooltip` | 更新托盘提示 |
+| Agents | `list_agents` | 查询内置和已安装 Agent |
+| Agents | `refresh_agents` | 重新扫描 Agent 插件 |
+| Agents | `start_agent_session` | 创建单 Agent 对话 |
+| Agents | `start_agent_group_session` | 创建多 Agent 群聊 |
+| Agents | `send_agent_message_stream` | 流式发送单 Agent 回复 |
+| Agents | `send_agent_group_message_stream` | 流式发送多 Agent 回复 |
+| Agents | `get_agent_plugin_detail` | 查看 Agent 插件元数据、README、诊断和 RAG 状态 |
+| Agents | `rebuild_agent_rag_index` | 重建单个 Agent 的 RAG 知识索引 |
+| Agents | `list_agent_memories` | 查询本地 Agent 记忆 |
+| Agents | `confirm_agent_tool_action` | 确认或拒绝 Agent 提议的写入/工具动作 |
+| Agents | `list_agent_external_cli_tools` | 管理已注册外部 CLI 工具 |
 | App | `get_db_path` | 获取数据库路径 |
 | App | `get_app_settings` | 获取应用设置 |
 | App | `save_app_settings` | 保存应用设置 |

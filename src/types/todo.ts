@@ -7,6 +7,8 @@ export interface Todo {
   deadline: string | null; // ISO 8601
   recurrence: Recurrence;
   recurrence_anchor: string | null;
+  recurrence_weekday: number | null; // 1=Monday, 7=Sunday
+  recurrence_month_day: number | null; // 1-31
   reminder_minutes_before: number | null;
   reminder_due_at: string | null;
   reminder_state: ReminderState;
@@ -24,6 +26,8 @@ export interface CreateTodo {
   priority?: number;
   deadline?: string;
   recurrence?: Recurrence;
+  recurrence_weekday?: number;
+  recurrence_month_day?: number;
   reminder_minutes_before?: number;
 }
 
@@ -35,5 +39,7 @@ export interface UpdateTodo {
   deadline?: string;
   clear_deadline?: boolean;
   recurrence?: Recurrence;
+  recurrence_weekday?: number;
+  recurrence_month_day?: number;
   reminder_minutes_before?: number;
 }

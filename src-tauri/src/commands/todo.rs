@@ -18,6 +18,8 @@ pub fn add_todo(db: State<'_, Database>, input: CreateTodo) -> Result<Todo, Stri
         priority,
         deadline,
         input.recurrence.as_deref(),
+        input.recurrence_weekday,
+        input.recurrence_month_day,
         input.reminder_minutes_before,
     )
     .map_err(|e| e.to_string())
@@ -38,6 +40,8 @@ pub fn update_todo(db: State<'_, Database>, input: UpdateTodo) -> Result<Todo, S
         input.deadline.as_deref(),
         input.clear_deadline.unwrap_or(false),
         input.recurrence.as_deref(),
+        input.recurrence_weekday,
+        input.recurrence_month_day,
         input.reminder_minutes_before,
     )
     .map_err(|e| e.to_string())

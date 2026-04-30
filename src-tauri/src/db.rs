@@ -95,6 +95,14 @@ fn normalize_reminder_minutes(value: Option<i64>) -> Option<i64> {
     value.filter(|minutes| *minutes > 0)
 }
 
+fn normalize_recurrence_weekday(value: Option<i64>) -> Option<i64> {
+    value.filter(|weekday| (1..=7).contains(weekday))
+}
+
+fn normalize_recurrence_month_day(value: Option<i64>) -> Option<i64> {
+    value.filter(|day| (1..=31).contains(day))
+}
+
 fn parse_todo_datetime(value: &str) -> Option<NaiveDateTime> {
     let trimmed = value.trim();
     for format in [
@@ -139,10 +147,39 @@ fn add_months_clamped(value: NaiveDateTime, months: i32, anchor_day: u32) -> Nai
         .expect("valid original time")
 }
 
+fn next_weekday_after(value: NaiveDateTime, target_weekday: i64) -> NaiveDateTime {
+    let current_weekday = i64::from(value.weekday().number_from_monday());
+    let mut days = (target_weekday - current_weekday).rem_euclid(7);
+    if days == 0 {
+        days = 7;
+    }
+    value + Duration::days(days)
+}
+
+fn next_month_day_after(value: NaiveDateTime, target_day: i64) -> NaiveDateTime {
+    let anchor_day = target_day as u32;
+    let candidate = NaiveDate::from_ymd_opt(
+        value.year(),
+        value.month(),
+        anchor_day.min(last_day_of_month(value.year(), value.month())),
+    )
+    .expect("valid clamped date")
+    .and_hms_opt(value.hour(), value.minute(), value.second())
+    .expect("valid original time");
+
+    if candidate > value {
+        candidate
+    } else {
+        add_months_clamped(value, 1, anchor_day)
+    }
+}
+
 fn next_recurrence_deadline(
     current_deadline: &str,
     recurrence: &str,
     recurrence_anchor: Option<&str>,
+    recurrence_weekday: Option<i64>,
+    recurrence_month_day: Option<i64>,
 ) -> Option<String> {
     let current = parse_todo_datetime(current_deadline)?;
     let anchor_day = recurrence_anchor
@@ -151,8 +188,14 @@ fn next_recurrence_deadline(
         .unwrap_or_else(|| current.day());
     let next = match recurrence {
         "daily" => current + Duration::days(1),
-        "weekly" => current + Duration::weeks(1),
-        "monthly" => add_months_clamped(current, 1, anchor_day),
+        "weekly" => recurrence_weekday
+            .and_then(|weekday| normalize_recurrence_weekday(Some(weekday)))
+            .map(|weekday| next_weekday_after(current, weekday))
+            .unwrap_or_else(|| current + Duration::weeks(1)),
+        "monthly" => recurrence_month_day
+            .and_then(|day| normalize_recurrence_month_day(Some(day)))
+            .map(|day| next_month_day_after(current, day))
+            .unwrap_or_else(|| add_months_clamped(current, 1, anchor_day)),
         "yearly" => add_months_clamped(current, 12, anchor_day),
         _ => return None,
     };
@@ -200,9 +243,11 @@ fn todo_from_row(row: &Row<'_>, now: NaiveDateTime) -> Result<Todo> {
     let deadline: Option<String> = row.get(5)?;
     let recurrence: String = row.get(7)?;
     let recurrence_anchor: Option<String> = row.get(8)?;
-    let reminder_minutes_before: Option<i64> = row.get(9)?;
-    let last_reminded_at: Option<String> = row.get(10)?;
-    let last_reminded_deadline: Option<String> = row.get(11)?;
+    let recurrence_weekday: Option<i64> = row.get(9)?;
+    let recurrence_month_day: Option<i64> = row.get(10)?;
+    let reminder_minutes_before: Option<i64> = row.get(11)?;
+    let last_reminded_at: Option<String> = row.get(12)?;
+    let last_reminded_deadline: Option<String> = row.get(13)?;
     let (reminder_state, reminder_due_at) = reminder_state_for(
         completed,
         deadline.as_deref(),
@@ -221,6 +266,8 @@ fn todo_from_row(row: &Row<'_>, now: NaiveDateTime) -> Result<Todo> {
         created_at: row.get(6)?,
         recurrence,
         recurrence_anchor,
+        recurrence_weekday,
+        recurrence_month_day,
         reminder_minutes_before,
         reminder_due_at,
         reminder_state,
@@ -233,7 +280,8 @@ fn fetch_todo_by_id(conn: &Connection, id: i64) -> Result<Todo> {
     let now = Local::now().naive_local();
     let mut stmt = conn.prepare(
         "SELECT id, title, description, priority, completed, deadline, created_at,
-                recurrence, recurrence_anchor, reminder_minutes_before,
+                recurrence, recurrence_anchor, recurrence_weekday, recurrence_month_day,
+                reminder_minutes_before,
                 last_reminded_at, last_reminded_deadline
          FROM todos WHERE id = ?1",
     )?;
@@ -255,6 +303,21 @@ impl Database {
         }
         if !column_names.iter().any(|name| name == "recurrence_anchor") {
             conn.execute("ALTER TABLE todos ADD COLUMN recurrence_anchor TEXT", [])?;
+        }
+        if !column_names.iter().any(|name| name == "recurrence_weekday") {
+            conn.execute(
+                "ALTER TABLE todos ADD COLUMN recurrence_weekday INTEGER",
+                [],
+            )?;
+        }
+        if !column_names
+            .iter()
+            .any(|name| name == "recurrence_month_day")
+        {
+            conn.execute(
+                "ALTER TABLE todos ADD COLUMN recurrence_month_day INTEGER",
+                [],
+            )?;
         }
         if !column_names
             .iter()
@@ -2107,7 +2170,8 @@ impl Database {
         let now = Local::now().naive_local();
         let mut stmt = conn.prepare(
             "SELECT id, title, description, priority, completed, deadline, created_at,
-                    recurrence, recurrence_anchor, reminder_minutes_before,
+                    recurrence, recurrence_anchor, recurrence_weekday, recurrence_month_day,
+                    reminder_minutes_before,
                     last_reminded_at, last_reminded_deadline
              FROM todos ORDER BY completed ASC, priority ASC, deadline ASC NULLS LAST",
         )?;
@@ -2126,6 +2190,8 @@ impl Database {
         priority: i32,
         deadline: Option<&str>,
         recurrence: Option<&str>,
+        recurrence_weekday: Option<i64>,
+        recurrence_month_day: Option<i64>,
         reminder_minutes_before: Option<i64>,
     ) -> Result<Todo> {
         let conn = self.conn.lock().expect("db lock poisoned");
@@ -2134,6 +2200,16 @@ impl Database {
             recurrence = "none".to_string();
         }
         let recurrence_anchor = if recurrence == "none" { None } else { deadline };
+        let recurrence_weekday = if recurrence == "weekly" {
+            normalize_recurrence_weekday(recurrence_weekday)
+        } else {
+            None
+        };
+        let recurrence_month_day = if recurrence == "monthly" {
+            normalize_recurrence_month_day(recurrence_month_day)
+        } else {
+            None
+        };
         let reminder_minutes_before = if deadline.is_some() {
             normalize_reminder_minutes(reminder_minutes_before)
         } else {
@@ -2142,8 +2218,8 @@ impl Database {
         conn.execute(
             "INSERT INTO todos (
                 title, description, priority, deadline, recurrence, recurrence_anchor,
-                reminder_minutes_before
-             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                recurrence_weekday, recurrence_month_day, reminder_minutes_before
+             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
             params![
                 title,
                 description,
@@ -2151,6 +2227,8 @@ impl Database {
                 deadline,
                 recurrence,
                 recurrence_anchor,
+                recurrence_weekday,
+                recurrence_month_day,
                 reminder_minutes_before
             ],
         )?;
@@ -2168,6 +2246,8 @@ impl Database {
                     deadline,
                     &current.recurrence,
                     current.recurrence_anchor.as_deref(),
+                    current.recurrence_weekday,
+                    current.recurrence_month_day,
                 ) {
                     let tx = conn.transaction()?;
                     tx.execute(
@@ -2209,6 +2289,8 @@ impl Database {
         deadline: Option<&str>,
         clear_deadline: bool,
         recurrence: Option<&str>,
+        recurrence_weekday: Option<i64>,
+        recurrence_month_day: Option<i64>,
         reminder_minutes_before: Option<i64>,
     ) -> Result<Todo> {
         let conn = self.conn.lock().expect("db lock poisoned");
@@ -2244,6 +2326,8 @@ impl Database {
                  SET deadline = NULL,
                      recurrence = 'none',
                      recurrence_anchor = NULL,
+                     recurrence_weekday = NULL,
+                     recurrence_month_day = NULL,
                      reminder_minutes_before = NULL,
                      last_reminded_at = NULL,
                      last_reminded_deadline = NULL
@@ -2267,15 +2351,33 @@ impl Database {
             } else {
                 current_deadline.as_deref()
             };
+            let recurrence_weekday = if recurrence == "weekly" {
+                normalize_recurrence_weekday(recurrence_weekday)
+            } else {
+                None
+            };
+            let recurrence_month_day = if recurrence == "monthly" {
+                normalize_recurrence_month_day(recurrence_month_day)
+            } else {
+                None
+            };
             conn.execute(
                 "UPDATE todos
                  SET recurrence = ?1,
                      recurrence_anchor = ?2,
+                     recurrence_weekday = ?3,
+                     recurrence_month_day = ?4,
                      completed = CASE WHEN ?1 = 'none' THEN completed ELSE 0 END,
                      last_reminded_at = NULL,
                      last_reminded_deadline = NULL
-                 WHERE id = ?3",
-                params![recurrence, recurrence_anchor, id],
+                 WHERE id = ?5",
+                params![
+                    recurrence,
+                    recurrence_anchor,
+                    recurrence_weekday,
+                    recurrence_month_day,
+                    id
+                ],
             )?;
         }
         if reminder_minutes_before.is_some() {
@@ -3279,6 +3381,8 @@ mod tests {
         assert_eq!(todos.len(), 1);
         assert_eq!(todos[0].title, "Legacy task");
         assert_eq!(todos[0].recurrence, "none");
+        assert_eq!(todos[0].recurrence_weekday, None);
+        assert_eq!(todos[0].recurrence_month_day, None);
         assert_eq!(todos[0].reminder_minutes_before, None);
         assert_eq!(todos[0].reminder_state, "none");
 
@@ -3296,12 +3400,44 @@ mod tests {
     #[test]
     fn recurrence_calculation_clamps_month_end_and_leap_day() {
         assert_eq!(
-            next_recurrence_deadline("2026-01-31T09:30", "monthly", Some("2026-01-31T09:30")),
+            next_recurrence_deadline(
+                "2026-01-31T09:30",
+                "monthly",
+                Some("2026-01-31T09:30"),
+                None,
+                None
+            ),
             Some("2026-02-28T09:30".to_string())
         );
         assert_eq!(
-            next_recurrence_deadline("2024-02-29T08:00", "yearly", Some("2024-02-29T08:00")),
+            next_recurrence_deadline(
+                "2024-02-29T08:00",
+                "yearly",
+                Some("2024-02-29T08:00"),
+                None,
+                None
+            ),
             Some("2025-02-28T08:00".to_string())
+        );
+    }
+
+    #[test]
+    fn recurrence_calculation_uses_explicit_weekday_and_month_day() {
+        assert_eq!(
+            next_recurrence_deadline("2026-05-01T09:30", "weekly", None, Some(1), None),
+            Some("2026-05-04T09:30".to_string())
+        );
+        assert_eq!(
+            next_recurrence_deadline("2026-01-15T09:30", "monthly", None, None, Some(31)),
+            Some("2026-01-31T09:30".to_string())
+        );
+        assert_eq!(
+            next_recurrence_deadline("2026-01-31T09:30", "monthly", None, None, Some(31)),
+            Some("2026-02-28T09:30".to_string())
+        );
+        assert_eq!(
+            next_recurrence_deadline("2026-02-28T09:30", "monthly", None, None, Some(31)),
+            Some("2026-03-31T09:30".to_string())
         );
     }
 
@@ -3316,6 +3452,8 @@ mod tests {
                 2,
                 Some("2026-05-01T09:00"),
                 Some("daily"),
+                None,
+                None,
                 Some(15),
             )
             .expect("add todo");
@@ -3344,7 +3482,16 @@ mod tests {
         let dir = temp_db_dir("todo_recurrence_edits");
         let db = Database::new(&dir).expect("create db");
         let one_off = db
-            .add_todo("One off", "", 2, Some("2026-05-01T09:00"), None, None)
+            .add_todo(
+                "One off",
+                "",
+                2,
+                Some("2026-05-01T09:00"),
+                None,
+                None,
+                None,
+                None,
+            )
             .expect("add one-off");
         let completed = db.toggle_todo(one_off.id).expect("complete one-off");
         assert!(completed.completed);
@@ -3358,6 +3505,8 @@ mod tests {
                 Some("2026-05-01T09:00"),
                 Some("weekly"),
                 None,
+                None,
+                None,
             )
             .expect("add recurring");
         let monthly = db
@@ -3369,6 +3518,8 @@ mod tests {
                 None,
                 false,
                 Some("monthly"),
+                None,
+                None,
                 None,
             )
             .expect("change recurrence");
@@ -3387,6 +3538,8 @@ mod tests {
                 None,
                 false,
                 Some("none"),
+                None,
+                None,
                 None,
             )
             .expect("remove recurrence");
@@ -3410,6 +3563,8 @@ mod tests {
                 2,
                 Some(&future_deadline),
                 None,
+                None,
+                None,
                 Some(30),
             )
             .expect("add due reminder");
@@ -3419,6 +3574,8 @@ mod tests {
                 "",
                 2,
                 Some(&overdue_deadline),
+                None,
+                None,
                 None,
                 Some(10),
             )

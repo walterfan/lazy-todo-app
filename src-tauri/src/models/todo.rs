@@ -10,6 +10,8 @@ pub struct Todo {
     pub deadline: Option<String>, // ISO 8601 format
     pub recurrence: String,       // none, daily, weekly, monthly, yearly
     pub recurrence_anchor: Option<String>,
+    pub recurrence_weekday: Option<i64>,   // 1=Monday, 7=Sunday
+    pub recurrence_month_day: Option<i64>, // 1-31
     pub reminder_minutes_before: Option<i64>,
     pub reminder_due_at: Option<String>,
     pub reminder_state: String, // none, upcoming, due, reminded, missed, overdue
@@ -25,6 +27,8 @@ pub struct CreateTodo {
     pub priority: Option<i32>,
     pub deadline: Option<String>,
     pub recurrence: Option<String>,
+    pub recurrence_weekday: Option<i64>,
+    pub recurrence_month_day: Option<i64>,
     pub reminder_minutes_before: Option<i64>,
 }
 
@@ -37,5 +41,7 @@ pub struct UpdateTodo {
     pub deadline: Option<String>,
     pub clear_deadline: Option<bool>,
     pub recurrence: Option<String>,
+    pub recurrence_weekday: Option<i64>,
+    pub recurrence_month_day: Option<i64>,
     pub reminder_minutes_before: Option<i64>,
 }

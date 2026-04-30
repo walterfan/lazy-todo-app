@@ -1746,6 +1746,8 @@ fn execute_confirmed_action(db: &Database, action: &AgentToolAction) -> Result<V
                     deadline.as_deref(),
                     None,
                     None,
+                    None,
+                    None,
                 )
                 .map_err(|e| e.to_string())?;
             Ok(json!({ "todo": todo }))
@@ -1765,6 +1767,8 @@ fn execute_confirmed_action(db: &Database, action: &AgentToolAction) -> Result<V
                     priority,
                     deadline.as_deref(),
                     false,
+                    None,
+                    None,
                     None,
                     None,
                 )
@@ -5448,7 +5452,7 @@ mod tests {
     fn llm_tool_call_routes_through_builtin_executor() {
         let db_root = unique_test_dir("llm_tool_route_db");
         let db = Database::new(&db_root).expect("create db");
-        db.add_todo("Answer through a tool", "", 2, None, None, None)
+        db.add_todo("Answer through a tool", "", 2, None, None, None, None, None)
             .expect("add todo");
         let call = LlmToolCall {
             id: "call_todos".to_string(),
@@ -6430,8 +6434,17 @@ mod tests {
             source_message_id: None,
         })
         .expect("save memory");
-        db.add_todo("Review Agents prompt context", "", 1, None, None, None)
-            .expect("add todo");
+        db.add_todo(
+            "Review Agents prompt context",
+            "",
+            1,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+        .expect("add todo");
         db.insert_note(
             "Agent note",
             "This note should be visible to the Agent.",
@@ -6479,8 +6492,17 @@ mod tests {
     fn built_in_read_tools_return_app_data_and_audit() {
         let db_root = unique_test_dir("tool_read_db");
         let db = Database::new(&db_root).expect("create db");
-        db.add_todo("Ship tool registry", "with tests", 1, None, None, None)
-            .expect("add todo");
+        db.add_todo(
+            "Ship tool registry",
+            "with tests",
+            1,
+            None,
+            None,
+            None,
+            None,
+            None,
+        )
+        .expect("add todo");
         let note = db
             .insert_note("Tool note", "Readable by an Agent.", "blue")
             .expect("add note");

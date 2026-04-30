@@ -2,7 +2,7 @@
 
 [English Version](README.md) | [Chinese Version](README_zh.md)
 
-A cross-platform desktop productivity app built with **Tauri v2 + Rust + React + TypeScript**, combining todo management, sticky notes, pomodoro focus tools, and app settings in one native shell.
+A cross-platform desktop productivity app built with **Tauri v2 + Rust + React + TypeScript**, combining todo management, sticky notes, Pomodoro focus tools, developer utilities, local AI Agents, and app settings in one native shell.
 
 This project also serves as a practical [Harness Engineering](https://www.fanyamin.com/tech/harness-engineering.html) case study: AI agents contribute inside explicit architectural guardrails instead of writing code with no boundaries.
 
@@ -12,7 +12,7 @@ This project also serves as a practical [Harness Engineering](https://www.fanyam
 
 - **Todo CRUD**: add, edit, complete, and delete tasks.
 - **Priority and deadlines**: supports high/medium/low priority plus live countdowns.
-- **Recurring tasks**: daily, weekly, monthly, and yearly tasks advance to the next due occurrence when completed.
+- **Recurring tasks**: daily, weekly, monthly, and yearly tasks advance to the next due occurrence when completed, with explicit weekday and day-of-month controls.
 - **Local reminders**: reminder lead times surface in the list and can trigger desktop notifications while the app is running.
 - **Search and display modes**: task search plus list/grid rendering modes.
 
@@ -38,10 +38,19 @@ This project also serves as a practical [Harness Engineering](https://www.fanyam
 - **Encryption**: AES-GCM / AES-CBC (128/192/256-bit keys) plus ROT13, Caesar, Atbash.
 - **Fully client-side**: inputs and outputs never leave the app — no persistence, no network.
 
+### AI Agents
+
+- **Agent chat**: talk with bundled local Agents such as Personal Secretary and Confucius from the desktop app.
+- **Plugin-based personas**: Agents are loaded from static plugin folders with manifest, prompt, config, avatar, README, and optional RAG knowledge files.
+- **Local memory and identity**: manage user identity, durable memories, memory proposals, and previous conversation recall in local SQLite.
+- **RAG knowledge**: per-Agent `rag_knowledge.md` files are chunked and retrieved only for the active Agent.
+- **Safe tool actions**: Agents can propose todo, note, milestone, file, memory, and external CLI actions, with app-owned confirmation flows for writes or sensitive operations.
+- **Plugin management**: refresh, enable, disable, install, inspect, uninstall, and rebuild RAG indexes from Settings.
+
 ### Settings and Desktop Experience
 
 - **App settings**: supports page size, todo/note display modes, note templates, and note folder labels.
-- **SQLite persistence**: todos, notes, pomodoro data, and app settings are all stored locally in SQLite.
+- **SQLite persistence**: todos, notes, pomodoro data, Agents data, and app settings are all stored locally in SQLite.
 - **Configurable DB path**: supports environment-variable and local-config overrides for the database directory.
 - **Tray behavior**: closing the main window hides it to the tray, with show/hide and quit actions.
 
@@ -52,68 +61,11 @@ This project also serves as a practical [Harness Engineering](https://www.fanyam
 | Desktop shell | Tauri v2 | Native windows, tray integration, plugin wiring |
 | Frontend | React 18 + TypeScript | Main UI, search, settings, countdowns, pop-out note windows |
 | Backend | Rust | Tauri commands, window management, state, and DB access |
-| Storage | SQLite via `rusqlite` | Local persistence for todos, sticky notes, pomodoro, and settings |
+| Storage | SQLite via `rusqlite` | Local persistence for todos, sticky notes, Pomodoro, Agents, and settings |
 | Notifications | `tauri-plugin-notification` | Native system alerts |
 | External links | `@tauri-apps/plugin-shell` | Opens HTTP links outside the webview |
 | Markdown | `react-markdown` + `remark-gfm` | Note content rendering |
 | Build | Vite + Cargo | Frontend bundling and desktop packaging |
-
-## Project Structure
-
-```text
-lazy-todo-app/
-├── README.md
-├── README_zh.md
-├── CLAUDE.md                         # AI agent architecture rules
-├── package.json
-├── scripts/
-│   ├── check_pkb_staleness.py        # Advisory PKB freshness checker
-│   └── release_version.sh            # Bump versions, commit, and push release tag
-├── src/                              # React frontend
-│   ├── App.tsx                       # Main shell: tabs, search, settings
-│   ├── main.tsx                      # Bootstrap: App vs NoteWindow
-│   ├── App.css
-│   ├── hooks/
-│   │   ├── useTodos.ts
-│   │   ├── useNotes.ts
-│   │   ├── usePomodoro.ts
-│   │   ├── usePomodoroStats.ts
-│   │   ├── useCountdown.ts
-│   │   └── useSettings.ts
-│   ├── components/
-│   │   ├── TodoList.tsx
-│   │   ├── NoteList.tsx
-│   │   ├── NoteWindow.tsx
-│   │   ├── PomodoroPanel.tsx
-│   │   ├── PomodoroMilestones.tsx
-│   │   └── SettingsPanel.tsx
-│   └── types/
-│       ├── todo.ts
-│       ├── note.ts
-│       ├── pomodoro.ts
-│       └── settings.ts
-├── src-tauri/                        # Rust backend
-│   ├── Cargo.toml
-│   ├── tauri.conf.json
-│   └── src/
-│       ├── lib.rs                    # Builder, tray, command registration
-│       ├── db.rs                     # SQLite schema and persistence
-│       ├── commands/
-│       │   ├── todo.rs
-│       │   ├── note.rs
-│       │   ├── pomodoro.rs
-│       │   └── app.rs
-│       └── models/
-│           ├── todo.rs
-│           ├── note.rs
-│           ├── pomodoro.rs
-│           └── settings.rs
-├── doc/                              # Bilingual PKB / Sphinx docs
-└── .github/workflows/
-    ├── release.yml                   # Build native binaries on tag push
-    ├── docs.yml                      # Publish bilingual docs to GitHub Pages
-    └── pkb-check.yml                 # Advisory PKB freshness summary
-```
 
 ## Quick Start
 
@@ -243,9 +195,9 @@ For the full release checklist and bilingual docs publish steps, see `doc/08-bui
 
 This project demonstrates how to guide AI coding with rules, constraints, and automation instead of asking a model to generate code with no boundaries.
 
-### `CLAUDE.md` as Architectural Guardrails
+### `AGENTS.md` as Architectural Guardrails
 
-`CLAUDE.md` defines where commands live, how frontend/backend boundaries work, how persistence is handled, and what Tauri commands must return.
+`AGENTS.md` defines where commands live, how frontend/backend boundaries work, how persistence is handled, and what Tauri commands must return.
 
 ### Pre-commit Checks
 
@@ -273,6 +225,8 @@ The frontend can only reach the backend through `invoke()` and cannot directly t
 | Todo | `toggle_todo` | Toggle completion |
 | Todo | `update_todo` | Update a todo |
 | Todo | `delete_todo` | Delete a todo |
+| Todo | `list_due_todo_reminders` | List due and overdue todo reminders |
+| Todo | `mark_todo_reminded` | Mark a reminder as delivered |
 | Notes | `list_notes` | List notes |
 | Notes | `add_note` | Add a note |
 | Notes | `update_note` | Update a note |
@@ -283,6 +237,17 @@ The frontend can only reach the backend through `invoke()` and cannot directly t
 | Pomodoro | `get_today_pomodoro_count` | Get today's count |
 | Pomodoro | `get_weekly_pomodoro_stats` | Get weekly stats |
 | Pomodoro | `update_tray_tooltip` | Update tray tooltip |
+| Agents | `list_agents` | List bundled and installed Agents |
+| Agents | `refresh_agents` | Rescan Agent plugins |
+| Agents | `start_agent_session` | Start a single-Agent chat |
+| Agents | `start_agent_group_session` | Start a group Agent chat |
+| Agents | `send_agent_message_stream` | Stream a single-Agent reply |
+| Agents | `send_agent_group_message_stream` | Stream group Agent replies |
+| Agents | `get_agent_plugin_detail` | Inspect Agent plugin metadata, README, diagnostics, and RAG status |
+| Agents | `rebuild_agent_rag_index` | Rebuild RAG knowledge for one Agent |
+| Agents | `list_agent_memories` | List local Agent memories |
+| Agents | `confirm_agent_tool_action` | Confirm or reject proposed write/tool actions |
+| Agents | `list_agent_external_cli_tools` | Manage registered external CLI tools |
 | App | `get_db_path` | Get DB path |
 | App | `get_app_settings` | Get app settings |
 | App | `save_app_settings` | Save app settings |

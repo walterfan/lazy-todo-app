@@ -7,6 +7,14 @@ The system SHALL allow users to create a todo with no recurrence or with a daily
 - **WHEN** the user creates a todo with recurrence set to daily and a deadline
 - **THEN** the system persists the todo as recurring with the deadline as the first due occurrence
 
+#### Scenario: Create weekly recurring todo for a selected weekday
+- **WHEN** the user creates a todo with recurrence set to weekly and selects a weekday
+- **THEN** the system persists the selected weekday and advances future occurrences to that weekday
+
+#### Scenario: Create monthly recurring todo for a selected day
+- **WHEN** the user creates a todo with recurrence set to monthly and selects a day of month
+- **THEN** the system persists the selected day and advances future occurrences to that day, clamping to month end when needed
+
 #### Scenario: Create one-off todo
 - **WHEN** the user creates a todo without selecting a recurrence cadence
 - **THEN** the system persists the todo as a one-off todo with existing todo behavior
@@ -17,6 +25,10 @@ The system SHALL allow users to change or remove recurrence settings on an exist
 #### Scenario: Change weekly task to monthly
 - **WHEN** the user edits a weekly recurring todo and changes the cadence to monthly
 - **THEN** the system updates the recurrence cadence and keeps the todo in the list with the recalculated future schedule
+
+#### Scenario: Change recurrence schedule details
+- **WHEN** the user edits the weekday for a weekly todo or the day of month for a monthly todo
+- **THEN** the system updates the stored schedule details and uses them for future occurrences
 
 #### Scenario: Remove recurrence
 - **WHEN** the user removes recurrence from a recurring todo
@@ -57,6 +69,10 @@ The system SHALL show recurring tasks in the todo list with enough visual state 
 #### Scenario: Recurring todo in list
 - **WHEN** the todo list contains a recurring task
 - **THEN** the task row shows its recurrence cadence and current due state
+
+#### Scenario: Recurring todo schedule in list
+- **WHEN** the todo list contains a weekly or monthly recurring task with explicit schedule details
+- **THEN** the task row shows the selected weekday or day of month alongside the cadence
 
 #### Scenario: Search includes recurring tasks
 - **WHEN** the user searches todos

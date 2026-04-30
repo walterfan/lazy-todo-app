@@ -27,6 +27,7 @@
 - [x] 4.3 Update todo list rendering to show recurring status, next due deadline, reminder due state, and overdue state.
 - [x] 4.4 Update todo hooks and invoke calls to send and receive recurrence and reminder fields.
 - [x] 4.5 Preserve existing filtering, pagination, search, pinning, and completion interactions for one-off and recurring todos.
+- [x] 4.6 Add explicit weekday controls for weekly recurrence and day-of-month controls for monthly recurrence.
 
 ## 5. Local Notification Integration
 
