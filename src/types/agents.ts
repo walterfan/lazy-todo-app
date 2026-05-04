@@ -4,10 +4,10 @@ export interface AgentValidationDiagnostic {
   message: string;
 }
 
-export interface AgentPlugin {
-  plugin_id: string;
-  plugin_name: string;
-  plugin_version: string;
+export interface AgentDefinition {
+  agent_id: string;
+  agent_name: string;
+  agent_version: string;
   author: string;
   description: string;
   tags: string[];
@@ -24,9 +24,9 @@ export interface AgentPlugin {
 }
 
 export interface AgentManifest {
-  plugin_id: string;
-  plugin_name: string;
-  plugin_version: string;
+  agent_id: string;
+  agent_name: string;
+  agent_version: string;
   author: string;
   description: string;
   tags: string[];
@@ -46,24 +46,24 @@ export interface AgentConfig {
   ban_topics: string[];
 }
 
-export interface AgentPluginDetail {
-  plugin: AgentPlugin;
+export interface AgentDefinitionDetail {
+  agent: AgentDefinition;
   manifest: AgentManifest | null;
   config: AgentConfig | null;
   system_prompt: string;
   readme: string;
 }
 
-export interface InstallAgentPluginZipInput {
+export interface InstallAgentZipInput {
   zip_path: string;
 }
 
-export interface AgentPluginDirectorySettings {
-  plugin_directory: string;
+export interface AgentDirectorySettings {
+  agent_directory: string;
 }
 
-export interface SaveAgentPluginDirectorySettings {
-  plugin_directory: string;
+export interface SaveAgentDirectorySettings {
+  agent_directory: string;
 }
 
 export interface AgentSafeFileRootSettings {
@@ -190,7 +190,7 @@ export interface AgentStreamEvent {
 }
 
 export interface AgentRagStatus {
-  plugin_id: string;
+  agent_id: string;
   rag_enabled: boolean;
   has_rag_knowledge: boolean;
   indexed_chunks: number;

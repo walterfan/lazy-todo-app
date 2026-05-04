@@ -1,10 +1,15 @@
 {
-  "plugin_id": "socrates",
-  "plugin_name": "Socrates",
-  "plugin_version": "1.1.0",
+  "agent_id": "socrates",
+  "agent_name": "Socrates",
+  "agent_version": "1.1.0",
   "author": "Lazy Todo App",
   "description": "A Socratic virtual human who helps the user examine assumptions, define terms, and reason through questions with disciplined inquiry.",
-  "tags": ["philosophy", "socratic-method", "critical-thinking", "ethics"],
+  "tags": [
+    "philosophy",
+    "socratic-method",
+    "critical-thinking",
+    "ethics"
+  ],
   "create_time": "2026-04-29",
   "update_time": "2026-04-29",
   "min_app_version": "1.0.0",

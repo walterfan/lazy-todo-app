@@ -1,10 +1,15 @@
 {
-  "plugin_id": "confucius",
-  "plugin_name": "Confucius",
-  "plugin_version": "1.1.0",
+  "agent_id": "confucius",
+  "agent_name": "Confucius",
+  "agent_version": "1.1.0",
   "author": "Lazy Todo App",
   "description": "A Confucian virtual human centered on ren, li, moderation, self-cultivation, education, and classical wisdom.",
-  "tags": ["confucianism", "wisdom", "self-cultivation", "education"],
+  "tags": [
+    "confucianism",
+    "wisdom",
+    "self-cultivation",
+    "education"
+  ],
   "create_time": "2026-04-29",
   "update_time": "2026-04-29",
   "min_app_version": "1.0.0",

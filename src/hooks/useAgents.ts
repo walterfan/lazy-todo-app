@@ -8,9 +8,9 @@ import type {
   AgentMemory,
   AgentMemoryProposal,
   AgentMigrationStatus,
-  AgentPlugin,
-  AgentPluginDetail,
-  AgentPluginDirectorySettings,
+  AgentDefinition,
+  AgentDefinitionDetail,
+  AgentDirectorySettings,
   AgentRagStatus,
   AgentSafeFileRootSettings,
   AgentSession,
@@ -22,7 +22,7 @@ import type {
   ConfirmAgentMemoryProposalInput,
   SaveAgentMemory,
   SaveAgentExternalCliTool,
-  SaveAgentPluginDirectorySettings,
+  SaveAgentDirectorySettings,
   SaveAgentSafeFileRootSettings,
   SaveAgentUserIdentity,
   SendAgentMessageResult,
@@ -30,13 +30,13 @@ import type {
 import { DEFAULT_SELECTED_CONTEXT } from "../types/secretary";
 
 export function useAgents() {
-  const [agents, setAgents] = useState<AgentPlugin[]>([]);
+  const [agents, setAgents] = useState<AgentDefinition[]>([]);
   const [sessions, setSessions] = useState<AgentSession[]>([]);
   const [session, setSession] = useState<AgentSession | null>(null);
   const [identity, setIdentity] = useState<AgentUserIdentity | null>(null);
   const [memories, setMemories] = useState<AgentMemory[]>([]);
   const [memoryProposals, setMemoryProposals] = useState<AgentMemoryProposal[]>([]);
-  const [pluginDirectorySettings, setPluginDirectorySettings] = useState<AgentPluginDirectorySettings | null>(null);
+  const [agentDirectorySettings, setAgentDirectorySettings] = useState<AgentDirectorySettings | null>(null);
   const [safeFileRootSettings, setSafeFileRootSettings] = useState<AgentSafeFileRootSettings | null>(null);
   const [builtinTools, setBuiltinTools] = useState<AgentBuiltinTool[]>([]);
   const [externalCliTools, setExternalCliTools] = useState<AgentExternalCliTool[]>([]);
@@ -62,8 +62,8 @@ export function useAgents() {
         ? [selectedAgentId]
         : [];
     const picked = ids
-      .map((id) => enabled.find((agent) => agent.plugin_id === id))
-      .filter((agent): agent is AgentPlugin => Boolean(agent));
+      .map((id) => enabled.find((agent) => agent.agent_id === id))
+      .filter((agent): agent is AgentDefinition => Boolean(agent));
     if (picked.length > 0) return picked;
     return enabled.slice(0, 1);
   }, [agents, selectedAgentId, selectedAgentIds]);
@@ -76,14 +76,14 @@ export function useAgents() {
   const refresh = useCallback(async () => {
     setError(null);
     try {
-      const [nextAgents, nextSessions, nextTools, nextExternalCliTools, nextActions, nextMemoryProposals, nextPluginDirectory, nextSafeFileRoots, nextMigrationStatus] = await Promise.all([
-        invoke<AgentPlugin[]>("list_agents"),
+      const [nextAgents, nextSessions, nextTools, nextExternalCliTools, nextActions, nextMemoryProposals, nextAgentDirectory, nextSafeFileRoots, nextMigrationStatus] = await Promise.all([
+        invoke<AgentDefinition[]>("list_agents"),
         invoke<AgentSession[]>("list_agent_sessions"),
         invoke<AgentBuiltinTool[]>("list_agent_builtin_tools"),
         invoke<AgentExternalCliTool[]>("list_agent_external_cli_tools"),
         invoke<AgentToolAction[]>("list_pending_agent_tool_actions"),
         invoke<AgentMemoryProposal[]>("list_agent_memory_proposals"),
-        invoke<AgentPluginDirectorySettings>("get_agent_plugin_directory_settings"),
+        invoke<AgentDirectorySettings>("get_agent_directory_settings"),
         invoke<AgentSafeFileRootSettings>("get_agent_safe_file_root_settings"),
         invoke<AgentMigrationStatus>("get_agent_migration_status"),
       ]);
@@ -93,10 +93,10 @@ export function useAgents() {
       setExternalCliTools(nextExternalCliTools);
       setPendingToolActions(nextActions);
       setMemoryProposals(nextMemoryProposals);
-      setPluginDirectorySettings(nextPluginDirectory);
+      setAgentDirectorySettings(nextAgentDirectory);
       setSafeFileRootSettings(nextSafeFileRoots);
       setMigrationStatus(nextMigrationStatus);
-      const firstEnabled = nextAgents.find((agent) => agent.enabled)?.plugin_id ?? null;
+      const firstEnabled = nextAgents.find((agent) => agent.enabled)?.agent_id ?? null;
       setSelectedAgentId((current) => current ?? firstEnabled);
       setSelectedAgentIds((current) => current.length > 0 ? current : firstEnabled ? [firstEnabled] : []);
       if (!session && nextSessions.length > 0) {
@@ -118,10 +118,10 @@ export function useAgents() {
       setRagStatus(null);
       return;
     }
-    invoke<AgentRagStatus>("get_agent_rag_status", { pluginId: selectedAgent.plugin_id })
+    invoke<AgentRagStatus>("get_agent_rag_status", { agentId: selectedAgent.agent_id })
       .then(setRagStatus)
       .catch(() => setRagStatus(null));
-    invoke<AgentMemory[]>("list_agent_memories", { agentId: selectedAgent.plugin_id })
+    invoke<AgentMemory[]>("list_agent_memories", { agentId: selectedAgent.agent_id })
       .then(setMemories)
       .catch(() => setMemories([]));
   }, [selectedAgent]);
@@ -194,8 +194,8 @@ export function useAgents() {
   const startSession = useCallback(async () => {
     if (selectedAgents.length === 0) return;
     const next = selectedAgents.length > 1
-      ? await invoke<AgentSession>("start_agent_group_session", { agentIds: selectedAgents.map((agent) => agent.plugin_id) })
-      : await invoke<AgentSession>("start_agent_session", { agentId: selectedAgents[0].plugin_id });
+      ? await invoke<AgentSession>("start_agent_group_session", { agentIds: selectedAgents.map((agent) => agent.agent_id) })
+      : await invoke<AgentSession>("start_agent_session", { agentId: selectedAgents[0].agent_id });
     setSession(next);
     setSelectedAgentId(next.agent_ids[0] ?? null);
     setSelectedAgentIds(next.agent_ids);
@@ -268,7 +268,7 @@ export function useAgents() {
         ? await invoke<SendAgentMessageResult>("send_agent_group_message_stream", {
             input: {
               session_id: session?.session_id ?? null,
-              agent_ids: targetAgents.map((agent) => agent.plugin_id),
+              agent_ids: targetAgents.map((agent) => agent.agent_id),
               message,
               selected_context: DEFAULT_SELECTED_CONTEXT,
               stream_id: streamId,
@@ -277,7 +277,7 @@ export function useAgents() {
         : await invoke<SendAgentMessageResult>("send_agent_message_stream", {
             input: {
               session_id: session?.session_id ?? null,
-              agent_id: targetAgents[0].plugin_id,
+              agent_id: targetAgents[0].agent_id,
               message,
               selected_context: DEFAULT_SELECTED_CONTEXT,
               stream_id: streamId,
@@ -300,38 +300,38 @@ export function useAgents() {
 
   const rebuildRag = useCallback(async () => {
     if (!selectedAgent) return;
-    const next = await invoke<AgentRagStatus>("rebuild_agent_rag_index", { pluginId: selectedAgent.plugin_id });
+    const next = await invoke<AgentRagStatus>("rebuild_agent_rag_index", { agentId: selectedAgent.agent_id });
     setRagStatus(next);
   }, [selectedAgent]);
 
   const refreshAgents = useCallback(async () => {
-    const next = await invoke<AgentPlugin[]>("refresh_agents");
+    const next = await invoke<AgentDefinition[]>("refresh_agents");
     setAgents(next);
     return next;
   }, []);
 
-  const setAgentEnabled = useCallback(async (pluginId: string, enabled: boolean) => {
-    await invoke<void>("set_agent_enabled", { pluginId, enabled });
+  const setAgentEnabled = useCallback(async (agentId: string, enabled: boolean) => {
+    await invoke<void>("set_agent_enabled", { agentId, enabled });
     await refresh();
   }, [refresh]);
 
-  const installPluginZip = useCallback(async (zipPath: string) => {
-    const plugin = await invoke<AgentPlugin>("install_agent_plugin_zip", {
+  const installAgentZip = useCallback(async (zipPath: string) => {
+    const agent = await invoke<AgentDefinition>("install_agent_zip", {
       input: { zip_path: zipPath },
     });
     await refresh();
-    return plugin;
+    return agent;
   }, [refresh]);
 
-  const uninstallPlugin = useCallback(async (pluginId: string) => {
-    const next = await invoke<AgentPlugin[]>("uninstall_agent_plugin", { pluginId });
+  const uninstallAgent = useCallback(async (agentId: string) => {
+    const next = await invoke<AgentDefinition[]>("uninstall_agent", { agentId });
     setAgents(next);
     await refresh();
     return next;
   }, [refresh]);
 
-  const loadPluginDetail = useCallback(async (pluginId: string) => {
-    return invoke<AgentPluginDetail>("get_agent_plugin_detail", { pluginId });
+  const loadAgentDetail = useCallback(async (agentId: string) => {
+    return invoke<AgentDefinitionDetail>("get_agent_detail", { agentId });
   }, []);
 
   const saveIdentity = useCallback(async (input: SaveAgentUserIdentity) => {
@@ -343,15 +343,15 @@ export function useAgents() {
   const saveMemory = useCallback(async (input: SaveAgentMemory) => {
     const next = await invoke<AgentMemory>("save_agent_memory", { input });
     if (selectedAgent) {
-      const list = await invoke<AgentMemory[]>("list_agent_memories", { agentId: selectedAgent.plugin_id });
+      const list = await invoke<AgentMemory[]>("list_agent_memories", { agentId: selectedAgent.agent_id });
       setMemories(list);
     }
     return next;
   }, [selectedAgent]);
 
-  const savePluginDirectorySettings = useCallback(async (input: SaveAgentPluginDirectorySettings) => {
-    const next = await invoke<AgentPluginDirectorySettings>("save_agent_plugin_directory_settings", { input });
-    setPluginDirectorySettings(next);
+  const saveAgentDirectorySettings = useCallback(async (input: SaveAgentDirectorySettings) => {
+    const next = await invoke<AgentDirectorySettings>("save_agent_directory_settings", { input });
+    setAgentDirectorySettings(next);
     await refresh();
     return next;
   }, [refresh]);
@@ -377,7 +377,7 @@ export function useAgents() {
     const nextProposals = await invoke<AgentMemoryProposal[]>("list_agent_memory_proposals");
     setMemoryProposals(nextProposals);
     if (selectedAgent) {
-      const list = await invoke<AgentMemory[]>("list_agent_memories", { agentId: selectedAgent.plugin_id });
+      const list = await invoke<AgentMemory[]>("list_agent_memories", { agentId: selectedAgent.agent_id });
       setMemories(list);
     }
     await refresh();
@@ -429,7 +429,7 @@ export function useAgents() {
     identity,
     memories,
     memoryProposals,
-    pluginDirectorySettings,
+    agentDirectorySettings,
     safeFileRootSettings,
     migrationStatus,
     builtinTools,
@@ -462,12 +462,12 @@ export function useAgents() {
     rebuildRag,
     refreshAgents,
     setAgentEnabled,
-    installPluginZip,
-    uninstallPlugin,
-    loadPluginDetail,
+    installAgentZip,
+    uninstallAgent,
+    loadAgentDetail,
     saveIdentity,
     saveMemory,
-    savePluginDirectorySettings,
+    saveAgentDirectorySettings,
     saveSafeFileRootSettings,
     confirmToolAction,
     confirmMemoryProposal,
@@ -484,17 +484,17 @@ export type AgentsController = ReturnType<typeof useAgents>;
 
 function targetAgentsForMessage(
   message: string,
-  allAgents: AgentPlugin[],
-  selectedAgents: AgentPlugin[],
-): AgentPlugin[] {
+  allAgents: AgentDefinition[],
+  selectedAgents: AgentDefinition[],
+): AgentDefinition[] {
   const lowerMessage = message.toLowerCase();
   const mentioned = allAgents.filter((agent) => {
-    const idMention = `@${agent.plugin_id.toLowerCase()}`;
-    const nameMention = `@${agent.plugin_name.toLowerCase()}`;
+    const idMention = `@${agent.agent_id.toLowerCase()}`;
+    const nameMention = `@${agent.agent_name.toLowerCase()}`;
     return lowerMessage.includes(idMention) || lowerMessage.includes(nameMention);
   });
-  const selectedIds = new Set(selectedAgents.map((agent) => agent.plugin_id));
-  const selectedMentions = mentioned.filter((agent) => selectedIds.has(agent.plugin_id));
+  const selectedIds = new Set(selectedAgents.map((agent) => agent.agent_id));
+  const selectedMentions = mentioned.filter((agent) => selectedIds.has(agent.agent_id));
   if (selectedMentions.length > 0) return selectedMentions;
   if (mentioned.length > 0) return mentioned.filter((agent) => agent.enabled);
   return selectedAgents;

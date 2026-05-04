@@ -70,7 +70,7 @@ If time is short, read `doc/ai-guide.md` plus the specific source files you will
 │       ├── db.rs              # SQLite schema and persistence
 │       ├── commands/          # Tauri command handlers
 │       └── models/            # Rust request/response/domain models
-├── plugins/                   # bundled AI Agent plugin folders
+├── agents/                   # bundled AI Agent package folders
 ├── openspec/                  # OpenSpec config, specs, and changes
 ├── doc/                       # bilingual PKB / Sphinx docs
 ├── scripts/                   # release and PKB helper scripts
@@ -82,15 +82,15 @@ Boundaries that matter:
 - Public app behavior crosses the Tauri command boundary. Keep frontend calls in `@tauri-apps/api/core.invoke()` and Rust commands in `src-tauri/src/commands/`.
 - SQLite schema and migrations live in `src-tauri/src/db.rs`. Do not persist app data directly from React.
 - Shared structs need Rust and TypeScript mirrors, usually in `src-tauri/src/models/` and `src/types/`.
-- Bundled AI Agents live in `plugins/<plugin_id>/` and must follow the static plugin structure: `manifest.json`, `system_prompt.md`, `config.json`, `avatar.png`, `README.md`, and optional `rag_knowledge.md`.
+- Bundled AI Agents live in `agents/<agent_id>/` and must follow the static Agent package structure: `manifest.json`, `system_prompt.md`, `config.json`, `avatar.png`, `README.md`, and optional `rag_knowledge.md`.
 - Tauri resources are configured in `src-tauri/tauri.conf.json`; update it when bundling new static resources.
 
 Danger zones:
 
 - `src-tauri/src/db.rs`: schema changes must be additive and safe for existing local databases.
 - `src-tauri/src/lib.rs`: command registration and tray/window lifecycle affect startup.
-- `src-tauri/src/commands/agents.rs` and `src-tauri/src/models/agents.rs`: plugin validation, LLM streaming, memory, RAG, and tool boundaries are security-sensitive.
-- `plugins/`: plugin IDs, file names, and manifest fields are part of the local plugin contract.
+- `src-tauri/src/commands/agents.rs` and `src-tauri/src/models/agents.rs`: Agent package validation, LLM streaming, memory, RAG, and tool boundaries are security-sensitive.
+- `agents/`: Agent IDs, file names, and manifest fields are part of the local Agent package contract.
 - `scripts/release_version.sh` and `.github/workflows/release.yml`: release automation can tag or publish artifacts.
 - Generated output under `dist/`, `src-tauri/target/`, and `doc/_build/` should not be hand-edited.
 
@@ -144,7 +144,7 @@ Notes:
 - Use `@tauri-apps/api/core.invoke()` for frontend/backend calls.
 - Keep UI state in React hooks under `src/hooks/`; keep component rendering in `src/components/`.
 - Use additive SQLite migrations with `CREATE TABLE IF NOT EXISTS`, `ALTER TABLE` guards, and data preservation.
-- For AI Agents, treat plugins as static resources only. Do not add executable plugin code.
+- For AI Agents, treat Agent packages as static resources only. Do not add executable Agent package code.
 - For LLM credentials, preserve environment-variable precedence: `LLM_BASE_URL`, `LLM_MODEL`, `LLM_API_KEY`.
 - Do not add logs that expose API keys, local file contents, private notes, or user memory.
 
@@ -152,11 +152,11 @@ Notes:
 
 The Agents module is replacing the older Secretary user experience. During the transition, some `secretary_*` tables, files, and CSS names still exist.
 
-- Keep Agent persona and knowledge in `plugins/<plugin_id>/`.
+- Keep Agent persona and knowledge in `agents/<agent_id>/`.
 - Keep app-owned identity, memory, sessions, and tool permissions in SQLite.
 - Agents may read selected app context, but writes to notes, todos, milestones, files, memory, or external CLIs must go through app-owned confirmation flows.
 - Streaming LLM replies should emit Tauri events and persist final messages after completion.
-- RAG knowledge is per Agent. `rag_knowledge.md` must not leak between plugins.
+- RAG knowledge is per Agent. `rag_knowledge.md` must not leak between Agents.
 - External CLI tool execution must use explicit registrations and direct process spawning, never shell interpolation of Agent-generated strings.
 
 ## 7. OpenSpec Workflow
@@ -220,7 +220,7 @@ Keep `AGENTS.md` as the canonical root instruction file. If client-specific file
 - If Tauri dev startup fails, run `make doctor`, `make check`, then `cd src-tauri && cargo check`.
 - If SQLite behavior changes unexpectedly, inspect `LAZY_TODO_DB_DIR` and the active app data directory before assuming data loss.
 - If the frontend cannot find a command, confirm it is registered in both `src-tauri/src/commands/mod.rs` and the `generate_handler!` list in `src-tauri/src/lib.rs`.
-- If plugin loading behaves strangely, validate the plugin folder structure and `manifest.json` before changing loader code.
+- If Agent loading behaves strangely, validate the Agent package folder structure and `manifest.json` before changing loader code.
 - If OpenSpec validation succeeds but prints telemetry/network errors, treat the validation result as authoritative and note the network warning separately.
 
 ## 11. Keeping This File Useful
@@ -229,7 +229,7 @@ Update this file when:
 
 - A new top-level module, feature area, or app resource directory is added.
 - Makefile, npm, Cargo, docs, or OpenSpec commands change.
-- The Agents plugin contract changes.
+- The Agents package contract changes.
 - New persistent tables or Tauri command families are introduced.
 - A new coding-agent client is wired into the repo.
 

@@ -26,7 +26,7 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
   const selectedAgents = agents.selectedAgents;
   const isGroupChat = selectedAgents.length > 1;
-  const selectedAgentNames = selectedAgents.map((agent) => agent.plugin_name).join(", ");
+  const selectedAgentNames = selectedAgents.map((agent) => agent.agent_name).join(", ");
 
   if (agents.loading) {
     return <div className="loading">{t("agentsLoading")}</div>;
@@ -136,19 +136,19 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
                   className="agent-avatar"
                   src={convertFileSrc(agent.avatar_path)}
                   alt=""
-                  key={agent.plugin_id}
+                  key={agent.agent_id}
                 />
               ))}
             </div>
           )}
           <div>
-            <div className="secretary-name">{isGroupChat ? t("groupChat") : agents.selectedAgent?.plugin_name ?? t("agents")}</div>
+            <div className="secretary-name">{isGroupChat ? t("groupChat") : agents.selectedAgent?.agent_name ?? t("agents")}</div>
             <div className="secretary-subtitle">
               {isGroupChat ? selectedAgentNames : agents.selectedAgent?.description ?? t("selectAgentPrompt")}
             </div>
             {!isGroupChat && agents.selectedAgent && (
               <div className="agent-meta">
-                {agents.selectedAgent.author} · v{agents.selectedAgent.plugin_version}
+                {agents.selectedAgent.author} · v{agents.selectedAgent.agent_version}
               </div>
             )}
             {isGroupChat && (
@@ -157,7 +157,7 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
           </div>
           <div className="secretary-status">
             {!isGroupChat && agents.selectedAgent?.tags.slice(0, 4).map((tag) => <span key={tag}>{tag}</span>)}
-            {isGroupChat && selectedAgents.slice(0, 4).map((agent) => <span key={agent.plugin_id}>@{agent.plugin_name}</span>)}
+            {isGroupChat && selectedAgents.slice(0, 4).map((agent) => <span key={agent.agent_id}>@{agent.agent_name}</span>)}
             {agents.ragStatus && <span>{agents.ragStatus.indexed_chunks} RAG chunks</span>}
             <span>{agents.memories.filter((memory) => memory.status === "active").length} memories</span>
           </div>
@@ -221,7 +221,7 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
             ))
           ) : agents.streamingMessage && (
             <div className="secretary-message secretary-message-assistant secretary-message-streaming">
-              <div className="secretary-message-meta">{agents.selectedAgent?.plugin_name ?? "agent"} · streaming</div>
+              <div className="secretary-message-meta">{agents.selectedAgent?.agent_name ?? "agent"} · streaming</div>
               <div className="secretary-message-body">{agents.streamingMessage}</div>
             </div>
           )}
@@ -310,10 +310,10 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
               {selectedAgents.map((agent) => (
                 <button
                   type="button"
-                  key={agent.plugin_id}
-                  onClick={() => setMessage((current) => `${current}${current.endsWith(" ") || !current ? "" : " "}@${agent.plugin_name} `)}
+                  key={agent.agent_id}
+                  onClick={() => setMessage((current) => `${current}${current.endsWith(" ") || !current ? "" : " "}@${agent.agent_name} `)}
                 >
-                  @{agent.plugin_name}
+                  @{agent.agent_name}
                 </button>
               ))}
             </div>
@@ -327,7 +327,7 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
                 send();
               }
             }}
-            placeholder={selectedAgents.length > 1 ? t("messageGroup") : agents.selectedAgent ? t("messageAgent", { name: agents.selectedAgent.plugin_name }) : t("selectAgentFirst")}
+            placeholder={selectedAgents.length > 1 ? t("messageGroup") : agents.selectedAgent ? t("messageAgent", { name: agents.selectedAgent.agent_name }) : t("selectAgentFirst")}
             disabled={selectedAgents.length === 0 || agents.sending}
           />
           <div className="secretary-composer-actions">
@@ -347,14 +347,14 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
           <div className="secretary-list">
             {agents.agents.map((agent) => (
               <button
-                key={agent.plugin_id}
-                className={`secretary-list-item agent-select-item ${agents.selectedAgentIds.includes(agent.plugin_id) ? "active" : ""}`}
-                onClick={() => agents.toggleAgent(agent.plugin_id)}
+                key={agent.agent_id}
+                className={`secretary-list-item agent-select-item ${agents.selectedAgentIds.includes(agent.agent_id) ? "active" : ""}`}
+                onClick={() => agents.toggleAgent(agent.agent_id)}
                 disabled={!agent.enabled}
                 title={agent.validation_diagnostics.map((item) => item.message).join("\n")}
               >
-                <strong><span className="agent-select-check">{agents.selectedAgentIds.includes(agent.plugin_id) ? "✓" : ""}</span>{agent.plugin_name}</strong>
-                <span>{agent.plugin_version} · {agent.bundled ? "built-in" : "local"}</span>
+                <strong><span className="agent-select-check">{agents.selectedAgentIds.includes(agent.agent_id) ? "✓" : ""}</span>{agent.agent_name}</strong>
+                <span>{agent.agent_version} · {agent.bundled ? "built-in" : "local"}</span>
               </button>
             ))}
           </div>
@@ -533,8 +533,8 @@ function commandPreview(preview: ExternalCliPreview): string {
   return [preview.executable, ...preview.argv].join(" ");
 }
 
-function agentName(agents: { plugin_id: string; plugin_name: string }[], agentId: string): string {
-  return agents.find((agent) => agent.plugin_id === agentId)?.plugin_name ?? agentId;
+function agentName(agents: { agent_id: string; agent_name: string }[], agentId: string): string {
+  return agents.find((agent) => agent.agent_id === agentId)?.agent_name ?? agentId;
 }
 
 function toolActionTitle(toolName: string, preview: unknown): string {

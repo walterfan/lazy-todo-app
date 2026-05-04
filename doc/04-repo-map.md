@@ -89,6 +89,7 @@ lazy-todo-app/
 │   ├── adr/
 │   └── changes/
 │
+├── agents/                          # Bundled static Agent package folders
 ├── openspec/                        # OpenSpec proposals and design artifacts
 └── dist/                            # Frontend build output
 ```

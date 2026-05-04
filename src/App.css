@@ -1957,12 +1957,12 @@ body {
   font-size: 0.78rem;
 }
 
-.settings-plugin-list {
+.settings-agent-list {
   display: grid;
   gap: 8px;
 }
 
-.settings-plugin-row {
+.settings-agent-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
@@ -1973,33 +1973,33 @@ body {
   background: rgba(255, 255, 255, 0.03);
 }
 
-.settings-plugin-row strong,
-.settings-plugin-row span {
+.settings-agent-row strong,
+.settings-agent-row span {
   display: block;
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.settings-plugin-row span,
-.settings-plugin-detail span {
+.settings-agent-row span,
+.settings-agent-detail span {
   color: var(--text-muted);
   font-size: 0.78rem;
 }
 
-.settings-plugin-actions {
+.settings-agent-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 6px;
 }
 
-.settings-plugin-detail {
+.settings-agent-detail {
   display: grid;
   gap: 6px;
   min-width: 0;
 }
 
-.settings-plugin-detail pre {
+.settings-agent-detail pre {
   max-height: 180px;
   margin: 0;
   padding: 8px;

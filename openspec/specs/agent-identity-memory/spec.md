@@ -15,7 +15,7 @@ The system SHALL maintain a local user identity profile that Agents can use to u
 - **THEN** future Agent conversations use the updated profile
 
 ### Requirement: Durable app memory
-The system SHALL maintain local durable memories about user preferences, facts, goals, decisions, and relationship context separately from Agent plugin personas.
+The system SHALL maintain local durable memories about user preferences, facts, goals, decisions, and relationship context separately from Agent personas.
 
 #### Scenario: Memory is stored
 - **WHEN** the user confirms or manually creates a memory

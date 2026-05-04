@@ -6,11 +6,11 @@ use std::sync::Mutex;
 use std::time::Instant;
 
 use crate::models::agents::{
-    AgentConversationSummary, AgentExternalCliCallResult, AgentExternalCliTool, AgentMemory,
-    AgentMemoryProposal, AgentMessage, AgentMigrationStatus, AgentPlugin,
-    AgentPluginDirectorySettings, AgentRagChunk, AgentSafeFileRootSettings, AgentSession,
-    AgentToolAction, AgentUserIdentity, SaveAgentExternalCliTool, SaveAgentMemory,
-    SaveAgentPluginDirectorySettings, SaveAgentSafeFileRootSettings, SaveAgentUserIdentity,
+    AgentConversationSummary, AgentDefinition, AgentDirectorySettings, AgentExternalCliCallResult,
+    AgentExternalCliTool, AgentMemory, AgentMemoryProposal, AgentMessage, AgentMigrationStatus,
+    AgentRagChunk, AgentSafeFileRootSettings, AgentSession, AgentToolAction, AgentUserIdentity,
+    SaveAgentDirectorySettings, SaveAgentExternalCliTool, SaveAgentMemory,
+    SaveAgentSafeFileRootSettings, SaveAgentUserIdentity,
 };
 use crate::models::note::StickyNote;
 use crate::models::pomodoro::{DayStat, PomodoroMilestone, PomodoroSettings};
@@ -387,11 +387,45 @@ impl Database {
         Ok(())
     }
 
+    fn table_exists(conn: &Connection, table_name: &str) -> Result<bool> {
+        conn.query_row(
+            "SELECT EXISTS(
+                SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?1
+            )",
+            params![table_name],
+            |row| row.get::<_, i32>(0),
+        )
+        .map(|exists| exists != 0)
+    }
+
+    fn table_columns(conn: &Connection, table_name: &str) -> Result<Vec<String>> {
+        let mut stmt = conn.prepare(&format!("PRAGMA table_info({table_name})"))?;
+        let columns = stmt
+            .query_map([], |row| row.get::<_, String>(1))?
+            .collect::<Result<Vec<_>>>()?;
+        Ok(columns)
+    }
+
     fn ensure_agent_settings_schema(conn: &Connection) -> Result<()> {
         let mut stmt = conn.prepare("PRAGMA table_info(agent_settings)")?;
         let column_names = stmt
             .query_map([], |row| row.get::<_, String>(1))?
             .collect::<Result<Vec<_>>>()?;
+
+        if !column_names.iter().any(|name| name == "agent_directory") {
+            conn.execute(
+                "ALTER TABLE agent_settings ADD COLUMN agent_directory TEXT NOT NULL DEFAULT ''",
+                [],
+            )?;
+            if column_names.iter().any(|name| name == "plugin_directory") {
+                conn.execute(
+                    "UPDATE agent_settings
+                     SET agent_directory = plugin_directory
+                     WHERE agent_directory = '' AND plugin_directory != ''",
+                    [],
+                )?;
+            }
+        }
 
         if !column_names
             .iter()
@@ -403,6 +437,62 @@ impl Database {
             )?;
         }
 
+        Ok(())
+    }
+
+    fn ensure_agent_definition_schema(conn: &Connection) -> Result<()> {
+        if Self::table_exists(conn, "agent_plugins")? {
+            conn.execute(
+                "INSERT OR IGNORE INTO agent_definitions (
+                    agent_id, agent_name, agent_version, author, description, tags_json, path,
+                    avatar_path, readme_path, bundled, enabled, lifecycle_state, rag_enabled,
+                    is_multi_agent_supported, has_rag_knowledge, validation_json, created_at, updated_at
+                 )
+                 SELECT
+                    plugin_id, plugin_name, plugin_version, author, description, tags_json, path,
+                    avatar_path, readme_path, bundled, enabled, lifecycle_state, rag_enabled,
+                    is_multi_agent_supported, has_rag_knowledge, validation_json, created_at, updated_at
+                 FROM agent_plugins",
+                [],
+            )?;
+        }
+        Ok(())
+    }
+
+    fn ensure_agent_rag_schema(conn: &Connection) -> Result<()> {
+        let column_names = Self::table_columns(conn, "agent_rag_chunks")?;
+        if !column_names.iter().any(|name| name == "agent_id") {
+            conn.execute(
+                "ALTER TABLE agent_rag_chunks ADD COLUMN agent_id TEXT NOT NULL DEFAULT ''",
+                [],
+            )?;
+            if column_names.iter().any(|name| name == "plugin_id") {
+                conn.execute(
+                    "UPDATE agent_rag_chunks
+                     SET agent_id = plugin_id
+                     WHERE agent_id = '' AND plugin_id != ''",
+                    [],
+                )?;
+            }
+        }
+        if !column_names.iter().any(|name| name == "agent_version") {
+            conn.execute(
+                "ALTER TABLE agent_rag_chunks ADD COLUMN agent_version TEXT NOT NULL DEFAULT ''",
+                [],
+            )?;
+            if column_names.iter().any(|name| name == "plugin_version") {
+                conn.execute(
+                    "UPDATE agent_rag_chunks
+                     SET agent_version = plugin_version
+                     WHERE agent_version = '' AND plugin_version != ''",
+                    [],
+                )?;
+            }
+        }
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_agent_rag_agent_hash ON agent_rag_chunks(agent_id, source_hash)",
+            [],
+        )?;
         Ok(())
     }
 
@@ -546,13 +636,13 @@ impl Database {
             );
             CREATE TABLE IF NOT EXISTS agent_settings (
                 id               INTEGER PRIMARY KEY CHECK (id = 1),
-                plugin_directory TEXT NOT NULL DEFAULT '',
+                agent_directory TEXT NOT NULL DEFAULT '',
                 safe_file_roots_json TEXT NOT NULL DEFAULT '[]'
             );
-            CREATE TABLE IF NOT EXISTS agent_plugins (
-                plugin_id              TEXT PRIMARY KEY,
-                plugin_name            TEXT NOT NULL,
-                plugin_version         TEXT NOT NULL,
+            CREATE TABLE IF NOT EXISTS agent_definitions (
+                agent_id              TEXT PRIMARY KEY,
+                agent_name            TEXT NOT NULL,
+                agent_version         TEXT NOT NULL,
                 author                 TEXT NOT NULL DEFAULT '',
                 description            TEXT NOT NULL DEFAULT '',
                 tags_json              TEXT NOT NULL DEFAULT '[]',
@@ -726,8 +816,8 @@ impl Database {
             );
             CREATE TABLE IF NOT EXISTS agent_rag_chunks (
                 chunk_id        TEXT PRIMARY KEY,
-                plugin_id       TEXT NOT NULL,
-                plugin_version  TEXT NOT NULL,
+                agent_id       TEXT NOT NULL,
+                agent_version  TEXT NOT NULL,
                 source_hash     TEXT NOT NULL,
                 embedding_model TEXT NOT NULL DEFAULT '',
                 embedding_dim   INTEGER NOT NULL DEFAULT 0,
@@ -742,7 +832,7 @@ impl Database {
                 created_at   TEXT NOT NULL DEFAULT (datetime('now')),
                 updated_at   TEXT NOT NULL DEFAULT (datetime('now'))
             );
-            CREATE INDEX IF NOT EXISTS idx_agent_plugins_state ON agent_plugins(lifecycle_state, enabled);
+            CREATE INDEX IF NOT EXISTS idx_agent_definitions_state ON agent_definitions(lifecycle_state, enabled);
             CREATE INDEX IF NOT EXISTS idx_agent_sessions_updated ON agent_sessions(updated_at);
             CREATE INDEX IF NOT EXISTS idx_agent_messages_session ON agent_messages(session_id, turn_index, created_at);
             CREATE INDEX IF NOT EXISTS idx_agent_participants_session ON agent_session_participants(session_id, agent_id);
@@ -750,8 +840,7 @@ impl Database {
             CREATE INDEX IF NOT EXISTS idx_agent_memory_usage_session ON agent_memory_usage(session_id, message_id);
             CREATE INDEX IF NOT EXISTS idx_agent_cli_audit_tool ON agent_external_cli_audit(tool_id, created_at);
             CREATE INDEX IF NOT EXISTS idx_agent_tool_actions_status ON agent_tool_actions(status, tool_name, created_at);
-            CREATE INDEX IF NOT EXISTS idx_agent_builtin_tool_audit ON agent_builtin_tool_audit(tool_name, created_at);
-            CREATE INDEX IF NOT EXISTS idx_agent_rag_plugin_hash ON agent_rag_chunks(plugin_id, source_hash);"
+            CREATE INDEX IF NOT EXISTS idx_agent_builtin_tool_audit ON agent_builtin_tool_audit(tool_name, created_at);"
         )?;
 
         Self::ensure_todos_schema(&conn)?;
@@ -759,6 +848,8 @@ impl Database {
         Self::ensure_pomodoro_settings_schema(&conn)?;
         Self::ensure_app_settings_schema(&conn)?;
         Self::ensure_agent_settings_schema(&conn)?;
+        Self::ensure_agent_definition_schema(&conn)?;
+        Self::ensure_agent_rag_schema(&conn)?;
 
         Ok(Self {
             conn: Mutex::new(conn),
@@ -801,33 +892,33 @@ impl Database {
         query_connection_readonly(&conn, sql, max_rows)
     }
 
-    pub fn get_agent_plugin_directory_settings(&self) -> Result<AgentPluginDirectorySettings> {
+    pub fn get_agent_directory_settings(&self) -> Result<AgentDirectorySettings> {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.execute("INSERT OR IGNORE INTO agent_settings (id) VALUES (1)", [])?;
         conn.query_row(
-            "SELECT plugin_directory FROM agent_settings WHERE id = 1",
+            "SELECT agent_directory FROM agent_settings WHERE id = 1",
             [],
             |row| {
-                Ok(AgentPluginDirectorySettings {
-                    plugin_directory: row.get(0)?,
+                Ok(AgentDirectorySettings {
+                    agent_directory: row.get(0)?,
                 })
             },
         )
     }
 
-    pub fn save_agent_plugin_directory_settings(
+    pub fn save_agent_directory_settings(
         &self,
-        input: &SaveAgentPluginDirectorySettings,
-    ) -> Result<AgentPluginDirectorySettings> {
+        input: &SaveAgentDirectorySettings,
+    ) -> Result<AgentDirectorySettings> {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.execute(
-            "INSERT INTO agent_settings (id, plugin_directory)
+            "INSERT INTO agent_settings (id, agent_directory)
              VALUES (1, ?1)
-             ON CONFLICT(id) DO UPDATE SET plugin_directory = excluded.plugin_directory",
-            params![input.plugin_directory.trim()],
+             ON CONFLICT(id) DO UPDATE SET agent_directory = excluded.agent_directory",
+            params![input.agent_directory.trim()],
         )?;
         drop(conn);
-        self.get_agent_plugin_directory_settings()
+        self.get_agent_directory_settings()
     }
 
     pub fn get_agent_safe_file_root_settings(&self) -> Result<AgentSafeFileRootSettings> {
@@ -1020,22 +1111,22 @@ impl Database {
         Ok(())
     }
 
-    pub fn upsert_agent_plugin(&self, plugin: &AgentPlugin) -> Result<()> {
+    pub fn upsert_agent_definition(&self, agent: &AgentDefinition) -> Result<()> {
         let conn = self.conn.lock().expect("db lock poisoned");
-        let tags_json = serde_json::to_string(&plugin.tags)
+        let tags_json = serde_json::to_string(&agent.tags)
             .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
-        let validation_json = serde_json::to_string(&plugin.validation_diagnostics)
+        let validation_json = serde_json::to_string(&agent.validation_diagnostics)
             .map_err(|e| rusqlite::Error::ToSqlConversionFailure(Box::new(e)))?;
         conn.execute(
-            "INSERT INTO agent_plugins (
-                plugin_id, plugin_name, plugin_version, author, description, tags_json, path,
+            "INSERT INTO agent_definitions (
+                agent_id, agent_name, agent_version, author, description, tags_json, path,
                 avatar_path, readme_path, bundled, enabled, lifecycle_state, rag_enabled,
                 is_multi_agent_supported, has_rag_knowledge, validation_json
              )
              VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16)
-             ON CONFLICT(plugin_id) DO UPDATE SET
-                plugin_name = excluded.plugin_name,
-                plugin_version = excluded.plugin_version,
+             ON CONFLICT(agent_id) DO UPDATE SET
+                agent_name = excluded.agent_name,
+                agent_version = excluded.agent_version,
                 author = excluded.author,
                 description = excluded.description,
                 tags_json = excluded.tags_json,
@@ -1045,7 +1136,7 @@ impl Database {
                 bundled = excluded.bundled,
                 enabled = CASE
                     WHEN excluded.lifecycle_state = 'invalid' THEN 0
-                    ELSE agent_plugins.enabled
+                    ELSE agent_definitions.enabled
                 END,
                 lifecycle_state = excluded.lifecycle_state,
                 rag_enabled = excluded.rag_enabled,
@@ -1054,65 +1145,65 @@ impl Database {
                 validation_json = excluded.validation_json,
                 updated_at = datetime('now')",
             params![
-                plugin.plugin_id,
-                plugin.plugin_name,
-                plugin.plugin_version,
-                plugin.author,
-                plugin.description,
+                agent.agent_id,
+                agent.agent_name,
+                agent.agent_version,
+                agent.author,
+                agent.description,
                 tags_json,
-                plugin.path,
-                plugin.avatar_path,
-                plugin.readme_path,
-                plugin.bundled as i32,
-                plugin.enabled as i32,
-                plugin.lifecycle_state,
-                plugin.rag_enabled as i32,
-                plugin.is_multi_agent_supported as i32,
-                plugin.has_rag_knowledge as i32,
+                agent.path,
+                agent.avatar_path,
+                agent.readme_path,
+                agent.bundled as i32,
+                agent.enabled as i32,
+                agent.lifecycle_state,
+                agent.rag_enabled as i32,
+                agent.is_multi_agent_supported as i32,
+                agent.has_rag_knowledge as i32,
                 validation_json,
             ],
         )?;
         Ok(())
     }
 
-    pub fn set_agent_plugin_enabled(&self, plugin_id: &str, enabled: bool) -> Result<()> {
+    pub fn set_agent_definition_enabled(&self, agent_id: &str, enabled: bool) -> Result<()> {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.execute(
-            "UPDATE agent_plugins SET enabled = ?1, updated_at = datetime('now') WHERE plugin_id = ?2",
-            params![enabled as i32, plugin_id],
+            "UPDATE agent_definitions SET enabled = ?1, updated_at = datetime('now') WHERE agent_id = ?2",
+            params![enabled as i32, agent_id],
         )?;
         Ok(())
     }
 
-    pub fn mark_agent_plugin_uninstalled(&self, plugin_id: &str) -> Result<()> {
+    pub fn mark_agent_definition_uninstalled(&self, agent_id: &str) -> Result<()> {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.execute(
-            "UPDATE agent_plugins
+            "UPDATE agent_definitions
              SET enabled = 0, lifecycle_state = 'uninstalled', updated_at = datetime('now')
-             WHERE plugin_id = ?1",
-            params![plugin_id],
+             WHERE agent_id = ?1",
+            params![agent_id],
         )?;
         Ok(())
     }
 
-    pub fn list_agent_plugins(&self) -> Result<Vec<AgentPlugin>> {
+    pub fn list_agent_definitions(&self) -> Result<Vec<AgentDefinition>> {
         let conn = self.conn.lock().expect("db lock poisoned");
         let mut stmt = conn.prepare(
-            "SELECT plugin_id, plugin_name, plugin_version, author, description, tags_json, path,
+            "SELECT agent_id, agent_name, agent_version, author, description, tags_json, path,
                     avatar_path, readme_path, bundled, enabled, lifecycle_state, rag_enabled,
                     is_multi_agent_supported, has_rag_knowledge, validation_json
-             FROM agent_plugins
+             FROM agent_definitions
              WHERE lifecycle_state != 'uninstalled'
-             ORDER BY bundled DESC, plugin_name ASC",
+             ORDER BY bundled DESC, agent_name ASC",
         )?;
-        let plugins = stmt
+        let agents = stmt
             .query_map([], |row| {
                 let tags_json: String = row.get(5)?;
                 let validation_json: String = row.get(15)?;
-                Ok(AgentPlugin {
-                    plugin_id: row.get(0)?,
-                    plugin_name: row.get(1)?,
-                    plugin_version: row.get(2)?,
+                Ok(AgentDefinition {
+                    agent_id: row.get(0)?,
+                    agent_name: row.get(1)?,
+                    agent_version: row.get(2)?,
                     author: row.get(3)?,
                     description: row.get(4)?,
                     tags: serde_json::from_str(&tags_json).unwrap_or_default(),
@@ -1130,30 +1221,26 @@ impl Database {
                 })
             })?
             .collect::<Result<Vec<_>>>()?;
-        Ok(plugins)
+        Ok(agents)
     }
 
-    pub fn replace_agent_rag_chunks(
-        &self,
-        plugin_id: &str,
-        chunks: &[AgentRagChunk],
-    ) -> Result<()> {
+    pub fn replace_agent_rag_chunks(&self, agent_id: &str, chunks: &[AgentRagChunk]) -> Result<()> {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.execute(
-            "DELETE FROM agent_rag_chunks WHERE plugin_id = ?1",
-            params![plugin_id],
+            "DELETE FROM agent_rag_chunks WHERE agent_id = ?1",
+            params![agent_id],
         )?;
         for chunk in chunks {
             conn.execute(
                 "INSERT INTO agent_rag_chunks (
-                    chunk_id, plugin_id, plugin_version, source_hash, embedding_model,
+                    chunk_id, agent_id, agent_version, source_hash, embedding_model,
                     embedding_dim, chunk_text, embedding_json
                  )
                  VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, '[]')",
                 params![
                     chunk.chunk_id,
-                    chunk.plugin_id,
-                    chunk.plugin_version,
+                    chunk.agent_id,
+                    chunk.agent_version,
                     chunk.source_hash,
                     chunk.embedding_model,
                     chunk.embedding_dim,
@@ -1164,30 +1251,30 @@ impl Database {
         Ok(())
     }
 
-    pub fn delete_agent_rag_chunks(&self, plugin_id: &str) -> Result<()> {
+    pub fn delete_agent_rag_chunks(&self, agent_id: &str) -> Result<()> {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.execute(
-            "DELETE FROM agent_rag_chunks WHERE plugin_id = ?1",
-            params![plugin_id],
+            "DELETE FROM agent_rag_chunks WHERE agent_id = ?1",
+            params![agent_id],
         )?;
         Ok(())
     }
 
-    pub fn list_agent_rag_chunks(&self, plugin_id: &str) -> Result<Vec<AgentRagChunk>> {
+    pub fn list_agent_rag_chunks(&self, agent_id: &str) -> Result<Vec<AgentRagChunk>> {
         let conn = self.conn.lock().expect("db lock poisoned");
         let mut stmt = conn.prepare(
-            "SELECT chunk_id, plugin_id, plugin_version, source_hash, embedding_model,
+            "SELECT chunk_id, agent_id, agent_version, source_hash, embedding_model,
                     embedding_dim, chunk_text, created_at
              FROM agent_rag_chunks
-             WHERE plugin_id = ?1
+             WHERE agent_id = ?1
              ORDER BY chunk_id ASC",
         )?;
         let chunks = stmt
-            .query_map(params![plugin_id], |row| {
+            .query_map(params![agent_id], |row| {
                 Ok(AgentRagChunk {
                     chunk_id: row.get(0)?,
-                    plugin_id: row.get(1)?,
-                    plugin_version: row.get(2)?,
+                    agent_id: row.get(1)?,
+                    agent_version: row.get(2)?,
                     source_hash: row.get(3)?,
                     embedding_model: row.get(4)?,
                     embedding_dim: row.get(5)?,
@@ -3370,7 +3457,7 @@ mod tests {
             .expect("create old todos schema");
             conn.execute(
                 "INSERT INTO todos (title, description, priority, deadline)
-                 VALUES ('Legacy task', 'Keep me', 2, '2026-05-01T09:00')",
+                 VALUES ('Legacy task', 'Keep me', 2, '2099-05-01T09:00')",
                 [],
             )
             .expect("insert legacy todo");
@@ -3394,6 +3481,88 @@ mod tests {
             .expect("count occurrences");
         assert_eq!(occurrence_count, 0);
         drop(conn);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn agent_rename_migration_preserves_legacy_agent_package_data() {
+        let dir = temp_db_dir("agent_rename_migration");
+        std::fs::create_dir_all(&dir).expect("create temp db dir");
+        {
+            let conn = Connection::open(dir.join("todos.db")).expect("open old db");
+            conn.execute_batch(
+                "CREATE TABLE agent_settings (
+                    id               INTEGER PRIMARY KEY CHECK (id = 1),
+                    plugin_directory TEXT NOT NULL DEFAULT '',
+                    safe_file_roots_json TEXT NOT NULL DEFAULT '[]'
+                );
+                INSERT INTO agent_settings (id, plugin_directory)
+                VALUES (1, '/tmp/legacy-plugins');
+                CREATE TABLE agent_plugins (
+                    plugin_id              TEXT PRIMARY KEY,
+                    plugin_name            TEXT NOT NULL,
+                    plugin_version         TEXT NOT NULL,
+                    author                 TEXT NOT NULL DEFAULT '',
+                    description            TEXT NOT NULL DEFAULT '',
+                    tags_json              TEXT NOT NULL DEFAULT '[]',
+                    path                   TEXT NOT NULL,
+                    avatar_path            TEXT NOT NULL DEFAULT '',
+                    readme_path            TEXT NOT NULL DEFAULT '',
+                    bundled                INTEGER NOT NULL DEFAULT 0,
+                    enabled                INTEGER NOT NULL DEFAULT 1,
+                    lifecycle_state        TEXT NOT NULL DEFAULT 'discovered',
+                    rag_enabled            INTEGER NOT NULL DEFAULT 0,
+                    is_multi_agent_supported INTEGER NOT NULL DEFAULT 0,
+                    has_rag_knowledge      INTEGER NOT NULL DEFAULT 0,
+                    validation_json        TEXT NOT NULL DEFAULT '[]',
+                    created_at             TEXT NOT NULL DEFAULT (datetime('now')),
+                    updated_at             TEXT NOT NULL DEFAULT (datetime('now'))
+                );
+                INSERT INTO agent_plugins (
+                    plugin_id, plugin_name, plugin_version, author, description, path,
+                    bundled, enabled, lifecycle_state, rag_enabled, is_multi_agent_supported,
+                    has_rag_knowledge
+                )
+                VALUES (
+                    'legacy_agent', 'Legacy Agent', '1.2.3', 'Test', 'Legacy package',
+                    '/tmp/legacy-plugins/legacy_agent', 0, 1, 'loaded', 1, 1, 1
+                );
+                CREATE TABLE agent_rag_chunks (
+                    chunk_id        TEXT PRIMARY KEY,
+                    plugin_id       TEXT NOT NULL,
+                    plugin_version  TEXT NOT NULL,
+                    source_hash     TEXT NOT NULL,
+                    embedding_model TEXT NOT NULL DEFAULT '',
+                    embedding_dim   INTEGER NOT NULL DEFAULT 0,
+                    chunk_text      TEXT NOT NULL,
+                    embedding_json  TEXT NOT NULL DEFAULT '[]',
+                    created_at      TEXT NOT NULL DEFAULT (datetime('now'))
+                );
+                INSERT INTO agent_rag_chunks (
+                    chunk_id, plugin_id, plugin_version, source_hash, embedding_model,
+                    embedding_dim, chunk_text
+                )
+                VALUES (
+                    'legacy_agent:hash:0000', 'legacy_agent', '1.2.3', 'hash',
+                    'pending', 1536, 'legacy knowledge'
+                );",
+            )
+            .expect("create legacy agent schema");
+        }
+
+        let db = Database::new(&dir).expect("migrate db");
+        let settings = db.get_agent_directory_settings().expect("agent settings");
+        assert_eq!(settings.agent_directory, "/tmp/legacy-plugins");
+        let agents = db.list_agent_definitions().expect("list agents");
+        assert_eq!(agents.len(), 1);
+        assert_eq!(agents[0].agent_id, "legacy_agent");
+        assert_eq!(agents[0].agent_name, "Legacy Agent");
+        let chunks = db
+            .list_agent_rag_chunks("legacy_agent")
+            .expect("list rag chunks");
+        assert_eq!(chunks.len(), 1);
+        assert_eq!(chunks[0].agent_id, "legacy_agent");
+        assert_eq!(chunks[0].agent_version, "1.2.3");
         let _ = std::fs::remove_dir_all(dir);
     }
 

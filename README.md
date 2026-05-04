@@ -41,11 +41,11 @@ This project also serves as a practical [Harness Engineering](https://www.fanyam
 ### AI Agents
 
 - **Agent chat**: talk with bundled local Agents such as Personal Secretary and Confucius from the desktop app.
-- **Plugin-based personas**: Agents are loaded from static plugin folders with manifest, prompt, config, avatar, README, and optional RAG knowledge files.
+- **File-based personas**: Agents are loaded from static Agent folders with manifest, prompt, config, avatar, README, and optional RAG knowledge files.
 - **Local memory and identity**: manage user identity, durable memories, memory proposals, and previous conversation recall in local SQLite.
 - **RAG knowledge**: per-Agent `rag_knowledge.md` files are chunked and retrieved only for the active Agent.
 - **Safe tool actions**: Agents can propose todo, note, milestone, file, memory, and external CLI actions, with app-owned confirmation flows for writes or sensitive operations.
-- **Plugin management**: refresh, enable, disable, install, inspect, uninstall, and rebuild RAG indexes from Settings.
+- **Agent management**: refresh, enable, disable, install, inspect, uninstall, and rebuild RAG indexes from Settings.
 
 ### Settings and Desktop Experience
 
@@ -238,12 +238,12 @@ The frontend can only reach the backend through `invoke()` and cannot directly t
 | Pomodoro | `get_weekly_pomodoro_stats` | Get weekly stats |
 | Pomodoro | `update_tray_tooltip` | Update tray tooltip |
 | Agents | `list_agents` | List bundled and installed Agents |
-| Agents | `refresh_agents` | Rescan Agent plugins |
+| Agents | `refresh_agents` | Rescan Agents |
 | Agents | `start_agent_session` | Start a single-Agent chat |
 | Agents | `start_agent_group_session` | Start a group Agent chat |
 | Agents | `send_agent_message_stream` | Stream a single-Agent reply |
 | Agents | `send_agent_group_message_stream` | Stream group Agent replies |
-| Agents | `get_agent_plugin_detail` | Inspect Agent plugin metadata, README, diagnostics, and RAG status |
+| Agents | `get_agent_detail` | Inspect Agent metadata, README, diagnostics, and RAG status |
 | Agents | `rebuild_agent_rag_index` | Rebuild RAG knowledge for one Agent |
 | Agents | `list_agent_memories` | List local Agent memories |
 | Agents | `confirm_agent_tool_action` | Confirm or reject proposed write/tool actions |

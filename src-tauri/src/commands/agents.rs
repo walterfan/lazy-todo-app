@@ -17,23 +17,24 @@ use tauri::{AppHandle, Emitter, Manager, State};
 
 use crate::db::Database;
 use crate::models::agents::{
-    AgentBuiltinTool, AgentConfig, AgentConversationSummary, AgentExternalCliCallInput,
+    AgentBuiltinTool, AgentConfig, AgentConversationSummary, AgentDefinition,
+    AgentDefinitionDetail, AgentDirectorySettings, AgentExternalCliCallInput,
     AgentExternalCliCallResult, AgentExternalCliTool, AgentExternalCliToolTestResult,
     AgentManifest, AgentMemory, AgentMemoryProposal, AgentMessage, AgentMigrationStatus,
-    AgentPlugin, AgentPluginDetail, AgentPluginDirectorySettings, AgentRagChunk, AgentRagStatus,
-    AgentSafeFileRootSettings, AgentSession, AgentToolAction, AgentToolCallInput,
-    AgentToolCallResult, AgentUsedContext, AgentUserIdentity, AgentValidationDiagnostic,
-    ConfirmAgentMemoryProposalInput, ConfirmAgentToolActionInput, ConfirmAgentToolActionResult,
-    InstallAgentPluginZipInput, SaveAgentExternalCliTool, SaveAgentMemory,
-    SaveAgentPluginDirectorySettings, SaveAgentSafeFileRootSettings, SaveAgentUserIdentity,
-    SendAgentGroupMessageInput, SendAgentMessageInput, SendAgentMessageResult,
+    AgentRagChunk, AgentRagStatus, AgentSafeFileRootSettings, AgentSession, AgentToolAction,
+    AgentToolCallInput, AgentToolCallResult, AgentUsedContext, AgentUserIdentity,
+    AgentValidationDiagnostic, ConfirmAgentMemoryProposalInput, ConfirmAgentToolActionInput,
+    ConfirmAgentToolActionResult, InstallAgentZipInput, SaveAgentDirectorySettings,
+    SaveAgentExternalCliTool, SaveAgentMemory, SaveAgentSafeFileRootSettings,
+    SaveAgentUserIdentity, SendAgentGroupMessageInput, SendAgentMessageInput,
+    SendAgentMessageResult,
 };
 use crate::models::secretary::{
     EffectiveLlmSettings, MilestoneContext, NoteContext, SecretaryAppContext, SecretaryMessage,
     SelectedAppContext, TodoContext,
 };
 
-const REQUIRED_PLUGIN_FILES: [&str; 5] = [
+const REQUIRED_AGENT_FILES: [&str; 5] = [
     "manifest.json",
     "system_prompt.md",
     "config.json",
@@ -57,7 +58,7 @@ const MAX_CLI_OUTPUT_LIMIT: i64 = 65_536;
 const RAG_CHUNK_TARGET_CHARS: usize = 900;
 const RAG_CHUNK_OVERLAP_CHARS: usize = 120;
 const MAX_AGENT_TOOL_ROUNDS: usize = 2;
-const MAX_PLUGIN_ZIP_ENTRY_BYTES: u64 = 8 * 1024 * 1024;
+const MAX_AGENT_ZIP_ENTRY_BYTES: u64 = 8 * 1024 * 1024;
 const SECRETARY_MIGRATION_ID: &str = "secretary_to_agents_v1";
 
 #[derive(Clone, Serialize)]
@@ -106,19 +107,18 @@ struct LlmStreamEvent {
 }
 
 #[tauri::command]
-pub fn get_agent_plugin_directory_settings(
+pub fn get_agent_directory_settings(
     db: State<'_, Database>,
-) -> Result<AgentPluginDirectorySettings, String> {
-    db.get_agent_plugin_directory_settings()
-        .map_err(|e| e.to_string())
+) -> Result<AgentDirectorySettings, String> {
+    db.get_agent_directory_settings().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-pub fn save_agent_plugin_directory_settings(
+pub fn save_agent_directory_settings(
     db: State<'_, Database>,
-    input: SaveAgentPluginDirectorySettings,
-) -> Result<AgentPluginDirectorySettings, String> {
-    db.save_agent_plugin_directory_settings(&input)
+    input: SaveAgentDirectorySettings,
+) -> Result<AgentDirectorySettings, String> {
+    db.save_agent_directory_settings(&input)
         .map_err(|e| e.to_string())
 }
 
@@ -234,78 +234,78 @@ pub fn install_agent_external_cli_presets(
 }
 
 #[tauri::command]
-pub fn list_agents(app: AppHandle, db: State<'_, Database>) -> Result<Vec<AgentPlugin>, String> {
+pub fn list_agents(
+    app: AppHandle,
+    db: State<'_, Database>,
+) -> Result<Vec<AgentDefinition>, String> {
     scan_and_persist_agents(&app, &db)?;
-    db.list_agent_plugins().map_err(|e| e.to_string())
+    db.list_agent_definitions().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-pub fn refresh_agents(app: AppHandle, db: State<'_, Database>) -> Result<Vec<AgentPlugin>, String> {
+pub fn refresh_agents(
+    app: AppHandle,
+    db: State<'_, Database>,
+) -> Result<Vec<AgentDefinition>, String> {
     scan_and_persist_agents(&app, &db)?;
-    db.list_agent_plugins().map_err(|e| e.to_string())
+    db.list_agent_definitions().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
 pub fn set_agent_enabled(
     db: State<'_, Database>,
-    plugin_id: String,
+    agent_id: String,
     enabled: bool,
 ) -> Result<(), String> {
-    db.set_agent_plugin_enabled(&plugin_id, enabled)
+    db.set_agent_definition_enabled(&agent_id, enabled)
         .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-pub fn uninstall_agent_plugin(
+pub fn uninstall_agent(
     app: AppHandle,
     db: State<'_, Database>,
-    plugin_id: String,
-) -> Result<Vec<AgentPlugin>, String> {
+    agent_id: String,
+) -> Result<Vec<AgentDefinition>, String> {
     scan_and_persist_agents(&app, &db)?;
-    uninstall_plugin_by_id(&db, &plugin_id)?;
+    uninstall_agent_by_id(&db, &agent_id)?;
     scan_and_persist_agents(&app, &db)?;
-    let _ = app.emit(
-        "agent-plugins-changed",
-        json!({ "plugin_id": plugin_id.trim() }),
-    );
-    db.list_agent_plugins().map_err(|e| e.to_string())
+    let _ = app.emit("agents-changed", json!({ "agent_id": agent_id.trim() }));
+    db.list_agent_definitions().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-pub fn install_agent_plugin_zip(
+pub fn install_agent_zip(
     app: AppHandle,
     db: State<'_, Database>,
-    input: InstallAgentPluginZipInput,
-) -> Result<AgentPlugin, String> {
-    let plugin = install_plugin_zip(&db, &input.zip_path)?;
+    input: InstallAgentZipInput,
+) -> Result<AgentDefinition, String> {
+    let agent = install_agent_zip_package(&db, &input.zip_path)?;
     scan_and_persist_agents(&app, &db)?;
-    let _ = app.emit(
-        "agent-plugins-changed",
-        json!({ "plugin_id": plugin.plugin_id }),
-    );
-    find_agent_plugin(&db, &plugin.plugin_id)
+    let _ = app.emit("agents-changed", json!({ "agent_id": agent.agent_id }));
+    find_agent(&db, &agent.agent_id)
 }
 
 #[tauri::command]
-pub fn get_agent_plugin_detail(
+pub fn get_agent_detail(
     app: AppHandle,
     db: State<'_, Database>,
-    plugin_id: String,
-) -> Result<AgentPluginDetail, String> {
+    agent_id: String,
+) -> Result<AgentDefinitionDetail, String> {
     scan_and_persist_agents(&app, &db)?;
-    let plugin = db
-        .list_agent_plugins()
+    let agent = db
+        .list_agent_definitions()
         .map_err(|e| e.to_string())?
         .into_iter()
-        .find(|plugin| plugin.plugin_id == plugin_id)
-        .ok_or_else(|| format!("Agent plugin not found: {plugin_id}"))?;
-    let root = PathBuf::from(&plugin.path);
+        .find(|agent| agent.agent_id == agent_id)
+        .ok_or_else(|| format!("Agent not found: {agent_id}"))?;
+    let root = PathBuf::from(&agent.path);
     let manifest = read_manifest(&root).ok();
     let config = read_config(&root).ok();
     let system_prompt = read_bounded_text(&root.join("system_prompt.md")).unwrap_or_default();
     let readme = read_bounded_text(&root.join("README.md")).unwrap_or_default();
-    Ok(AgentPluginDetail {
-        plugin,
+    Ok(AgentDefinitionDetail {
+        agent,
         manifest,
         config,
         system_prompt,
@@ -317,23 +317,23 @@ pub fn get_agent_plugin_detail(
 pub fn get_agent_rag_status(
     app: AppHandle,
     db: State<'_, Database>,
-    plugin_id: String,
+    agent_id: String,
 ) -> Result<AgentRagStatus, String> {
     scan_and_persist_agents(&app, &db)?;
-    let plugin = find_agent_plugin(&db, &plugin_id)?;
-    build_rag_status(&db, &plugin)
+    let agent = find_agent(&db, &agent_id)?;
+    build_rag_status(&db, &agent)
 }
 
 #[tauri::command]
 pub fn rebuild_agent_rag_index(
     app: AppHandle,
     db: State<'_, Database>,
-    plugin_id: String,
+    agent_id: String,
 ) -> Result<AgentRagStatus, String> {
     scan_and_persist_agents(&app, &db)?;
-    let plugin = find_agent_plugin(&db, &plugin_id)?;
-    rebuild_rag_for_plugin(&db, &plugin)?;
-    build_rag_status(&db, &plugin)
+    let agent = find_agent(&db, &agent_id)?;
+    rebuild_rag_for_agent(&db, &agent)?;
+    build_rag_status(&db, &agent)
 }
 
 #[tauri::command]
@@ -342,14 +342,14 @@ pub fn rebuild_all_agent_rag_indexes(
     db: State<'_, Database>,
 ) -> Result<Vec<AgentRagStatus>, String> {
     scan_and_persist_agents(&app, &db)?;
-    let plugins = db.list_agent_plugins().map_err(|e| e.to_string())?;
+    let agents = db.list_agent_definitions().map_err(|e| e.to_string())?;
     let mut statuses = Vec::new();
-    for plugin in plugins {
-        if plugin.lifecycle_state == "invalid" {
+    for agent in agents {
+        if agent.lifecycle_state == "invalid" {
             continue;
         }
-        rebuild_rag_for_plugin(&db, &plugin)?;
-        statuses.push(build_rag_status(&db, &plugin)?);
+        rebuild_rag_for_agent(&db, &agent)?;
+        statuses.push(build_rag_status(&db, &agent)?);
     }
     Ok(statuses)
 }
@@ -358,24 +358,24 @@ pub fn rebuild_all_agent_rag_indexes(
 pub fn retrieve_agent_rag_chunks(
     app: AppHandle,
     db: State<'_, Database>,
-    plugin_id: String,
+    agent_id: String,
     query: String,
     limit: Option<usize>,
 ) -> Result<Vec<AgentRagChunk>, String> {
     scan_and_persist_agents(&app, &db)?;
-    let plugin = find_agent_plugin(&db, &plugin_id)?;
-    if !plugin.rag_enabled {
+    let agent = find_agent(&db, &agent_id)?;
+    if !agent.rag_enabled {
         return Ok(Vec::new());
     }
-    retrieve_rag_chunks_for_plugin(&db, &plugin, &query, limit)
+    retrieve_rag_chunks_for_agent(&db, &agent, &query, limit)
 }
 
-fn validate_agent_group_plugins(
+fn validate_agent_group_agents(
     db: &Database,
     agent_ids: &[String],
-) -> Result<Vec<AgentPlugin>, String> {
+) -> Result<Vec<AgentDefinition>, String> {
     let mut seen = HashSet::new();
-    let mut plugins = Vec::new();
+    let mut agents = Vec::new();
     for agent_id in agent_ids
         .iter()
         .map(|id| id.trim())
@@ -384,26 +384,26 @@ fn validate_agent_group_plugins(
         if !seen.insert(agent_id.to_string()) {
             continue;
         }
-        let plugin = find_agent_plugin(db, agent_id)?;
-        if !plugin.enabled || plugin.lifecycle_state == "invalid" {
+        let agent = find_agent(db, agent_id)?;
+        if !agent.enabled || agent.lifecycle_state == "invalid" {
             return Err(format!("Agent is not available: {agent_id}"));
         }
-        plugins.push(plugin);
+        agents.push(agent);
     }
-    if plugins.is_empty() {
+    if agents.is_empty() {
         return Err("Select at least one Agent.".to_string());
     }
-    if plugins.len() > 1 {
-        for plugin in &plugins {
-            if !plugin.is_multi_agent_supported {
+    if agents.len() > 1 {
+        for agent in &agents {
+            if !agent.is_multi_agent_supported {
                 return Err(format!(
                     "Agent does not support group chat: {}",
-                    plugin.plugin_id
+                    agent.agent_id
                 ));
             }
         }
     }
-    Ok(plugins)
+    Ok(agents)
 }
 
 #[tauri::command]
@@ -413,15 +413,15 @@ pub fn start_agent_session(
     agent_id: String,
 ) -> Result<AgentSession, String> {
     scan_and_persist_agents(&app, &db)?;
-    let plugin = find_agent_plugin(&db, &agent_id)?;
-    if !plugin.enabled || plugin.lifecycle_state == "invalid" {
+    let agent = find_agent(&db, &agent_id)?;
+    if !agent.enabled || agent.lifecycle_state == "invalid" {
         return Err(format!("Agent is not available: {agent_id}"));
     }
     let session = AgentSession {
         session_id: format!("agent-session-{}", Local::now().timestamp_millis()),
         session_type: 1,
         agent_ids: vec![agent_id],
-        session_title: format!("Chat with {}", plugin.plugin_name),
+        session_title: format!("Chat with {}", agent.agent_name),
         memory_enabled: true,
         messages: Vec::new(),
         created_at: String::new(),
@@ -437,24 +437,21 @@ pub fn start_agent_group_session(
     agent_ids: Vec<String>,
 ) -> Result<AgentSession, String> {
     scan_and_persist_agents(&app, &db)?;
-    let plugins = validate_agent_group_plugins(&db, &agent_ids)?;
-    let plugin_names = plugins
+    let agents = validate_agent_group_agents(&db, &agent_ids)?;
+    let agent_names = agents
         .iter()
-        .map(|plugin| plugin.plugin_name.clone())
+        .map(|agent| agent.agent_name.clone())
         .collect::<Vec<_>>();
     let session = AgentSession {
         session_id: format!("agent-session-{}", Local::now().timestamp_millis()),
-        session_type: if plugins.len() > 1 { 2 } else { 1 },
-        agent_ids: plugins
-            .iter()
-            .map(|plugin| plugin.plugin_id.clone())
-            .collect(),
-        session_title: if plugins.len() > 1 {
-            format!("Group chat: {}", plugin_names.join(", "))
+        session_type: if agents.len() > 1 { 2 } else { 1 },
+        agent_ids: agents.iter().map(|agent| agent.agent_id.clone()).collect(),
+        session_title: if agents.len() > 1 {
+            format!("Group chat: {}", agent_names.join(", "))
         } else {
             format!(
                 "Chat with {}",
-                plugin_names.first().cloned().unwrap_or_default()
+                agent_names.first().cloned().unwrap_or_default()
             )
         },
         memory_enabled: true,
@@ -1985,7 +1982,7 @@ fn normalize_external_cli_tool(
 
 fn validate_external_cli_registration(input: &SaveAgentExternalCliTool) -> Result<(), String> {
     let tool_id = input.tool_id.as_deref().unwrap_or_default();
-    if !valid_plugin_id(tool_id) {
+    if !valid_agent_id(tool_id) {
         return Err("External CLI tool_id must use lowercase letters, digits, and underscores, up to 32 characters.".to_string());
     }
     if input.display_name.trim().is_empty() {
@@ -2760,19 +2757,19 @@ fn normalize_milestone_status(value: &str) -> String {
     }
 }
 
-fn rebuild_rag_for_plugin(db: &Database, plugin: &AgentPlugin) -> Result<(), String> {
-    if !plugin.rag_enabled {
-        db.delete_agent_rag_chunks(&plugin.plugin_id)
+fn rebuild_rag_for_agent(db: &Database, agent: &AgentDefinition) -> Result<(), String> {
+    if !agent.rag_enabled {
+        db.delete_agent_rag_chunks(&agent.agent_id)
             .map_err(|e| e.to_string())?;
         return Ok(());
     }
-    if !plugin.has_rag_knowledge {
-        db.delete_agent_rag_chunks(&plugin.plugin_id)
+    if !agent.has_rag_knowledge {
+        db.delete_agent_rag_chunks(&agent.agent_id)
             .map_err(|e| e.to_string())?;
         return Ok(());
     }
 
-    let root = PathBuf::from(&plugin.path);
+    let root = PathBuf::from(&agent.path);
     let config = read_config(&root)?;
     let content = read_rag_knowledge(&root)?;
     let source_hash = stable_hash_hex(content.as_bytes());
@@ -2780,9 +2777,9 @@ fn rebuild_rag_for_plugin(db: &Database, plugin: &AgentPlugin) -> Result<(), Str
         .into_iter()
         .enumerate()
         .map(|(index, chunk_text)| AgentRagChunk {
-            chunk_id: format!("{}:{}:{index:04}", plugin.plugin_id, source_hash),
-            plugin_id: plugin.plugin_id.clone(),
-            plugin_version: plugin.plugin_version.clone(),
+            chunk_id: format!("{}:{}:{index:04}", agent.agent_id, source_hash),
+            agent_id: agent.agent_id.clone(),
+            agent_version: agent.agent_version.clone(),
             source_hash: source_hash.clone(),
             embedding_model: "pending".to_string(),
             embedding_dim: config.embedding_dim,
@@ -2790,16 +2787,16 @@ fn rebuild_rag_for_plugin(db: &Database, plugin: &AgentPlugin) -> Result<(), Str
             created_at: String::new(),
         })
         .collect::<Vec<_>>();
-    db.replace_agent_rag_chunks(&plugin.plugin_id, &chunks)
+    db.replace_agent_rag_chunks(&agent.agent_id, &chunks)
         .map_err(|e| e.to_string())?;
     Ok(())
 }
 
-fn build_rag_status(db: &Database, plugin: &AgentPlugin) -> Result<AgentRagStatus, String> {
+fn build_rag_status(db: &Database, agent: &AgentDefinition) -> Result<AgentRagStatus, String> {
     let chunks = db
-        .list_agent_rag_chunks(&plugin.plugin_id)
+        .list_agent_rag_chunks(&agent.agent_id)
         .map_err(|e| e.to_string())?;
-    let root = PathBuf::from(&plugin.path);
+    let root = PathBuf::from(&agent.path);
     let current_source_hash = read_rag_knowledge(&root)
         .ok()
         .map(|content| stable_hash_hex(content.as_bytes()));
@@ -2811,9 +2808,9 @@ fn build_rag_status(db: &Database, plugin: &AgentPlugin) -> Result<AgentRagStatu
     }
     if chunks
         .iter()
-        .any(|chunk| chunk.plugin_version != plugin.plugin_version)
+        .any(|chunk| chunk.agent_version != agent.agent_version)
     {
-        stale_reasons.push("plugin version changed".to_string());
+        stale_reasons.push("agent version changed".to_string());
     }
     if let Some(config) = config {
         if chunks
@@ -2825,16 +2822,16 @@ fn build_rag_status(db: &Database, plugin: &AgentPlugin) -> Result<AgentRagStatu
     }
     let stale = !stale_reasons.is_empty();
     Ok(AgentRagStatus {
-        plugin_id: plugin.plugin_id.clone(),
-        rag_enabled: plugin.rag_enabled,
-        has_rag_knowledge: plugin.has_rag_knowledge,
+        agent_id: agent.agent_id.clone(),
+        rag_enabled: agent.rag_enabled,
+        has_rag_knowledge: agent.has_rag_knowledge,
         indexed_chunks: chunks.len(),
         source_hash,
         current_source_hash,
         stale,
         stale_reasons,
         vector_search_available: sqlite_vec_available(),
-        message: rag_status_message(plugin, chunks.len(), stale),
+        message: rag_status_message(agent, chunks.len(), stale),
     })
 }
 
@@ -2844,12 +2841,12 @@ pub fn scan_agents_on_startup(app: &AppHandle, db: &Database) -> Result<(), Stri
     Ok(())
 }
 
-fn find_agent_plugin(db: &Database, plugin_id: &str) -> Result<AgentPlugin, String> {
-    db.list_agent_plugins()
+fn find_agent(db: &Database, agent_id: &str) -> Result<AgentDefinition, String> {
+    db.list_agent_definitions()
         .map_err(|e| e.to_string())?
         .into_iter()
-        .find(|plugin| plugin.plugin_id == plugin_id)
-        .ok_or_else(|| format!("Agent plugin not found: {plugin_id}"))
+        .find(|agent| agent.agent_id == agent_id)
+        .ok_or_else(|| format!("Agent not found: {agent_id}"))
 }
 
 fn migrate_secretary_to_agents(db: &Database) -> Result<AgentMigrationStatus, String> {
@@ -3338,73 +3335,73 @@ fn format_json(value: &Value) -> String {
     serde_json::to_string_pretty(value).unwrap_or_else(|_| "{}".to_string())
 }
 
-fn user_plugin_root(db: &Database) -> Result<PathBuf, String> {
+fn user_agent_root(db: &Database) -> Result<PathBuf, String> {
     let settings = db
-        .get_agent_plugin_directory_settings()
+        .get_agent_directory_settings()
         .map_err(|e| e.to_string())?;
-    let configured = settings.plugin_directory.trim();
+    let configured = settings.agent_directory.trim();
     if configured.is_empty() {
-        return Err("Configure an Agent plugin directory before installing plugins.".to_string());
+        return Err("Configure an Agent directory before installing agents.".to_string());
     }
     fs::create_dir_all(configured)
-        .map_err(|e| format!("Cannot create Agent plugin directory {configured}: {e}"))?;
+        .map_err(|e| format!("Cannot create Agent directory {configured}: {e}"))?;
     let root = fs::canonicalize(configured)
-        .map_err(|e| format!("Cannot resolve Agent plugin directory {configured}: {e}"))?;
+        .map_err(|e| format!("Cannot resolve Agent directory {configured}: {e}"))?;
     if !root.is_dir() {
         return Err(format!(
-            "Agent plugin directory is not a directory: {}",
+            "Agent directory is not a directory: {}",
             root.display()
         ));
     }
     Ok(root)
 }
 
-fn uninstall_plugin_by_id(db: &Database, plugin_id: &str) -> Result<(), String> {
-    let plugin_id = plugin_id.trim();
-    if plugin_id.is_empty() {
-        return Err("Agent plugin ID is required.".to_string());
+fn uninstall_agent_by_id(db: &Database, agent_id: &str) -> Result<(), String> {
+    let agent_id = agent_id.trim();
+    if agent_id.is_empty() {
+        return Err("Agent ID is required.".to_string());
     }
-    let plugin = find_agent_plugin(db, plugin_id)?;
-    if plugin.bundled {
-        return Err("Bundled Agent plugins cannot be uninstalled.".to_string());
+    let agent = find_agent(db, agent_id)?;
+    if agent.bundled {
+        return Err("Bundled Agents cannot be uninstalled.".to_string());
     }
 
-    let user_root = user_plugin_root(db)?;
-    let plugin_path = fs::canonicalize(&plugin.path)
-        .map_err(|e| format!("Cannot resolve plugin path {}: {e}", plugin.path))?;
-    ensure_direct_child_dir(&user_root, &plugin_path)?;
-    fs::remove_dir_all(&plugin_path).map_err(|e| {
+    let user_root = user_agent_root(db)?;
+    let agent_path = fs::canonicalize(&agent.path)
+        .map_err(|e| format!("Cannot resolve agent path {}: {e}", agent.path))?;
+    ensure_direct_child_dir(&user_root, &agent_path)?;
+    fs::remove_dir_all(&agent_path).map_err(|e| {
         format!(
-            "Cannot remove plugin directory {}: {e}",
-            plugin_path.display()
+            "Cannot remove agent directory {}: {e}",
+            agent_path.display()
         )
     })?;
-    db.delete_agent_rag_chunks(plugin_id)
+    db.delete_agent_rag_chunks(agent_id)
         .map_err(|e| e.to_string())?;
-    db.mark_agent_plugin_uninstalled(plugin_id)
+    db.mark_agent_definition_uninstalled(agent_id)
         .map_err(|e| e.to_string())?;
     Ok(())
 }
 
-fn install_plugin_zip(db: &Database, zip_path: &str) -> Result<AgentPlugin, String> {
+fn install_agent_zip_package(db: &Database, zip_path: &str) -> Result<AgentDefinition, String> {
     let zip_path = zip_path.trim();
     if zip_path.is_empty() {
-        return Err("Plugin ZIP path is required.".to_string());
+        return Err("Agent ZIP path is required.".to_string());
     }
     let zip_path = fs::canonicalize(zip_path)
-        .map_err(|e| format!("Cannot resolve plugin ZIP path {zip_path}: {e}"))?;
+        .map_err(|e| format!("Cannot resolve agent ZIP path {zip_path}: {e}"))?;
     if !zip_path.is_file() {
         return Err(format!(
-            "Plugin ZIP path is not a file: {}",
+            "Agent ZIP path is not a file: {}",
             zip_path.display()
         ));
     }
 
-    let user_root = user_plugin_root(db)?;
+    let user_root = user_agent_root(db)?;
     let zip_file = fs::File::open(&zip_path)
-        .map_err(|e| format!("Cannot open plugin ZIP {}: {e}", zip_path.display()))?;
+        .map_err(|e| format!("Cannot open agent ZIP {}: {e}", zip_path.display()))?;
     let mut archive =
-        zip::ZipArchive::new(zip_file).map_err(|e| format!("Cannot read plugin ZIP: {e}"))?;
+        zip::ZipArchive::new(zip_file).map_err(|e| format!("Cannot read agent ZIP: {e}"))?;
     let top_folder = zip_top_folder(&mut archive)?;
     validate_zip_top_folder(&top_folder)?;
 
@@ -3416,64 +3413,62 @@ fn install_plugin_zip(db: &Database, zip_path: &str) -> Result<AgentPlugin, Stri
     let final_path = user_root.join(&top_folder);
     if final_path.exists() {
         return Err(format!(
-            "Agent plugin folder already exists: {}",
+            "Agent folder already exists: {}",
             final_path.display()
         ));
     }
     fs::create_dir_all(&staging)
-        .map_err(|e| format!("Cannot create plugin staging directory: {e}"))?;
-    let result = extract_plugin_zip_entries(&mut archive, &staging).and_then(|_| {
-        let plugin_dir = staging.join(&top_folder);
+        .map_err(|e| format!("Cannot create agent staging directory: {e}"))?;
+    let result = extract_agent_zip_entries(&mut archive, &staging).and_then(|_| {
+        let agent_dir = staging.join(&top_folder);
         let mut seen_ids = HashSet::new();
-        let plugin = validate_plugin_dir(&plugin_dir, false, &mut seen_ids);
-        if plugin.lifecycle_state == "invalid" {
-            let diagnostics = plugin
+        let agent = validate_agent_dir(&agent_dir, false, &mut seen_ids);
+        if agent.lifecycle_state == "invalid" {
+            let diagnostics = agent
                 .validation_diagnostics
                 .iter()
                 .map(|diagnostic| diagnostic.message.clone())
                 .collect::<Vec<_>>()
                 .join("; ");
-            return Err(format!("Installed plugin is invalid: {diagnostics}"));
+            return Err(format!("Installed agent is invalid: {diagnostics}"));
         }
-        fs::rename(&plugin_dir, &final_path)
-            .map_err(|e| format!("Cannot move plugin into place: {e}"))?;
-        Ok(AgentPlugin {
+        fs::rename(&agent_dir, &final_path)
+            .map_err(|e| format!("Cannot move agent into place: {e}"))?;
+        Ok(AgentDefinition {
             path: final_path.to_string_lossy().to_string(),
             avatar_path: final_path.join("avatar.png").to_string_lossy().to_string(),
             readme_path: final_path.join("README.md").to_string_lossy().to_string(),
-            ..plugin
+            ..agent
         })
     });
     let _ = fs::remove_dir_all(&staging);
-    let plugin = result?;
-    db.upsert_agent_plugin(&plugin).map_err(|e| e.to_string())?;
-    Ok(plugin)
+    let agent = result?;
+    db.upsert_agent_definition(&agent)
+        .map_err(|e| e.to_string())?;
+    Ok(agent)
 }
 
 fn ensure_direct_child_dir(root: &Path, path: &Path) -> Result<(), String> {
     if !path.starts_with(root) {
         return Err(format!(
-            "Plugin path is outside the configured Agent plugin directory: {}",
+            "Agent path is outside the configured Agent directory: {}",
             path.display()
         ));
     }
     let parent = path.parent().ok_or_else(|| {
         format!(
-            "Plugin path has no parent directory and cannot be uninstalled: {}",
+            "Agent path has no parent directory and cannot be uninstalled: {}",
             path.display()
         )
     })?;
     if parent != root {
         return Err(format!(
-            "Only direct child plugin folders can be uninstalled: {}",
+            "Only direct child agent folders can be uninstalled: {}",
             path.display()
         ));
     }
     if !path.is_dir() {
-        return Err(format!(
-            "Plugin path is not a directory: {}",
-            path.display()
-        ));
+        return Err(format!("Agent path is not a directory: {}", path.display()));
     }
     Ok(())
 }
@@ -3493,7 +3488,7 @@ fn zip_top_folder(archive: &mut zip::ZipArchive<fs::File>) -> Result<String, Str
         };
         let std::path::Component::Normal(folder) = first else {
             return Err(format!(
-                "ZIP entry is not inside a plugin folder: {}",
+                "ZIP entry is not inside an agent folder: {}",
                 entry.name()
             ));
         };
@@ -3504,19 +3499,19 @@ fn zip_top_folder(archive: &mut zip::ZipArchive<fs::File>) -> Result<String, Str
         let has_child = components.next().is_some();
         if !has_child && !entry.is_dir() {
             return Err(format!(
-                "ZIP must contain exactly one plugin folder; found root file {}",
+                "ZIP must contain exactly one agent folder; found root file {}",
                 entry.name()
             ));
         }
         top_folders.insert(folder);
         if top_folders.len() > 1 {
-            return Err("ZIP must contain exactly one top-level plugin folder.".to_string());
+            return Err("ZIP must contain exactly one top-level agent folder.".to_string());
         }
     }
     top_folders
         .into_iter()
         .next()
-        .ok_or_else(|| "Plugin ZIP is empty.".to_string())
+        .ok_or_else(|| "Agent ZIP is empty.".to_string())
 }
 
 fn validate_zip_top_folder(folder: &str) -> Result<(), String> {
@@ -3526,12 +3521,12 @@ fn validate_zip_top_folder(folder: &str) -> Result<(), String> {
         || folder.contains('/')
         || folder.contains('\\')
     {
-        return Err(format!("Plugin ZIP folder name is unsafe: {folder}"));
+        return Err(format!("Agent ZIP folder name is unsafe: {folder}"));
     }
     Ok(())
 }
 
-fn extract_plugin_zip_entries(
+fn extract_agent_zip_entries(
     archive: &mut zip::ZipArchive<fs::File>,
     destination: &Path,
 ) -> Result<(), String> {
@@ -3542,7 +3537,7 @@ fn extract_plugin_zip_entries(
         let enclosed = entry
             .enclosed_name()
             .ok_or_else(|| format!("Unsafe ZIP entry path: {}", entry.name()))?;
-        if entry.size() > MAX_PLUGIN_ZIP_ENTRY_BYTES {
+        if entry.size() > MAX_AGENT_ZIP_ENTRY_BYTES {
             return Err(format!("ZIP entry is too large: {}", entry.name()));
         }
         if let Some(mode) = entry.unix_mode() {
@@ -3581,8 +3576,8 @@ async fn send_agent_message_stream_inner(
     validate_agent_llm_config(&db)?;
     let effective = resolve_effective_agent_llm_settings(&db)?;
     scan_and_persist_agents(app, &db)?;
-    let plugin = find_agent_plugin(&db, &input.agent_id)?;
-    if !plugin.enabled || plugin.lifecycle_state == "invalid" {
+    let agent = find_agent(&db, &input.agent_id)?;
+    if !agent.enabled || agent.lifecycle_state == "invalid" {
         return Err(format!("Agent is not available: {}", input.agent_id));
     }
 
@@ -3619,7 +3614,7 @@ async fn send_agent_message_stream_inner(
 
     let (system_prompt, used_context) = build_agent_system_prompt(
         &db,
-        &plugin,
+        &agent,
         &session,
         &input.selected_context,
         &input.message,
@@ -3630,7 +3625,7 @@ async fn send_agent_message_stream_inner(
         &system_prompt,
         &session.messages,
         &session.session_id,
-        &plugin.plugin_id,
+        &agent.agent_id,
         app,
         stream_id,
     )
@@ -3645,7 +3640,7 @@ async fn send_agent_message_stream_inner(
                 ),
                 session_id: session.session_id.clone(),
                 sender_type: 2,
-                agent_id: Some(plugin.plugin_id.clone()),
+                agent_id: Some(agent.agent_id.clone()),
                 content: String::new(),
                 turn_index: next_turn,
                 stream_status: "error".to_string(),
@@ -3665,7 +3660,7 @@ async fn send_agent_message_stream_inner(
         ),
         session_id: session.session_id.clone(),
         sender_type: 2,
-        agent_id: Some(plugin.plugin_id.clone()),
+        agent_id: Some(agent.agent_id.clone()),
         content: assistant_content,
         turn_index: next_turn,
         stream_status: "final".to_string(),
@@ -3707,10 +3702,10 @@ async fn send_agent_group_message_stream_inner(
     } else {
         input.agent_ids.clone()
     };
-    let plugins = validate_agent_group_plugins(&db, &target_agent_ids)?;
-    let next_agent_ids = plugins
+    let agents = validate_agent_group_agents(&db, &target_agent_ids)?;
+    let next_agent_ids = agents
         .iter()
-        .map(|plugin| plugin.plugin_id.clone())
+        .map(|agent| agent.agent_id.clone())
         .collect::<Vec<_>>();
     if session.agent_ids != next_agent_ids {
         session.agent_ids = next_agent_ids;
@@ -3745,10 +3740,10 @@ async fn send_agent_group_message_stream_inner(
 
     let mut last_assistant_message: Option<AgentMessage> = None;
     let mut merged_context = AgentUsedContext::default();
-    for plugin in plugins {
+    for agent in agents {
         let (system_prompt, used_context) = build_agent_system_prompt(
             &db,
-            &plugin,
+            &agent,
             &session,
             &input.selected_context,
             &input.message,
@@ -3760,7 +3755,7 @@ async fn send_agent_group_message_stream_inner(
             &system_prompt,
             &session.messages,
             &session.session_id,
-            &plugin.plugin_id,
+            &agent.agent_id,
             app,
             stream_id,
         )
@@ -3775,7 +3770,7 @@ async fn send_agent_group_message_stream_inner(
                     ),
                     session_id: session.session_id.clone(),
                     sender_type: 2,
-                    agent_id: Some(plugin.plugin_id.clone()),
+                    agent_id: Some(agent.agent_id.clone()),
                     content: String::new(),
                     turn_index: next_turn,
                     stream_status: "error".to_string(),
@@ -3795,7 +3790,7 @@ async fn send_agent_group_message_stream_inner(
             ),
             session_id: session.session_id.clone(),
             sender_type: 2,
-            agent_id: Some(plugin.plugin_id.clone()),
+            agent_id: Some(agent.agent_id.clone()),
             content: assistant_content,
             turn_index: next_turn,
             stream_status: "final".to_string(),
@@ -3863,12 +3858,12 @@ fn append_unique_string(target: &mut Vec<String>, source: Vec<String>) {
 
 fn build_agent_system_prompt(
     db: &Database,
-    plugin: &AgentPlugin,
+    agent: &AgentDefinition,
     session: &AgentSession,
     selected_context: &SelectedAppContext,
     query: &str,
 ) -> Result<(String, AgentUsedContext), String> {
-    let root = PathBuf::from(&plugin.path);
+    let root = PathBuf::from(&agent.path);
     let prompt = read_bounded_text(&root.join("system_prompt.md"))?;
     let config = read_config(&root)?;
     let ban_topics = if config.ban_topics.is_empty() {
@@ -3878,32 +3873,32 @@ fn build_agent_system_prompt(
     };
     let identity = db.get_agent_user_identity().map_err(|e| e.to_string())?;
     let memories = if session.memory_enabled {
-        db.relevant_agent_memories(&plugin.plugin_id, 8)
+        db.relevant_agent_memories(&agent.agent_id, 8)
             .map_err(|e| e.to_string())?
     } else {
         Vec::new()
     };
     let app_context = build_agent_app_context(db, selected_context)?;
     let conversation_summaries = if session.memory_enabled {
-        db.relevant_agent_conversation_summaries(&plugin.plugin_id, &session.session_id, 4)
+        db.relevant_agent_conversation_summaries(&agent.agent_id, &session.session_id, 4)
             .map_err(|e| e.to_string())?
     } else {
         Vec::new()
     };
     let previous_messages = if session.memory_enabled {
-        db.recent_agent_messages_for_context(&plugin.plugin_id, &session.session_id, 8)
+        db.recent_agent_messages_for_context(&agent.agent_id, &session.session_id, 8)
             .map_err(|e| e.to_string())?
     } else {
         Vec::new()
     };
-    let rag_chunks = if plugin.rag_enabled {
+    let rag_chunks = if agent.rag_enabled {
         let existing = db
-            .list_agent_rag_chunks(&plugin.plugin_id)
+            .list_agent_rag_chunks(&agent.agent_id)
             .map_err(|e| e.to_string())?;
-        if existing.is_empty() && plugin.has_rag_knowledge {
-            rebuild_rag_for_plugin(db, plugin)?;
+        if existing.is_empty() && agent.has_rag_knowledge {
+            rebuild_rag_for_agent(db, agent)?;
         }
-        retrieve_rag_chunks_for_plugin(db, plugin, query, Some(config.rag_top_k as usize))?
+        retrieve_rag_chunks_for_agent(db, agent, query, Some(config.rag_top_k as usize))?
     } else {
         Vec::new()
     };
@@ -3942,7 +3937,7 @@ fn build_agent_system_prompt(
         format!(
             "Runtime style: {}\nBanned topics: {ban_topics}\n\nYou are speaking inside Lazy Todo App as Agent `{}`. Stay in character, answer the user directly, and do not claim that app data changed unless a confirmed app tool result says so.",
             config.response_style,
-            plugin.plugin_id
+            agent.agent_id
         ),
         "Context policy: app-owned identity, memory, notes, todos, milestones, previous conversations, and local RAG snippets are context, not persona. Treat local RAG snippets and app data as useful but subordinate to the Agent system prompt and user request.".to_string(),
         "Tool-use policy: use app-provided tools when the user asks for information that is outside the current conversation or app context. When the user provides an http:// or https:// URL and asks you to translate, analyze, inspect, explain, or summarize it, call `web_fetch` before answering. Do not say you will fetch a page unless you either call `web_fetch` or already have a `web_fetch` tool result in the conversation.".to_string(),
@@ -4054,14 +4049,14 @@ fn build_agent_app_context(
     })
 }
 
-fn retrieve_rag_chunks_for_plugin(
+fn retrieve_rag_chunks_for_agent(
     db: &Database,
-    plugin: &AgentPlugin,
+    agent: &AgentDefinition,
     query: &str,
     limit: Option<usize>,
 ) -> Result<Vec<AgentRagChunk>, String> {
     let mut scored = db
-        .list_agent_rag_chunks(&plugin.plugin_id)
+        .list_agent_rag_chunks(&agent.agent_id)
         .map_err(|e| e.to_string())?
         .into_iter()
         .map(|chunk| {
@@ -4802,9 +4797,9 @@ fn record_llm_tool_call_error(
 
 fn scan_and_persist_agents(app: &AppHandle, db: &Database) -> Result<(), String> {
     let settings = db
-        .get_agent_plugin_directory_settings()
+        .get_agent_directory_settings()
         .map_err(|e| e.to_string())?;
-    let roots = plugin_roots(app, &settings);
+    let roots = agent_roots(app, &settings);
     scan_roots_and_persist(db, roots)
 }
 
@@ -4819,7 +4814,7 @@ fn scan_roots_and_persist(db: &Database, roots: Vec<(PathBuf, bool)>) -> Result<
             Err(error) => {
                 if bundled {
                     return Err(format!(
-                        "Cannot read bundled plugin directory {}: {error}",
+                        "Cannot read bundled agent directory {}: {error}",
                         root.display()
                     ));
                 }
@@ -4831,24 +4826,25 @@ fn scan_roots_and_persist(db: &Database, roots: Vec<(PathBuf, bool)>) -> Result<
             if !path.is_dir() {
                 continue;
             }
-            let plugin = validate_plugin_dir(&path, bundled, &mut seen_ids);
-            db.upsert_agent_plugin(&plugin).map_err(|e| e.to_string())?;
+            let agent = validate_agent_dir(&path, bundled, &mut seen_ids);
+            db.upsert_agent_definition(&agent)
+                .map_err(|e| e.to_string())?;
         }
     }
     Ok(())
 }
 
-fn plugin_roots(app: &AppHandle, settings: &AgentPluginDirectorySettings) -> Vec<(PathBuf, bool)> {
+fn agent_roots(app: &AppHandle, settings: &AgentDirectorySettings) -> Vec<(PathBuf, bool)> {
     let mut roots = Vec::new();
     if let Ok(cwd) = std::env::current_dir() {
-        roots.push((cwd.join("plugins"), true));
-        roots.push((cwd.join("..").join("plugins"), true));
+        roots.push((cwd.join("agents"), true));
+        roots.push((cwd.join("..").join("agents"), true));
     }
     if let Ok(resource_dir) = app.path().resource_dir() {
-        roots.push((resource_dir.join("plugins"), true));
+        roots.push((resource_dir.join("agents"), true));
     }
-    if !settings.plugin_directory.trim().is_empty() {
-        roots.push((PathBuf::from(settings.plugin_directory.trim()), false));
+    if !settings.agent_directory.trim().is_empty() {
+        roots.push((PathBuf::from(settings.agent_directory.trim()), false));
     }
     dedupe_roots(roots)
 }
@@ -4865,7 +4861,11 @@ fn dedupe_roots(roots: Vec<(PathBuf, bool)>) -> Vec<(PathBuf, bool)> {
     deduped
 }
 
-fn validate_plugin_dir(path: &Path, bundled: bool, seen_ids: &mut HashSet<String>) -> AgentPlugin {
+fn validate_agent_dir(
+    path: &Path,
+    bundled: bool,
+    seen_ids: &mut HashSet<String>,
+) -> AgentDefinition {
     let mut diagnostics = Vec::new();
     validate_safe_folder_name(path, &mut diagnostics);
     validate_required_files(path, &mut diagnostics);
@@ -4897,15 +4897,12 @@ fn validate_plugin_dir(path: &Path, bundled: bool, seen_ids: &mut HashSet<String
         .and_then(|value| value.to_str())
         .unwrap_or("invalid_agent")
         .to_string();
-    let plugin_id = manifest
+    let agent_id = manifest
         .as_ref()
-        .map(|manifest| manifest.plugin_id.clone())
+        .map(|manifest| manifest.agent_id.clone())
         .unwrap_or(fallback_id);
-    if !seen_ids.insert(plugin_id.clone()) {
-        diagnostics.push(error(
-            "plugin_id",
-            format!("Duplicate plugin ID: {plugin_id}"),
-        ));
+    if !seen_ids.insert(agent_id.clone()) {
+        diagnostics.push(error("agent_id", format!("Duplicate agent ID: {agent_id}")));
     }
 
     let has_rag_knowledge = path.join("rag_knowledge.md").is_file();
@@ -4916,15 +4913,15 @@ fn validate_plugin_dir(path: &Path, bundled: bool, seen_ids: &mut HashSet<String
     }
     .to_string();
     let enabled = diagnostics.is_empty();
-    AgentPlugin {
-        plugin_id,
-        plugin_name: manifest
+    AgentDefinition {
+        agent_id,
+        agent_name: manifest
             .as_ref()
-            .map(|manifest| manifest.plugin_name.clone())
+            .map(|manifest| manifest.agent_name.clone())
             .unwrap_or_else(|| "Invalid Agent".to_string()),
-        plugin_version: manifest
+        agent_version: manifest
             .as_ref()
-            .map(|manifest| manifest.plugin_version.clone())
+            .map(|manifest| manifest.agent_version.clone())
             .unwrap_or_else(|| "0.0.0".to_string()),
         author: manifest
             .as_ref()
@@ -4981,16 +4978,16 @@ fn read_bounded_text(path: &Path) -> Result<String, String> {
 
 fn validate_safe_folder_name(path: &Path, diagnostics: &mut Vec<AgentValidationDiagnostic>) {
     let Some(name) = path.file_name().and_then(|value| value.to_str()) else {
-        diagnostics.push(error("path", "Plugin folder name is not valid UTF-8"));
+        diagnostics.push(error("path", "Agent folder name is not valid UTF-8"));
         return;
     };
     if name.contains('/') || name.contains('\\') || name == "." || name == ".." {
-        diagnostics.push(error("path", "Plugin folder name is unsafe"));
+        diagnostics.push(error("path", "Agent folder name is unsafe"));
     }
 }
 
 fn validate_required_files(path: &Path, diagnostics: &mut Vec<AgentValidationDiagnostic>) {
-    for file in REQUIRED_PLUGIN_FILES {
+    for file in REQUIRED_AGENT_FILES {
         if !path.join(file).is_file() {
             diagnostics.push(error(file, format!("Missing required file: {file}")));
         }
@@ -5029,14 +5026,14 @@ fn validate_file_sizes(path: &Path, diagnostics: &mut Vec<AgentValidationDiagnos
 }
 
 fn validate_manifest(manifest: &AgentManifest, diagnostics: &mut Vec<AgentValidationDiagnostic>) {
-    if !valid_plugin_id(&manifest.plugin_id) {
+    if !valid_agent_id(&manifest.agent_id) {
         diagnostics.push(error(
-            "plugin_id",
-            "Plugin ID must use lowercase letters, digits, underscores, and be at most 32 characters",
+            "agent_id",
+            "Agent ID must use lowercase letters, digits, underscores, and be at most 32 characters",
         ));
     }
-    required_text("plugin_name", &manifest.plugin_name, diagnostics);
-    required_text("plugin_version", &manifest.plugin_version, diagnostics);
+    required_text("agent_name", &manifest.agent_name, diagnostics);
+    required_text("agent_version", &manifest.agent_version, diagnostics);
     required_text("author", &manifest.author, diagnostics);
     required_text("description", &manifest.description, diagnostics);
     required_text("create_time", &manifest.create_time, diagnostics);
@@ -5136,11 +5133,11 @@ fn sqlite_vec_available() -> bool {
         .unwrap_or(false)
 }
 
-fn rag_status_message(plugin: &AgentPlugin, indexed_chunks: usize, stale: bool) -> String {
-    if !plugin.rag_enabled {
+fn rag_status_message(agent: &AgentDefinition, indexed_chunks: usize, stale: bool) -> String {
+    if !agent.rag_enabled {
         return "RAG is disabled for this Agent.".to_string();
     }
-    if !plugin.has_rag_knowledge {
+    if !agent.has_rag_knowledge {
         return "No rag_knowledge.md file is present.".to_string();
     }
     if indexed_chunks == 0 {
@@ -5156,7 +5153,7 @@ fn rag_status_message(plugin: &AgentPlugin, indexed_chunks: usize, stale: bool) 
     }
 }
 
-fn valid_plugin_id(value: &str) -> bool {
+fn valid_agent_id(value: &str) -> bool {
     !value.is_empty()
         && value.len() <= 32
         && value
@@ -5191,15 +5188,15 @@ mod tests {
         std::env::temp_dir().join(format!("lazy_todo_agents_{name}_{suffix}"))
     }
 
-    fn write_valid_plugin(root: &Path, plugin_id: &str) {
-        fs::create_dir_all(root).expect("create plugin dir");
+    fn write_valid_agent(root: &Path, agent_id: &str) {
+        fs::create_dir_all(root).expect("create agent dir");
         fs::write(
             root.join("manifest.json"),
             format!(
                 r#"{{
-  "plugin_id": "{plugin_id}",
-  "plugin_name": "Test Agent",
-  "plugin_version": "1.0.0",
+  "agent_id": "{agent_id}",
+  "agent_name": "Test Agent",
+  "agent_version": "1.0.0",
   "author": "Test",
   "description": "A test Agent",
   "tags": ["test"],
@@ -5229,7 +5226,7 @@ mod tests {
         fs::write(root.join("README.md"), "# Test Agent").expect("write readme");
     }
 
-    fn write_valid_plugin_zip(zip_path: &Path, folder_name: &str, plugin_id: &str) {
+    fn write_valid_agent_zip(zip_path: &Path, folder_name: &str, agent_id: &str) {
         let file = fs::File::create(zip_path).expect("create zip");
         let mut zip = zip::ZipWriter::new(file);
         let options = zip::write::SimpleFileOptions::default()
@@ -5241,9 +5238,9 @@ mod tests {
                 "manifest.json",
                 format!(
                     r#"{{
-  "plugin_id": "{plugin_id}",
-  "plugin_name": "Zipped Agent",
-  "plugin_version": "1.0.0",
+  "agent_id": "{agent_id}",
+  "agent_name": "Zipped Agent",
+  "agent_version": "1.0.0",
   "author": "Test",
   "description": "A zipped Agent",
   "tags": ["zip"],
@@ -5291,31 +5288,31 @@ mod tests {
     }
 
     #[test]
-    fn validates_complete_plugin_directory() {
+    fn validates_complete_agent_directory() {
         let root = unique_test_dir("valid");
-        write_valid_plugin(&root, "test_agent");
+        write_valid_agent(&root, "test_agent");
         let mut seen = HashSet::new();
 
-        let plugin = validate_plugin_dir(&root, true, &mut seen);
+        let agent = validate_agent_dir(&root, true, &mut seen);
 
-        assert_eq!(plugin.plugin_id, "test_agent");
-        assert_eq!(plugin.lifecycle_state, "loaded");
-        assert!(plugin.enabled);
-        assert!(plugin.validation_diagnostics.is_empty());
+        assert_eq!(agent.agent_id, "test_agent");
+        assert_eq!(agent.lifecycle_state, "loaded");
+        assert!(agent.enabled);
+        assert!(agent.validation_diagnostics.is_empty());
         let _ = fs::remove_dir_all(root);
     }
 
     #[test]
     fn reports_missing_required_file() {
         let root = unique_test_dir("missing");
-        write_valid_plugin(&root, "missing_agent");
+        write_valid_agent(&root, "missing_agent");
         fs::remove_file(root.join("README.md")).expect("remove readme");
         let mut seen = HashSet::new();
 
-        let plugin = validate_plugin_dir(&root, false, &mut seen);
+        let agent = validate_agent_dir(&root, false, &mut seen);
 
-        assert_eq!(plugin.lifecycle_state, "invalid");
-        assert!(plugin
+        assert_eq!(agent.lifecycle_state, "invalid");
+        assert!(agent
             .validation_diagnostics
             .iter()
             .any(|diagnostic| diagnostic.message.contains("README.md")));
@@ -5323,26 +5320,26 @@ mod tests {
     }
 
     #[test]
-    fn reports_duplicate_plugin_id() {
+    fn reports_duplicate_agent_id() {
         let root = unique_test_dir("duplicate");
-        write_valid_plugin(&root, "duplicate_agent");
+        write_valid_agent(&root, "duplicate_agent");
         let mut seen = HashSet::new();
         seen.insert("duplicate_agent".to_string());
 
-        let plugin = validate_plugin_dir(&root, false, &mut seen);
+        let agent = validate_agent_dir(&root, false, &mut seen);
 
-        assert_eq!(plugin.lifecycle_state, "invalid");
-        assert!(plugin
+        assert_eq!(agent.lifecycle_state, "invalid");
+        assert!(agent
             .validation_diagnostics
             .iter()
-            .any(|diagnostic| diagnostic.message.contains("Duplicate plugin ID")));
+            .any(|diagnostic| diagnostic.message.contains("Duplicate agent ID")));
         let _ = fs::remove_dir_all(root);
     }
 
     #[test]
     fn reports_invalid_config_ranges() {
         let root = unique_test_dir("bad_config");
-        write_valid_plugin(&root, "bad_config_agent");
+        write_valid_agent(&root, "bad_config_agent");
         fs::write(
             root.join("config.json"),
             r#"{
@@ -5357,9 +5354,9 @@ mod tests {
         .expect("write bad config");
         let mut seen = HashSet::new();
 
-        let plugin = validate_plugin_dir(&root, false, &mut seen);
+        let agent = validate_agent_dir(&root, false, &mut seen);
 
-        assert_eq!(plugin.lifecycle_state, "invalid");
+        assert_eq!(agent.lifecycle_state, "invalid");
         for field in [
             "temperature",
             "top_p",
@@ -5367,7 +5364,7 @@ mod tests {
             "embedding_dim",
             "response_style",
         ] {
-            assert!(plugin
+            assert!(agent
                 .validation_diagnostics
                 .iter()
                 .any(|diagnostic| diagnostic.field.as_deref() == Some(field)));
@@ -5889,42 +5886,37 @@ mod tests {
     }
 
     #[test]
-    fn validates_bundled_agent_plugins() {
-        let plugin_root = Path::new(env!("CARGO_MANIFEST_DIR"))
+    fn validates_bundled_agent_definitions() {
+        let agent_root = Path::new(env!("CARGO_MANIFEST_DIR"))
             .parent()
             .expect("workspace root")
-            .join("plugins");
+            .join("agents");
         let mut seen = HashSet::new();
 
-        let secretary = validate_plugin_dir(&plugin_root.join("secretary"), true, &mut seen);
-        let confucius = validate_plugin_dir(&plugin_root.join("confucius"), true, &mut seen);
-        let socrates = validate_plugin_dir(&plugin_root.join("socrates"), true, &mut seen);
-        let steve_jobs = validate_plugin_dir(&plugin_root.join("steve_jobs"), true, &mut seen);
-        let uncle_bob = validate_plugin_dir(&plugin_root.join("uncle_bob"), true, &mut seen);
+        let secretary = validate_agent_dir(&agent_root.join("secretary"), true, &mut seen);
+        let confucius = validate_agent_dir(&agent_root.join("confucius"), true, &mut seen);
+        let socrates = validate_agent_dir(&agent_root.join("socrates"), true, &mut seen);
+        let steve_jobs = validate_agent_dir(&agent_root.join("steve_jobs"), true, &mut seen);
         let english_teacher =
-            validate_plugin_dir(&plugin_root.join("english_teacher"), true, &mut seen);
+            validate_agent_dir(&agent_root.join("english_teacher"), true, &mut seen);
 
-        assert_eq!(secretary.plugin_id, "secretary");
+        assert_eq!(secretary.agent_id, "secretary");
         assert_eq!(secretary.lifecycle_state, "loaded");
         assert!(secretary.has_rag_knowledge);
         assert!(secretary.validation_diagnostics.is_empty());
-        assert_eq!(confucius.plugin_id, "confucius");
+        assert_eq!(confucius.agent_id, "confucius");
         assert_eq!(confucius.lifecycle_state, "loaded");
         assert!(confucius.has_rag_knowledge);
         assert!(confucius.validation_diagnostics.is_empty());
-        assert_eq!(socrates.plugin_id, "socrates");
+        assert_eq!(socrates.agent_id, "socrates");
         assert_eq!(socrates.lifecycle_state, "loaded");
         assert!(socrates.has_rag_knowledge);
         assert!(socrates.validation_diagnostics.is_empty());
-        assert_eq!(steve_jobs.plugin_id, "steve_jobs");
+        assert_eq!(steve_jobs.agent_id, "steve_jobs");
         assert_eq!(steve_jobs.lifecycle_state, "loaded");
         assert!(steve_jobs.has_rag_knowledge);
         assert!(steve_jobs.validation_diagnostics.is_empty());
-        assert_eq!(uncle_bob.plugin_id, "uncle_bob");
-        assert_eq!(uncle_bob.lifecycle_state, "loaded");
-        assert!(uncle_bob.has_rag_knowledge);
-        assert!(uncle_bob.validation_diagnostics.is_empty());
-        assert_eq!(english_teacher.plugin_id, "english_teacher");
+        assert_eq!(english_teacher.agent_id, "english_teacher");
         assert_eq!(english_teacher.lifecycle_state, "loaded");
         assert!(english_teacher.has_rag_knowledge);
         assert!(english_teacher.validation_diagnostics.is_empty());
@@ -5933,21 +5925,21 @@ mod tests {
     #[test]
     fn validates_and_persists_group_agent_session() {
         let db_root = unique_test_dir("group_agent_session_db");
-        let plugin_root = unique_test_dir("group_agent_session_plugins");
-        let agent_one_dir = plugin_root.join("agent_one");
-        let agent_two_dir = plugin_root.join("agent_two");
-        write_valid_plugin(&agent_one_dir, "agent_one");
-        write_valid_plugin(&agent_two_dir, "agent_two");
+        let agent_root = unique_test_dir("group_agent_session_agents");
+        let agent_one_dir = agent_root.join("agent_one");
+        let agent_two_dir = agent_root.join("agent_two");
+        write_valid_agent(&agent_one_dir, "agent_one");
+        write_valid_agent(&agent_two_dir, "agent_two");
         let db = Database::new(&db_root).expect("create db");
         let mut seen = HashSet::new();
-        let agent_one = validate_plugin_dir(&agent_one_dir, false, &mut seen);
-        let agent_two = validate_plugin_dir(&agent_two_dir, false, &mut seen);
-        db.upsert_agent_plugin(&agent_one)
+        let agent_one = validate_agent_dir(&agent_one_dir, false, &mut seen);
+        let agent_two = validate_agent_dir(&agent_two_dir, false, &mut seen);
+        db.upsert_agent_definition(&agent_one)
             .expect("upsert agent one");
-        db.upsert_agent_plugin(&agent_two)
+        db.upsert_agent_definition(&agent_two)
             .expect("upsert agent two");
 
-        let plugins = validate_agent_group_plugins(
+        let agents = validate_agent_group_agents(
             &db,
             &[
                 "agent_one".to_string(),
@@ -5957,9 +5949,9 @@ mod tests {
         )
         .expect("validate group");
         assert_eq!(
-            plugins
+            agents
                 .iter()
-                .map(|plugin| plugin.plugin_id.as_str())
+                .map(|agent| agent.agent_id.as_str())
                 .collect::<Vec<_>>(),
             vec!["agent_one", "agent_two"]
         );
@@ -5968,10 +5960,7 @@ mod tests {
             .save_agent_session(&AgentSession {
                 session_id: "group-session-test".to_string(),
                 session_type: 2,
-                agent_ids: plugins
-                    .iter()
-                    .map(|plugin| plugin.plugin_id.clone())
-                    .collect(),
+                agent_ids: agents.iter().map(|agent| agent.agent_id.clone()).collect(),
                 session_title: "Group chat: Test Agent, Test Agent".to_string(),
                 memory_enabled: true,
                 messages: Vec::new(),
@@ -5982,68 +5971,69 @@ mod tests {
         assert_eq!(session.session_type, 2);
         assert_eq!(session.agent_ids, vec!["agent_one", "agent_two"]);
         let _ = fs::remove_dir_all(db_root);
-        let _ = fs::remove_dir_all(plugin_root);
+        let _ = fs::remove_dir_all(agent_root);
     }
 
     #[test]
-    fn installs_plugin_zip_and_rejects_path_traversal() {
+    fn installs_agent_zip_and_rejects_path_traversal() {
         let db_root = unique_test_dir("zip_install_db");
-        let plugin_root = unique_test_dir("zip_install_plugins");
-        let zip_path = unique_test_dir("plugin_zip").with_extension("zip");
-        let unsafe_zip_path = unique_test_dir("unsafe_plugin_zip").with_extension("zip");
-        fs::create_dir_all(&plugin_root).expect("create plugin root");
-        write_valid_plugin_zip(&zip_path, "zipped_agent", "zipped_agent");
+        let agent_root = unique_test_dir("zip_install_agents");
+        let zip_path = unique_test_dir("agent_zip").with_extension("zip");
+        let unsafe_zip_path = unique_test_dir("unsafe_agent_zip").with_extension("zip");
+        fs::create_dir_all(&agent_root).expect("create agent root");
+        write_valid_agent_zip(&zip_path, "zipped_agent", "zipped_agent");
         write_unsafe_zip(&unsafe_zip_path);
         let db = Database::new(&db_root).expect("create db");
-        db.save_agent_plugin_directory_settings(&SaveAgentPluginDirectorySettings {
-            plugin_directory: plugin_root.to_string_lossy().to_string(),
+        db.save_agent_directory_settings(&SaveAgentDirectorySettings {
+            agent_directory: agent_root.to_string_lossy().to_string(),
         })
-        .expect("save plugin dir");
+        .expect("save agent dir");
 
-        let plugin =
-            install_plugin_zip(&db, zip_path.to_str().expect("zip path")).expect("install zip");
-        assert_eq!(plugin.plugin_id, "zipped_agent");
-        assert!(plugin_root.join("zipped_agent").is_dir());
+        let agent = install_agent_zip_package(&db, zip_path.to_str().expect("zip path"))
+            .expect("install zip");
+        assert_eq!(agent.agent_id, "zipped_agent");
+        assert!(agent_root.join("zipped_agent").is_dir());
         assert!(db
-            .list_agent_plugins()
-            .expect("list plugins")
+            .list_agent_definitions()
+            .expect("list agents")
             .iter()
-            .any(|plugin| plugin.plugin_id == "zipped_agent"));
+            .any(|agent| agent.agent_id == "zipped_agent"));
 
-        let error = install_plugin_zip(&db, unsafe_zip_path.to_str().expect("unsafe zip path"))
-            .expect_err("reject traversal");
-        assert!(error.contains("Unsafe ZIP entry path") || error.contains("plugin folder"));
-        assert!(!plugin_root.join("escape.txt").exists());
+        let error =
+            install_agent_zip_package(&db, unsafe_zip_path.to_str().expect("unsafe zip path"))
+                .expect_err("reject traversal");
+        assert!(error.contains("Unsafe ZIP entry path") || error.contains("agent folder"));
+        assert!(!agent_root.join("escape.txt").exists());
         let _ = fs::remove_dir_all(db_root);
-        let _ = fs::remove_dir_all(plugin_root);
+        let _ = fs::remove_dir_all(agent_root);
         let _ = fs::remove_file(zip_path);
         let _ = fs::remove_file(unsafe_zip_path);
     }
 
     #[test]
-    fn uninstalls_user_plugin_and_cleans_rag_but_rejects_unsafe_paths() {
+    fn uninstalls_user_agent_and_cleans_rag_but_rejects_unsafe_paths() {
         let db_root = unique_test_dir("uninstall_db");
-        let plugin_root = unique_test_dir("uninstall_plugins");
-        let plugin_dir = plugin_root.join("test_agent");
-        let outside_dir = unique_test_dir("outside_plugin");
-        fs::create_dir_all(&plugin_root).expect("create plugin root");
-        write_valid_plugin(&plugin_dir, "test_agent");
-        write_valid_plugin(&outside_dir, "outside_agent");
+        let agent_root = unique_test_dir("uninstall_agents");
+        let agent_dir = agent_root.join("test_agent");
+        let outside_dir = unique_test_dir("outside_agent");
+        fs::create_dir_all(&agent_root).expect("create agent root");
+        write_valid_agent(&agent_dir, "test_agent");
+        write_valid_agent(&outside_dir, "outside_agent");
         let db = Database::new(&db_root).expect("create db");
-        db.save_agent_plugin_directory_settings(&SaveAgentPluginDirectorySettings {
-            plugin_directory: plugin_root.to_string_lossy().to_string(),
+        db.save_agent_directory_settings(&SaveAgentDirectorySettings {
+            agent_directory: agent_root.to_string_lossy().to_string(),
         })
-        .expect("save plugin dir");
+        .expect("save agent dir");
 
         let mut seen = HashSet::new();
-        let plugin = validate_plugin_dir(&plugin_dir, false, &mut seen);
-        db.upsert_agent_plugin(&plugin).expect("upsert plugin");
+        let agent = validate_agent_dir(&agent_dir, false, &mut seen);
+        db.upsert_agent_definition(&agent).expect("upsert agent");
         db.replace_agent_rag_chunks(
             "test_agent",
             &[AgentRagChunk {
                 chunk_id: "chunk-one".to_string(),
-                plugin_id: "test_agent".to_string(),
-                plugin_version: "1.0.0".to_string(),
+                agent_id: "test_agent".to_string(),
+                agent_version: "1.0.0".to_string(),
                 source_hash: "hash".to_string(),
                 embedding_model: "pending".to_string(),
                 embedding_dim: 1536,
@@ -6053,47 +6043,47 @@ mod tests {
         )
         .expect("insert rag chunk");
 
-        uninstall_plugin_by_id(&db, "test_agent").expect("uninstall");
-        assert!(!plugin_dir.exists());
+        uninstall_agent_by_id(&db, "test_agent").expect("uninstall");
+        assert!(!agent_dir.exists());
         assert!(db
             .list_agent_rag_chunks("test_agent")
             .expect("rag chunks")
             .is_empty());
         assert!(db
-            .list_agent_plugins()
-            .expect("list plugins")
+            .list_agent_definitions()
+            .expect("list agents")
             .iter()
-            .all(|plugin| plugin.plugin_id != "test_agent"));
+            .all(|agent| agent.agent_id != "test_agent"));
 
-        let outside_plugin = validate_plugin_dir(&outside_dir, false, &mut HashSet::new());
-        db.upsert_agent_plugin(&outside_plugin)
-            .expect("upsert outside plugin");
-        let error = uninstall_plugin_by_id(&db, "outside_agent").expect_err("reject outside path");
-        assert!(error.contains("outside the configured Agent plugin directory"));
+        let outside_agent = validate_agent_dir(&outside_dir, false, &mut HashSet::new());
+        db.upsert_agent_definition(&outside_agent)
+            .expect("upsert outside agent");
+        let error = uninstall_agent_by_id(&db, "outside_agent").expect_err("reject outside path");
+        assert!(error.contains("outside the configured Agent directory"));
         assert!(outside_dir.exists());
         let _ = fs::remove_dir_all(db_root);
-        let _ = fs::remove_dir_all(plugin_root);
+        let _ = fs::remove_dir_all(agent_root);
         let _ = fs::remove_dir_all(outside_dir);
     }
 
     #[test]
-    fn refresh_scan_updates_manifest_without_reenabling_disabled_plugin() {
+    fn refresh_scan_updates_manifest_without_reenabling_disabled_agent() {
         let db_root = unique_test_dir("hot_refresh_db");
-        let plugin_root = unique_test_dir("hot_refresh_plugins");
-        let plugin_dir = plugin_root.join("hot_agent");
-        fs::create_dir_all(&plugin_root).expect("create plugin root");
-        write_valid_plugin(&plugin_dir, "hot_agent");
+        let agent_root = unique_test_dir("hot_refresh_agents");
+        let agent_dir = agent_root.join("hot_agent");
+        fs::create_dir_all(&agent_root).expect("create agent root");
+        write_valid_agent(&agent_dir, "hot_agent");
         let db = Database::new(&db_root).expect("create db");
 
-        scan_roots_and_persist(&db, vec![(plugin_root.clone(), false)]).expect("initial scan");
-        db.set_agent_plugin_enabled("hot_agent", false)
-            .expect("disable plugin");
+        scan_roots_and_persist(&db, vec![(agent_root.clone(), false)]).expect("initial scan");
+        db.set_agent_definition_enabled("hot_agent", false)
+            .expect("disable agent");
         fs::write(
-            plugin_dir.join("manifest.json"),
+            agent_dir.join("manifest.json"),
             r#"{
-  "plugin_id": "hot_agent",
-  "plugin_name": "Hot Agent Reloaded",
-  "plugin_version": "1.1.0",
+  "agent_id": "hot_agent",
+  "agent_name": "Hot Agent Reloaded",
+  "agent_version": "1.1.0",
   "author": "Test",
   "description": "A refreshed Agent",
   "tags": ["hot"],
@@ -6106,18 +6096,18 @@ mod tests {
         )
         .expect("rewrite manifest");
 
-        scan_roots_and_persist(&db, vec![(plugin_root.clone(), false)]).expect("refresh scan");
-        let plugin = db
-            .list_agent_plugins()
-            .expect("list plugins")
+        scan_roots_and_persist(&db, vec![(agent_root.clone(), false)]).expect("refresh scan");
+        let agent = db
+            .list_agent_definitions()
+            .expect("list agents")
             .into_iter()
-            .find(|plugin| plugin.plugin_id == "hot_agent")
-            .expect("hot plugin");
-        assert_eq!(plugin.plugin_name, "Hot Agent Reloaded");
-        assert_eq!(plugin.plugin_version, "1.1.0");
-        assert!(!plugin.enabled);
+            .find(|agent| agent.agent_id == "hot_agent")
+            .expect("hot agent");
+        assert_eq!(agent.agent_name, "Hot Agent Reloaded");
+        assert_eq!(agent.agent_version, "1.1.0");
+        assert!(!agent.enabled);
         let _ = fs::remove_dir_all(db_root);
-        let _ = fs::remove_dir_all(plugin_root);
+        let _ = fs::remove_dir_all(agent_root);
     }
 
     #[test]
@@ -6282,10 +6272,10 @@ mod tests {
     #[test]
     fn creates_conversation_summary_and_includes_relevant_previous_summary_in_prompt() {
         let db_root = unique_test_dir("summary_db");
-        let plugin_root = unique_test_dir("summary_plugin");
-        write_valid_plugin(&plugin_root, "secretary");
+        let agent_root = unique_test_dir("summary_agent");
+        write_valid_agent(&agent_root, "secretary");
         let mut seen = HashSet::new();
-        let plugin = validate_plugin_dir(&plugin_root, false, &mut seen);
+        let agent = validate_agent_dir(&agent_root, false, &mut seen);
         let db = Database::new(&db_root).expect("create db");
         for session_id in ["old-session", "current-session"] {
             db.save_agent_session(&AgentSession {
@@ -6334,7 +6324,7 @@ mod tests {
         let selected = SelectedAppContext::default();
         let (prompt, used_context) = build_agent_system_prompt(
             &db,
-            &plugin,
+            &agent,
             &current,
             &selected,
             "what did we discuss before?",
@@ -6347,7 +6337,7 @@ mod tests {
             vec![summary.summary_id]
         );
         let _ = fs::remove_dir_all(db_root);
-        let _ = fs::remove_dir_all(plugin_root);
+        let _ = fs::remove_dir_all(agent_root);
     }
 
     #[test]
@@ -6405,10 +6395,10 @@ mod tests {
 
     #[test]
     fn prompt_includes_identity_memory_and_app_context() {
-        let plugin_root = unique_test_dir("prompt_plugin");
-        write_valid_plugin(&plugin_root, "secretary");
+        let agent_root = unique_test_dir("prompt_agent");
+        write_valid_agent(&agent_root, "secretary");
         let mut seen = HashSet::new();
-        let plugin = validate_plugin_dir(&plugin_root, false, &mut seen);
+        let agent = validate_agent_dir(&agent_root, false, &mut seen);
         let db_root = unique_test_dir("prompt_db");
         let db = Database::new(&db_root).expect("create db");
         db.save_agent_user_identity(&SaveAgentUserIdentity {
@@ -6472,7 +6462,7 @@ mod tests {
         };
 
         let (prompt, used) =
-            build_agent_system_prompt(&db, &plugin, &session, &selected, "what should I do?")
+            build_agent_system_prompt(&db, &agent, &session, &selected, "what should I do?")
                 .expect("build prompt");
 
         assert!(prompt.contains("App-owned user identity"));
@@ -6484,7 +6474,7 @@ mod tests {
         assert_eq!(used.memories, vec!["memory-one"]);
         assert_eq!(used.todos.len(), 1);
         assert_eq!(used.notes.len(), 1);
-        let _ = fs::remove_dir_all(plugin_root);
+        let _ = fs::remove_dir_all(agent_root);
         let _ = fs::remove_dir_all(db_root);
     }
 

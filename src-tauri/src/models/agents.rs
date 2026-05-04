@@ -5,9 +5,12 @@ use crate::models::secretary::SelectedAppContext;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentManifest {
-    pub plugin_id: String,
-    pub plugin_name: String,
-    pub plugin_version: String,
+    #[serde(alias = "plugin_id")]
+    pub agent_id: String,
+    #[serde(alias = "plugin_name")]
+    pub agent_name: String,
+    #[serde(alias = "plugin_version")]
+    pub agent_version: String,
     pub author: String,
     pub description: String,
     #[serde(default)]
@@ -38,10 +41,10 @@ pub struct AgentValidationDiagnostic {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AgentPlugin {
-    pub plugin_id: String,
-    pub plugin_name: String,
-    pub plugin_version: String,
+pub struct AgentDefinition {
+    pub agent_id: String,
+    pub agent_name: String,
+    pub agent_version: String,
     pub author: String,
     pub description: String,
     pub tags: Vec<String>,
@@ -58,8 +61,8 @@ pub struct AgentPlugin {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AgentPluginDetail {
-    pub plugin: AgentPlugin,
+pub struct AgentDefinitionDetail {
+    pub agent: AgentDefinition,
     pub manifest: Option<AgentManifest>,
     pub config: Option<AgentConfig>,
     pub system_prompt: String,
@@ -67,17 +70,17 @@ pub struct AgentPluginDetail {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AgentPluginDirectorySettings {
-    pub plugin_directory: String,
+pub struct AgentDirectorySettings {
+    pub agent_directory: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct SaveAgentPluginDirectorySettings {
-    pub plugin_directory: String,
+pub struct SaveAgentDirectorySettings {
+    pub agent_directory: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct InstallAgentPluginZipInput {
+pub struct InstallAgentZipInput {
     pub zip_path: String,
 }
 
@@ -95,8 +98,8 @@ pub struct SaveAgentSafeFileRootSettings {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentRagChunk {
     pub chunk_id: String,
-    pub plugin_id: String,
-    pub plugin_version: String,
+    pub agent_id: String,
+    pub agent_version: String,
     pub source_hash: String,
     pub embedding_model: String,
     pub embedding_dim: i64,
@@ -106,7 +109,7 @@ pub struct AgentRagChunk {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentRagStatus {
-    pub plugin_id: String,
+    pub agent_id: String,
     pub rag_enabled: bool,
     pub has_rag_knowledge: bool,
     pub indexed_chunks: usize,

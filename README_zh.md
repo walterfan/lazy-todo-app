@@ -41,11 +41,11 @@
 ### AI Agents
 
 - **Agent 对话**：可在桌面应用中与内置本地 Agent 对话，例如 Personal Secretary 和 Confucius。
-- **插件化人格**：Agent 来自静态插件目录，包含 manifest、prompt、config、avatar、README 和可选 RAG 知识文件。
+- **文件化人格**：Agent 来自静态智能体目录，包含 manifest、prompt、config、avatar、README 和可选 RAG 知识文件。
 - **本地身份与记忆**：用户身份、长期记忆、记忆提案和历史会话召回都保存在本地 SQLite。
 - **RAG 知识**：每个 Agent 的 `rag_knowledge.md` 独立切块和检索，只会注入当前 Agent 的知识。
 - **安全工具动作**：Agent 可以提议 Todo、便签、里程碑、文件、记忆和外部 CLI 动作；写入或敏感操作必须经过应用确认流。
-- **插件管理**：可在 Settings 中刷新、启用、禁用、安装、查看、卸载插件，并重建 RAG 索引。
+- **智能体管理**：可在 Settings 中刷新、启用、禁用、安装、查看、卸载智能体，并重建 RAG 索引。
 
 ### 设置与桌面体验
 
@@ -238,12 +238,12 @@ pre-commit install
 | Pomodoro | `get_weekly_pomodoro_stats` | 获取 7 日统计 |
 | Pomodoro | `update_tray_tooltip` | 更新托盘提示 |
 | Agents | `list_agents` | 查询内置和已安装 Agent |
-| Agents | `refresh_agents` | 重新扫描 Agent 插件 |
+| Agents | `refresh_agents` | 重新扫描 Agent |
 | Agents | `start_agent_session` | 创建单 Agent 对话 |
 | Agents | `start_agent_group_session` | 创建多 Agent 群聊 |
 | Agents | `send_agent_message_stream` | 流式发送单 Agent 回复 |
 | Agents | `send_agent_group_message_stream` | 流式发送多 Agent 回复 |
-| Agents | `get_agent_plugin_detail` | 查看 Agent 插件元数据、README、诊断和 RAG 状态 |
+| Agents | `get_agent_detail` | 查看 Agent 元数据、README、诊断和 RAG 状态 |
 | Agents | `rebuild_agent_rag_index` | 重建单个 Agent 的 RAG 知识索引 |
 | Agents | `list_agent_memories` | 查询本地 Agent 记忆 |
 | Agents | `confirm_agent_tool_action` | 确认或拒绝 Agent 提议的写入/工具动作 |

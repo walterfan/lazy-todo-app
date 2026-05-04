@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { AgentsController } from "../hooks/useAgents";
 import type { SecretaryController } from "../hooks/useSecretary";
-import type { AgentPluginDetail } from "../types/agents";
+import type { AgentDefinitionDetail } from "../types/agents";
 import type { AppSettings, DisplayStyle } from "../types/settings";
 import type { Translator } from "../i18n";
 
@@ -25,9 +25,9 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
     model: "",
     api_key: "",
   });
-  const [agentPluginDirectory, setAgentPluginDirectory] = useState("");
-  const [agentPluginZipPath, setAgentPluginZipPath] = useState("");
-  const [agentPluginDetail, setAgentPluginDetail] = useState<AgentPluginDetail | null>(null);
+  const [agentDirectory, setAgentDirectory] = useState("");
+  const [agentZipPath, setAgentZipPath] = useState("");
+  const [agentDetail, setAgentDetail] = useState<AgentDefinitionDetail | null>(null);
   const [safeFileRootsText, setSafeFileRootsText] = useState("");
   const [cliDraft, setCliDraft] = useState({
     tool_id: "",
@@ -54,8 +54,8 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
   }, [secretary.settings]);
 
   useEffect(() => {
-    setAgentPluginDirectory(agents.pluginDirectorySettings?.plugin_directory ?? "");
-  }, [agents.pluginDirectorySettings]);
+    setAgentDirectory(agents.agentDirectorySettings?.agent_directory ?? "");
+  }, [agents.agentDirectorySettings]);
 
   useEffect(() => {
     setSafeFileRootsText((agents.safeFileRootSettings?.safe_file_roots ?? []).join("\n"));
@@ -73,31 +73,31 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
     });
   };
 
-  const saveAgentPluginDirectory = async () => {
+  const saveAgentDirectory = async () => {
     setAgentSettingsStatus("");
     try {
-      await agents.savePluginDirectorySettings({ plugin_directory: agentPluginDirectory });
-      setAgentSettingsStatus(t("agentPluginFolderSaved"));
+      await agents.saveAgentDirectorySettings({ agent_directory: agentDirectory });
+      setAgentSettingsStatus(t("agentFolderSaved"));
     } catch (err) {
       setAgentSettingsStatus(String(err));
     }
   };
 
-  const installAgentPluginZip = async () => {
+  const installAgentZip = async () => {
     setAgentSettingsStatus("");
     try {
-      const plugin = await agents.installPluginZip(agentPluginZipPath);
-      setAgentSettingsStatus(t("installedPlugin", { name: plugin.plugin_name }));
-      setAgentPluginZipPath("");
+      const agent = await agents.installAgentZip(agentZipPath);
+      setAgentSettingsStatus(t("installedAgent", { name: agent.agent_name }));
+      setAgentZipPath("");
     } catch (err) {
       setAgentSettingsStatus(String(err));
     }
   };
 
-  const loadAgentPluginDetail = async (pluginId: string) => {
+  const loadAgentDetail = async (agentId: string) => {
     setAgentSettingsStatus("");
     try {
-      setAgentPluginDetail(await agents.loadPluginDetail(pluginId));
+      setAgentDetail(await agents.loadAgentDetail(agentId));
     } catch (err) {
       setAgentSettingsStatus(String(err));
     }
@@ -368,78 +368,78 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
       </section>
 
       <section className="settings-section">
-        <h3 className="settings-section-title">{t("agentsPluginsFiles")}</h3>
+        <h3 className="settings-section-title">{t("agentsFiles")}</h3>
 
         {agents.loading ? (
           <div className="settings-value">{t("loadingAgentSettings")}</div>
         ) : (
           <>
             <div className="settings-row settings-row-vertical">
-              <label>{t("pluginFolder")}</label>
+              <label>{t("agentFolder")}</label>
               <input
                 className="settings-path-input"
                 type="text"
-                value={agentPluginDirectory}
-                onChange={(e) => setAgentPluginDirectory(e.target.value)}
-                placeholder="/Users/walterfan/agents/plugins"
+                value={agentDirectory}
+                onChange={(e) => setAgentDirectory(e.target.value)}
+                placeholder="/Users/walterfan/agents"
               />
             </div>
 
             <div className="settings-actions">
-              <button className="settings-toggle active" onClick={() => void saveAgentPluginDirectory()}>
-                {t("savePluginFolder")}
+              <button className="settings-toggle active" onClick={() => void saveAgentDirectory()}>
+                {t("saveAgentFolder")}
               </button>
               <button className="settings-toggle" onClick={() => void agents.refreshAgents()}>
-                {t("refreshPlugins")}
+                {t("refreshAgents")}
               </button>
             </div>
 
             <div className="settings-row settings-row-vertical">
-              <label>{t("installPluginZip")}</label>
+              <label>{t("installAgentZip")}</label>
               <input
                 className="settings-path-input"
                 type="text"
-                value={agentPluginZipPath}
-                onChange={(e) => setAgentPluginZipPath(e.target.value)}
+                value={agentZipPath}
+                onChange={(e) => setAgentZipPath(e.target.value)}
                 placeholder="/Users/walterfan/Downloads/confucius_agent_v1.0.0.zip"
               />
             </div>
 
             <div className="settings-actions">
-              <button className="settings-toggle" onClick={() => void installAgentPluginZip()} disabled={!agentPluginZipPath.trim()}>
+              <button className="settings-toggle" onClick={() => void installAgentZip()} disabled={!agentZipPath.trim()}>
                 {t("installZip")}
               </button>
             </div>
 
             <div className="settings-row settings-row-vertical">
               <label>{t("installedAgents")}</label>
-              <div className="settings-plugin-list">
+              <div className="settings-agent-list">
                 {agents.agents.map((agent) => (
-                  <div className="settings-plugin-row" key={agent.plugin_id}>
+                  <div className="settings-agent-row" key={agent.agent_id}>
                     <div>
-                      <strong>{agent.plugin_name}</strong>
+                      <strong>{agent.agent_name}</strong>
                       <span>
-                        {agent.plugin_id} · {agent.lifecycle_state} · {agent.enabled ? t("statusEnabled") : t("statusDisabled")} ·{" "}
+                        {agent.agent_id} · {agent.lifecycle_state} · {agent.enabled ? t("statusEnabled") : t("statusDisabled")} ·{" "}
                         {agent.bundled ? t("builtIn") : t("local")}
                       </span>
                       {agent.validation_diagnostics.length > 0 && (
                         <span>{agent.validation_diagnostics.map((item) => item.message).join("; ")}</span>
                       )}
                     </div>
-                    <div className="settings-plugin-actions">
-                      <button className="settings-toggle" onClick={() => void loadAgentPluginDetail(agent.plugin_id)}>
+                    <div className="settings-agent-actions">
+                      <button className="settings-toggle" onClick={() => void loadAgentDetail(agent.agent_id)}>
                         {t("details")}
                       </button>
                       <button
                         className="settings-toggle"
-                        onClick={() => void agents.setAgentEnabled(agent.plugin_id, !agent.enabled)}
+                        onClick={() => void agents.setAgentEnabled(agent.agent_id, !agent.enabled)}
                         disabled={agent.lifecycle_state === "invalid"}
                       >
                         {agent.enabled ? t("disable") : t("enable")}
                       </button>
                       <button
                         className="settings-toggle"
-                        onClick={() => void agents.uninstallPlugin(agent.plugin_id)}
+                        onClick={() => void agents.uninstallAgent(agent.agent_id)}
                         disabled={agent.bundled}
                       >
                         {t("uninstall")}
@@ -450,16 +450,16 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
               </div>
             </div>
 
-            {agentPluginDetail && (
+            {agentDetail && (
               <div className="settings-row settings-row-vertical">
-                <label>{agentPluginDetail.plugin.plugin_name} details</label>
-                <div className="settings-plugin-detail">
-                  <span>{agentPluginDetail.plugin.path}</span>
+                <label>{agentDetail.agent.agent_name} details</label>
+                <div className="settings-agent-detail">
+                  <span>{agentDetail.agent.path}</span>
                   <span>
-                    {t("rag")} {agentPluginDetail.plugin.rag_enabled ? t("statusEnabled") : t("statusDisabled")} ·{" "}
-                    {agentPluginDetail.plugin.has_rag_knowledge ? t("knowledgeFilePresent") : t("noKnowledgeFile")}
+                    {t("rag")} {agentDetail.agent.rag_enabled ? t("statusEnabled") : t("statusDisabled")} ·{" "}
+                    {agentDetail.agent.has_rag_knowledge ? t("knowledgeFilePresent") : t("noKnowledgeFile")}
                   </span>
-                  <pre>{agentPluginDetail.readme || t("noReadmeContent")}</pre>
+                  <pre>{agentDetail.readme || t("noReadmeContent")}</pre>
                 </div>
               </div>
             )}

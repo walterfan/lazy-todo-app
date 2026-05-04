@@ -32,23 +32,23 @@ The system SHALL display each Agent as a virtual human with name, avatar, descri
 - **WHEN** a valid Agent is listed in the UI
 - **THEN** the system displays the Agent avatar, name, description, version, author, and tags
 
-### Requirement: Plugin management UI
-The system SHALL provide Settings or management UI for plugin directory configuration, refresh, install, uninstall, enable, disable, and validation diagnostics.
+### Requirement: Agent management UI
+The system SHALL provide Settings or management UI for Agent directory configuration, refresh, install, uninstall, enable, disable, and validation diagnostics.
 
-#### Scenario: User refreshes plugins
-- **WHEN** the user clicks refresh in plugin management
-- **THEN** the system rescans the plugin directory and updates the plugin list
+#### Scenario: User refreshes Agents
+- **WHEN** the user clicks refresh in Agent management
+- **THEN** the system rescans the Agent directory and updates the Agent list
 
-#### Scenario: User disables plugin
-- **WHEN** the user disables an enabled plugin
+#### Scenario: User disables Agent
+- **WHEN** the user disables an enabled Agent
 - **THEN** the UI marks it disabled and prevents it from being selected for new sessions
 
 ### Requirement: Local data controls
-The system SHALL show local data status for conversations, plugin data, and RAG indexes and provide safe cleanup controls.
+The system SHALL show local data status for conversations, Agent data, and RAG indexes and provide safe cleanup controls.
 
-#### Scenario: User views plugin data
-- **WHEN** the user opens an Agent plugin detail view
-- **THEN** the system shows local conversation count, RAG index status, and validation status for that plugin
+#### Scenario: User views Agent data
+- **WHEN** the user opens an Agent package detail view
+- **THEN** the system shows local conversation count, RAG index status, and validation status for that Agent
 
 ### Requirement: Secretary migration visibility
 The system SHALL show whether previous Secretary data has been migrated into Agents.

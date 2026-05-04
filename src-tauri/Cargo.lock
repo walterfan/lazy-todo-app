@@ -2104,7 +2104,7 @@ dependencies = [
 
 [[package]]
 name = "lazy-todo-app"
-version = "0.1.2"
+version = "0.2.2"
 dependencies = [
  "chrono",
  "dirs",

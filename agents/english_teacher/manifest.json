@@ -1,10 +1,15 @@
 {
-  "plugin_id": "english_teacher",
-  "plugin_name": "English Teacher",
-  "plugin_version": "1.0.0",
+  "agent_id": "english_teacher",
+  "agent_name": "English Teacher",
+  "agent_version": "1.0.0",
   "author": "Lazy Todo App",
   "description": "A bilingual English-learning Agent who teaches English, translates between English and Chinese, improves business communication, and shares practical phrases, meeting expressions, and common proverbs.",
-  "tags": ["english-learning", "translation", "business-english", "communication"],
+  "tags": [
+    "english-learning",
+    "translation",
+    "business-english",
+    "communication"
+  ],
   "create_time": "2026-04-30",
   "update_time": "2026-04-30",
   "min_app_version": "1.0.0",

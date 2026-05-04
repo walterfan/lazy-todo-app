@@ -4,21 +4,21 @@
 TBD - created by archiving change refactor-secretary-to-agents. Update Purpose after archive.
 ## Requirements
 ### Requirement: Per-Agent RAG ingestion
-The system SHALL ingest `rag_knowledge.md` for each valid Agent plugin when RAG is enabled in the manifest and runtime config.
+The system SHALL ingest `rag_knowledge.md` for each valid Agent package when RAG is enabled in the manifest and runtime config.
 
 #### Scenario: RAG knowledge exists
-- **WHEN** a valid plugin with RAG enabled contains `rag_knowledge.md`
-- **THEN** the system chunks and indexes the file for that plugin
+- **WHEN** a valid Agent with RAG enabled contains `rag_knowledge.md`
+- **THEN** the system chunks and indexes the file for that Agent
 
 #### Scenario: RAG disabled
-- **WHEN** a plugin has RAG disabled
-- **THEN** the system does not index or retrieve that plugin's `rag_knowledge.md`
+- **WHEN** an Agent has RAG disabled
+- **THEN** the system does not index or retrieve that Agent's `rag_knowledge.md`
 
 ### Requirement: sqlite-vec indexing
-The system SHALL store Agent knowledge embeddings in SQLite using sqlite-vec with plugin ID, plugin version, source hash, chunk text, embedding model, embedding dimension, and vector metadata.
+The system SHALL store Agent knowledge embeddings in SQLite using sqlite-vec with agent ID, agent version, source hash, chunk text, embedding model, embedding dimension, and vector metadata.
 
 #### Scenario: Embedding dimension matches
-- **WHEN** the embedding vector dimension matches the plugin config and sqlite-vec table
+- **WHEN** the embedding vector dimension matches the Agent config and sqlite-vec table
 - **THEN** the system stores the chunk vector and marks the index usable
 
 #### Scenario: Embedding dimension mismatches
@@ -44,13 +44,13 @@ The system SHALL prevent one Agent from retrieving another Agent's private RAG c
 - **THEN** the system retrieves only chunks indexed for Agent A
 
 ### Requirement: Rebuild and cleanup
-The system SHALL rebuild RAG indexes when plugin knowledge changes and delete plugin RAG indexes when a plugin is uninstalled.
+The system SHALL rebuild RAG indexes when Agent knowledge changes and delete Agent RAG indexes when an Agent is uninstalled.
 
 #### Scenario: Knowledge file changes
-- **WHEN** `rag_knowledge.md` hash changes for an installed plugin
-- **THEN** the system marks the plugin RAG index stale and rebuilds it on user request or configured refresh
+- **WHEN** `rag_knowledge.md` hash changes for an installed Agent
+- **THEN** the system marks the Agent RAG index stale and rebuilds it on user request or configured refresh
 
-#### Scenario: Plugin is uninstalled
-- **WHEN** the user uninstalls a plugin
-- **THEN** the system deletes that plugin's RAG chunks and vector rows
+#### Scenario: Agent is uninstalled
+- **WHEN** the user uninstalls an Agent
+- **THEN** the system deletes that Agent's RAG chunks and vector rows
 
