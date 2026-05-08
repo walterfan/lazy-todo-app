@@ -54,6 +54,12 @@ export interface AgentDefinitionDetail {
   readme: string;
 }
 
+export interface AgentPrompt {
+  tag: string;
+  label: string | null;
+  prompt: string;
+}
+
 export interface InstallAgentZipInput {
   zip_path: string;
 }
@@ -72,6 +78,14 @@ export interface AgentSafeFileRootSettings {
 
 export interface SaveAgentSafeFileRootSettings {
   safe_file_roots: string[];
+}
+
+export interface AgentDefaultSettings {
+  default_agent_id: string;
+}
+
+export interface SaveAgentDefaultSettings {
+  default_agent_id: string;
 }
 
 export interface AgentMessage {

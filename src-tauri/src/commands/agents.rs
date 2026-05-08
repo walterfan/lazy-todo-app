@@ -11,23 +11,23 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 use chrono::Local;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use tauri::{AppHandle, Emitter, Manager, State};
 
 use crate::db::Database;
 use crate::models::agents::{
-    AgentBuiltinTool, AgentConfig, AgentConversationSummary, AgentDefinition,
-    AgentDefinitionDetail, AgentDirectorySettings, AgentExternalCliCallInput,
+    AgentBuiltinTool, AgentConfig, AgentConversationSummary, AgentDefaultSettings,
+    AgentDefinition, AgentDefinitionDetail, AgentDirectorySettings, AgentExternalCliCallInput,
     AgentExternalCliCallResult, AgentExternalCliTool, AgentExternalCliToolTestResult,
     AgentManifest, AgentMemory, AgentMemoryProposal, AgentMessage, AgentMigrationStatus,
-    AgentRagChunk, AgentRagStatus, AgentSafeFileRootSettings, AgentSession, AgentToolAction,
-    AgentToolCallInput, AgentToolCallResult, AgentUsedContext, AgentUserIdentity,
-    AgentValidationDiagnostic, ConfirmAgentMemoryProposalInput, ConfirmAgentToolActionInput,
-    ConfirmAgentToolActionResult, InstallAgentZipInput, SaveAgentDirectorySettings,
-    SaveAgentExternalCliTool, SaveAgentMemory, SaveAgentSafeFileRootSettings,
-    SaveAgentUserIdentity, SendAgentGroupMessageInput, SendAgentMessageInput,
-    SendAgentMessageResult,
+    AgentPrompt, AgentRagChunk, AgentRagStatus, AgentSafeFileRootSettings, AgentSession,
+    AgentToolAction, AgentToolCallInput, AgentToolCallResult, AgentUsedContext,
+    AgentUserIdentity, AgentValidationDiagnostic, ConfirmAgentMemoryProposalInput,
+    ConfirmAgentToolActionInput, ConfirmAgentToolActionResult, InstallAgentZipInput,
+    SaveAgentDefaultSettings, SaveAgentDirectorySettings, SaveAgentExternalCliTool,
+    SaveAgentMemory, SaveAgentSafeFileRootSettings, SaveAgentUserIdentity,
+    SendAgentGroupMessageInput, SendAgentMessageInput, SendAgentMessageResult,
 };
 use crate::models::secretary::{
     EffectiveLlmSettings, MilestoneContext, NoteContext, SecretaryAppContext, SecretaryMessage,
@@ -55,6 +55,13 @@ const MIN_CLI_TIMEOUT_MS: i64 = 1_000;
 const MAX_CLI_TIMEOUT_MS: i64 = 300_000;
 const MIN_CLI_OUTPUT_LIMIT: i64 = 1_024;
 const MAX_CLI_OUTPUT_LIMIT: i64 = 65_536;
+const MAX_LLM_TOOL_QUERY_CHARS: usize = 8 * 1024;
+const MAX_LLM_TOOL_EMBEDDING_CHARS: usize = 32 * 1024;
+const MAX_LLM_TOOL_PROMPT_CHARS: usize = 4 * 1024;
+const MAX_SEARCH_RESULTS: i64 = 20;
+const MAX_LLM_TOOL_RESPONSE_BYTES: usize = 2 * 1024 * 1024;
+const LLM_TOOL_TIMEOUT_SECS: u64 = 60;
+const EMBEDDING_PREVIEW_LEN: usize = 8;
 const RAG_CHUNK_TARGET_CHARS: usize = 900;
 const RAG_CHUNK_OVERLAP_CHARS: usize = 120;
 const MAX_AGENT_TOOL_ROUNDS: usize = 2;
@@ -137,6 +144,33 @@ pub fn save_agent_safe_file_root_settings(
 ) -> Result<AgentSafeFileRootSettings, String> {
     let safe_file_roots = normalize_safe_roots(input.safe_file_roots)?;
     db.save_agent_safe_file_root_settings(&SaveAgentSafeFileRootSettings { safe_file_roots })
+        .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn get_agent_default_settings(
+    db: State<'_, Database>,
+) -> Result<AgentDefaultSettings, String> {
+    db.get_agent_default_settings().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn save_agent_default_settings(
+    db: State<'_, Database>,
+    input: SaveAgentDefaultSettings,
+) -> Result<AgentDefaultSettings, String> {
+    let default_agent_id = input.default_agent_id.trim().to_string();
+    if !default_agent_id.is_empty() {
+        let known = db
+            .list_agent_definitions()
+            .map_err(|e| e.to_string())?
+            .into_iter()
+            .any(|agent| agent.agent_id == default_agent_id);
+        if !known {
+            return Err(format!("Unknown agent_id: {default_agent_id}"));
+        }
+    }
+    db.save_agent_default_settings(&SaveAgentDefaultSettings { default_agent_id })
         .map_err(|e| e.to_string())
 }
 
@@ -249,6 +283,20 @@ pub fn refresh_agents(
 ) -> Result<Vec<AgentDefinition>, String> {
     scan_and_persist_agents(&app, &db)?;
     db.list_agent_definitions().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn list_agent_prompts(
+    app: AppHandle,
+    db: State<'_, Database>,
+    agent_id: String,
+) -> Result<Vec<AgentPrompt>, String> {
+    scan_and_persist_agents(&app, &db)?;
+    let agent = find_agent(&db, agent_id.trim())?;
+    if agent.lifecycle_state == "invalid" {
+        return Ok(Vec::new());
+    }
+    Ok(read_agent_prompts(Path::new(&agent.path)))
 }
 
 #[tauri::command]
@@ -761,6 +809,78 @@ fn builtin_tools() -> Vec<AgentBuiltinTool> {
                 }
             }),
         ),
+        read_tool(
+            "web_search",
+            "Search the web through the configured LLM gateway and return ranked results with snippets. Use for current information that the model may not know.",
+            json!({
+                "type": "object",
+                "required": ["query"],
+                "properties": {
+                    "query": { "type": "string", "maxLength": MAX_LLM_TOOL_QUERY_CHARS },
+                    "max_results": { "type": "integer", "minimum": 1, "maximum": MAX_SEARCH_RESULTS },
+                    "max_tokens_per_page": { "type": "integer", "minimum": 1, "maximum": 4096 },
+                    "model": { "type": "string" }
+                }
+            }),
+            json!({
+                "type": "object",
+                "properties": {
+                    "query": { "type": "string" },
+                    "model": { "type": "string" },
+                    "response": { "type": "object" }
+                }
+            }),
+        ),
+        read_tool(
+            "text_embedding",
+            "Compute an embedding vector for text via the configured LLM gateway. Returns a preview by default; pass include_vector=true to receive the full vector.",
+            json!({
+                "type": "object",
+                "required": ["input"],
+                "properties": {
+                    "input": {
+                        "oneOf": [
+                            { "type": "string", "maxLength": MAX_LLM_TOOL_EMBEDDING_CHARS },
+                            { "type": "array", "items": { "type": "string" }, "maxItems": 64 }
+                        ]
+                    },
+                    "model": { "type": "string" },
+                    "encoding_format": { "type": "string", "enum": ["float", "base64"] },
+                    "include_vector": { "type": "boolean" }
+                }
+            }),
+            json!({
+                "type": "object",
+                "properties": {
+                    "model": { "type": "string" },
+                    "vector_count": { "type": "integer" },
+                    "dim": { "type": "integer" },
+                    "vector_preview": { "type": "array" },
+                    "vectors": { "type": "array" }
+                }
+            }),
+        ),
+        read_tool(
+            "generate_image",
+            "Generate an image from a text prompt via the configured LLM gateway. Returns the gateway's response (URL or base64) without saving to disk.",
+            json!({
+                "type": "object",
+                "required": ["prompt"],
+                "properties": {
+                    "prompt": { "type": "string", "maxLength": MAX_LLM_TOOL_PROMPT_CHARS },
+                    "model": { "type": "string" },
+                    "params": { "type": "object" }
+                }
+            }),
+            json!({
+                "type": "object",
+                "properties": {
+                    "prompt": { "type": "string" },
+                    "model": { "type": "string" },
+                    "response": { "type": "object" }
+                }
+            }),
+        ),
         write_tool(
             "write_note",
             "Propose a sticky note edit. The note is changed only after user confirmation.",
@@ -935,6 +1055,27 @@ fn execute_builtin_tool(
             None,
             "completed",
             web_fetch_tool(&input.arguments)?,
+        ),
+        "web_search" => finish_tool_call(
+            db,
+            &input,
+            None,
+            "completed",
+            web_search_tool(db, &input.arguments)?,
+        ),
+        "text_embedding" => finish_tool_call(
+            db,
+            &input,
+            None,
+            "completed",
+            text_embedding_tool(db, &input.arguments)?,
+        ),
+        "generate_image" => finish_tool_call(
+            db,
+            &input,
+            None,
+            "completed",
+            generate_image_tool(db, &input.arguments)?,
         ),
         "read_file" => finish_tool_call(
             db,
@@ -1175,6 +1316,248 @@ fn web_fetch_tool(arguments: &Value) -> Result<Value, String> {
             "truncated": body_truncated || text_truncated,
         }));
     }
+}
+
+fn web_search_tool(db: &Database, arguments: &Value) -> Result<Value, String> {
+    let query = required_raw_string(arguments, "query")?;
+    if query.chars().count() > MAX_LLM_TOOL_QUERY_CHARS {
+        return Err(format!(
+            "web_search query is too long: {} > {}",
+            query.chars().count(),
+            MAX_LLM_TOOL_QUERY_CHARS
+        ));
+    }
+    let max_results = optional_i64(arguments, "max_results")?
+        .unwrap_or(5)
+        .clamp(1, MAX_SEARCH_RESULTS);
+    let max_tokens_per_page = optional_i64(arguments, "max_tokens_per_page")?
+        .unwrap_or(1024)
+        .clamp(1, 4096);
+    let argument_model = optional_string(arguments, "model");
+
+    let settings = resolve_effective_agent_llm_settings(db)?;
+    let model = pick_tool_model(argument_model.as_deref(), &settings.search_model);
+    let mut payload = json!({
+        "query": query.trim(),
+        "max_results": max_results,
+        "max_tokens_per_page": max_tokens_per_page,
+    });
+    if let Some(model_name) = &model {
+        payload["model"] = json!(model_name);
+    }
+    let response = call_llm_gateway(&settings, "/v1/search", &payload)?;
+    Ok(json!({
+        "query": query.trim(),
+        "model": model.clone().unwrap_or_default(),
+        "response": response,
+    }))
+}
+
+fn text_embedding_tool(db: &Database, arguments: &Value) -> Result<Value, String> {
+    let input_value = arguments
+        .get("input")
+        .ok_or_else(|| "Missing required field: input".to_string())?;
+    let total_chars = embedding_input_size(input_value)?;
+    if total_chars > MAX_LLM_TOOL_EMBEDDING_CHARS {
+        return Err(format!(
+            "text_embedding input is too long: {total_chars} > {MAX_LLM_TOOL_EMBEDDING_CHARS}"
+        ));
+    }
+    let argument_model = optional_string(arguments, "model");
+    let encoding_format = optional_string(arguments, "encoding_format").unwrap_or_else(|| "float".to_string());
+    let include_vector = arguments
+        .get("include_vector")
+        .and_then(Value::as_bool)
+        .unwrap_or(false);
+
+    let settings = resolve_effective_agent_llm_settings(db)?;
+    let model = pick_tool_model(argument_model.as_deref(), &settings.embedding_model)
+        .unwrap_or_else(|| "text-embedding-3-small".to_string());
+    let payload = json!({
+        "input": input_value,
+        "model": model,
+        "encoding_format": encoding_format,
+    });
+    let response = call_llm_gateway(&settings, "/v1/embeddings", &payload)?;
+    Ok(summarize_embedding_response(&response, &model, include_vector))
+}
+
+fn generate_image_tool(db: &Database, arguments: &Value) -> Result<Value, String> {
+    let prompt = required_raw_string(arguments, "prompt")?;
+    if prompt.chars().count() > MAX_LLM_TOOL_PROMPT_CHARS {
+        return Err(format!(
+            "generate_image prompt is too long: {} > {}",
+            prompt.chars().count(),
+            MAX_LLM_TOOL_PROMPT_CHARS
+        ));
+    }
+    let argument_model = optional_string(arguments, "model");
+    let extra_params = arguments.get("params").cloned();
+
+    let settings = resolve_effective_agent_llm_settings(db)?;
+    let model = pick_tool_model(argument_model.as_deref(), &settings.image_model)
+        .unwrap_or_else(|| "zoom_flux".to_string());
+    let mut payload = json!({
+        "model": model,
+        "prompt": prompt.trim(),
+    });
+    if let Some(Value::Object(map)) = extra_params {
+        for (key, value) in map {
+            payload[key] = value;
+        }
+    }
+    let response = call_llm_gateway(&settings, "/v1/images/generation", &payload)?;
+    Ok(json!({
+        "prompt": prompt.trim(),
+        "model": model,
+        "response": response,
+    }))
+}
+
+fn pick_tool_model(argument_model: Option<&str>, configured_model: &str) -> Option<String> {
+    if let Some(value) = argument_model {
+        let trimmed = value.trim();
+        if !trimmed.is_empty() {
+            return Some(trimmed.to_string());
+        }
+    }
+    let trimmed = configured_model.trim();
+    if trimmed.is_empty() {
+        None
+    } else {
+        Some(trimmed.to_string())
+    }
+}
+
+fn embedding_input_size(value: &Value) -> Result<usize, String> {
+    match value {
+        Value::String(text) => Ok(text.chars().count()),
+        Value::Array(items) => {
+            let mut total = 0usize;
+            for item in items {
+                let Some(text) = item.as_str() else {
+                    return Err("text_embedding input array must contain strings".to_string());
+                };
+                total = total.saturating_add(text.chars().count());
+            }
+            Ok(total)
+        }
+        _ => Err("text_embedding input must be a string or array of strings".to_string()),
+    }
+}
+
+fn summarize_embedding_response(response: &Value, model: &str, include_vector: bool) -> Value {
+    let data = response
+        .get("data")
+        .and_then(Value::as_array)
+        .cloned()
+        .unwrap_or_default();
+    let response_model = response
+        .get("model")
+        .and_then(Value::as_str)
+        .unwrap_or(model)
+        .to_string();
+    let dim = data
+        .first()
+        .and_then(|item| item.get("embedding"))
+        .and_then(Value::as_array)
+        .map(|vector| vector.len())
+        .unwrap_or(0);
+    let preview = data
+        .first()
+        .and_then(|item| item.get("embedding"))
+        .and_then(Value::as_array)
+        .map(|vector| {
+            vector
+                .iter()
+                .take(EMBEDDING_PREVIEW_LEN)
+                .cloned()
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
+    let mut result = json!({
+        "model": response_model,
+        "vector_count": data.len(),
+        "dim": dim,
+        "vector_preview": preview,
+    });
+    if include_vector {
+        result["vectors"] = Value::Array(
+            data.iter()
+                .filter_map(|item| item.get("embedding").cloned())
+                .collect(),
+        );
+    }
+    if let Some(usage) = response.get("usage").cloned() {
+        result["usage"] = usage;
+    }
+    result
+}
+
+fn call_llm_gateway(
+    settings: &EffectiveLlmSettings,
+    path: &str,
+    payload: &Value,
+) -> Result<Value, String> {
+    if settings.base_url.trim().is_empty() {
+        return Err("LLM_BASE_URL is not configured.".to_string());
+    }
+    if settings.api_key.trim().is_empty() {
+        return Err("LLM_API_KEY is not configured.".to_string());
+    }
+    let url = compose_llm_gateway_url(&settings.base_url, path)?;
+    let client = reqwest::blocking::Client::builder()
+        .timeout(Duration::from_secs(LLM_TOOL_TIMEOUT_SECS))
+        .build()
+        .map_err(|e| format!("Cannot create LLM gateway client: {e}"))?;
+    let response = client
+        .post(url)
+        .bearer_auth(settings.api_key.trim())
+        .header(reqwest::header::CONTENT_TYPE, "application/json")
+        .header(reqwest::header::ACCEPT, "application/json")
+        .json(payload)
+        .send()
+        .map_err(|e| format!("LLM gateway request failed: {e}"))?;
+    let status = response.status();
+    let mut bytes = Vec::new();
+    let mut reader = response.take((MAX_LLM_TOOL_RESPONSE_BYTES + 1) as u64);
+    reader
+        .read_to_end(&mut bytes)
+        .map_err(|e| format!("Cannot read LLM gateway response: {e}"))?;
+    if bytes.len() > MAX_LLM_TOOL_RESPONSE_BYTES {
+        return Err(format!(
+            "LLM gateway response exceeded {MAX_LLM_TOOL_RESPONSE_BYTES} bytes"
+        ));
+    }
+    if !status.is_success() {
+        let body_preview = String::from_utf8_lossy(&bytes).chars().take(512).collect::<String>();
+        return Err(format!(
+            "LLM gateway returned HTTP {status}: {body_preview}"
+        ));
+    }
+    serde_json::from_slice::<Value>(&bytes)
+        .map_err(|e| format!("LLM gateway response is not valid JSON: {e}"))
+}
+
+fn compose_llm_gateway_url(base_url: &str, path: &str) -> Result<String, String> {
+    let trimmed_base = base_url.trim().trim_end_matches('/');
+    if trimmed_base.is_empty() {
+        return Err("LLM_BASE_URL is empty".to_string());
+    }
+    let trimmed_path = path.trim();
+    let composed = if trimmed_base.ends_with("/v1") && trimmed_path.starts_with("/v1/") {
+        format!("{trimmed_base}{}", trimmed_path.trim_start_matches("/v1"))
+    } else if trimmed_path.starts_with('/') {
+        format!("{trimmed_base}{trimmed_path}")
+    } else {
+        format!("{trimmed_base}/{trimmed_path}")
+    };
+    let parsed = reqwest::Url::parse(&composed)
+        .map_err(|e| format!("LLM gateway URL is invalid: {e}"))?;
+    if !matches!(parsed.scheme(), "http" | "https") {
+        return Err("LLM gateway URL must use http or https".to_string());
+    }
+    Ok(composed)
 }
 
 fn web_fetch_url_from_user_message(message: &str) -> Option<String> {
@@ -4282,6 +4665,14 @@ fn resolve_effective_agent_llm_settings(db: &Database) -> Result<EffectiveLlmSet
     } else {
         saved_api_key
     };
+
+    let (search_model, search_model_from_env) =
+        resolve_model_setting(&saved.search_model, "LLM_SEARCH_MODEL");
+    let (embedding_model, embedding_model_from_env) =
+        resolve_model_setting(&saved.embedding_model, "LLM_EMBEDDING_MODEL");
+    let (image_model, image_model_from_env) =
+        resolve_model_setting(&saved.image_model, "LLM_IMAGE_MODEL");
+
     Ok(EffectiveLlmSettings {
         base_url: if base_url_from_env {
             env_base_url
@@ -4298,7 +4689,27 @@ fn resolve_effective_agent_llm_settings(db: &Database) -> Result<EffectiveLlmSet
         base_url_from_env,
         model_from_env,
         api_key_from_env,
+        search_model,
+        embedding_model,
+        image_model,
+        search_model_from_env,
+        embedding_model_from_env,
+        image_model_from_env,
     })
+}
+
+fn resolve_model_setting(saved: &str, env_key: &str) -> (String, bool) {
+    let saved = saved.trim();
+    if !saved.is_empty() {
+        return (saved.to_string(), false);
+    }
+    let from_env = std::env::var(env_key).unwrap_or_default();
+    let trimmed = from_env.trim();
+    if trimmed.is_empty() {
+        (String::new(), false)
+    } else {
+        (trimmed.to_string(), true)
+    }
 }
 
 async fn call_agent_llm_stream(
@@ -4966,6 +5377,41 @@ fn read_config(path: &Path) -> Result<AgentConfig, String> {
 
 fn read_rag_knowledge(path: &Path) -> Result<String, String> {
     read_bounded_text(&path.join("rag_knowledge.md"))
+}
+
+fn read_agent_prompts(path: &Path) -> Vec<AgentPrompt> {
+    let candidates = [path.join("prompts.yml"), path.join("prompts.yaml")];
+    let file_path = match candidates.iter().find(|candidate| candidate.is_file()) {
+        Some(path) => path,
+        None => return Vec::new(),
+    };
+    let text = match read_bounded_text(file_path) {
+        Ok(text) => text,
+        Err(_) => return Vec::new(),
+    };
+    parse_agent_prompts(&text)
+}
+
+fn parse_agent_prompts(text: &str) -> Vec<AgentPrompt> {
+    #[derive(Deserialize)]
+    struct PromptsFile {
+        #[serde(default)]
+        prompts: Vec<AgentPrompt>,
+    }
+    if let Ok(file) = serde_yaml::from_str::<PromptsFile>(text) {
+        return file
+            .prompts
+            .into_iter()
+            .filter(|prompt| !prompt.tag.trim().is_empty() && !prompt.prompt.is_empty())
+            .collect();
+    }
+    if let Ok(prompts) = serde_yaml::from_str::<Vec<AgentPrompt>>(text) {
+        return prompts
+            .into_iter()
+            .filter(|prompt| !prompt.tag.trim().is_empty() && !prompt.prompt.is_empty())
+            .collect();
+    }
+    Vec::new()
 }
 
 fn read_bounded_text(path: &Path) -> Result<String, String> {
@@ -6142,6 +6588,9 @@ mod tests {
             conversation_folder: None,
             active_persona_id: Some(persona.id),
             active_profile_id: Some(profile.id),
+            search_model: None,
+            embedding_model: None,
+            image_model: None,
         })
         .expect("save secretary settings");
         let memory = db
@@ -6534,6 +6983,85 @@ mod tests {
             Some("Tool note")
         );
         let _ = fs::remove_dir_all(db_root);
+    }
+
+    #[test]
+    fn llm_gateway_tools_are_registered_as_read_only() {
+        let tools = builtin_tools();
+        for name in ["web_search", "text_embedding", "generate_image"] {
+            let tool = tools
+                .iter()
+                .find(|tool| tool.name == name)
+                .unwrap_or_else(|| panic!("{name} tool registered"));
+            assert_eq!(tool.safety_class, "read", "{name} must be read-only");
+            assert!(
+                !tool.requires_confirmation,
+                "{name} must not require confirmation"
+            );
+        }
+    }
+
+    #[test]
+    fn web_search_rejects_oversized_query() {
+        let db = Database::new(&unique_test_dir("tool_web_search_size")).expect("create db");
+        let huge = "x".repeat(MAX_LLM_TOOL_QUERY_CHARS + 10);
+        let result = web_search_tool(&db, &json!({ "query": huge }));
+        let err = result.expect_err("oversize query rejected");
+        assert!(err.contains("too long"), "got: {err}");
+    }
+
+    #[test]
+    fn text_embedding_input_size_validation() {
+        assert_eq!(embedding_input_size(&json!("hello")).expect("string"), 5);
+        assert_eq!(
+            embedding_input_size(&json!(["ab", "cdef"])).expect("array of strings"),
+            6
+        );
+        assert!(embedding_input_size(&json!(42)).is_err());
+        assert!(embedding_input_size(&json!([1, 2])).is_err());
+    }
+
+    #[test]
+    fn embedding_summary_hides_full_vector_unless_requested() {
+        let response = json!({
+            "model": "text-embedding-3-small",
+            "data": [{ "embedding": vec![0.1f64; 100] }],
+            "usage": { "prompt_tokens": 4 }
+        });
+        let preview = summarize_embedding_response(&response, "text-embedding-3-small", false);
+        assert_eq!(preview["dim"], 100);
+        assert_eq!(preview["vector_count"], 1);
+        assert_eq!(preview["vector_preview"].as_array().unwrap().len(), 8);
+        assert!(preview.get("vectors").is_none(), "vectors hidden by default");
+
+        let full = summarize_embedding_response(&response, "text-embedding-3-small", true);
+        assert!(full.get("vectors").is_some(), "vectors included when requested");
+    }
+
+    #[test]
+    fn pick_tool_model_priority_argument_then_configured() {
+        assert_eq!(pick_tool_model(Some("gpt-4o-mini"), ""), Some("gpt-4o-mini".to_string()));
+        assert_eq!(pick_tool_model(None, "zoom_flux"), Some("zoom_flux".to_string()));
+        assert_eq!(pick_tool_model(Some("  "), "zoom_flux"), Some("zoom_flux".to_string()));
+        assert_eq!(pick_tool_model(None, ""), None);
+    }
+
+    #[test]
+    fn compose_llm_gateway_url_handles_v1_suffix() {
+        assert_eq!(
+            compose_llm_gateway_url("https://gw.example.com", "/v1/search").unwrap(),
+            "https://gw.example.com/v1/search"
+        );
+        assert_eq!(
+            compose_llm_gateway_url("https://gw.example.com/v1", "/v1/search").unwrap(),
+            "https://gw.example.com/v1/search"
+        );
+        assert_eq!(
+            compose_llm_gateway_url("https://gw.example.com/v1/", "/v1/embeddings").unwrap(),
+            "https://gw.example.com/v1/embeddings"
+        );
+        assert!(compose_llm_gateway_url("ftp://nope", "/v1/search").is_err());
+        assert!(compose_llm_gateway_url("", "/v1/search").is_err());
     }
 
     #[test]

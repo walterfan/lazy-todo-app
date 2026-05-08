@@ -1,16 +1,17 @@
 use chrono::{Datelike, Duration, Local, NaiveDate, NaiveDateTime, Timelike};
+use rusqlite::backup::Backup;
 use rusqlite::types::ValueRef;
-use rusqlite::{params, Connection, OpenFlags, Result, Row};
-use std::path::Path;
+use rusqlite::{params, Connection, DatabaseName, OpenFlags, Result, Row};
+use std::path::{Path, PathBuf};
 use std::sync::Mutex;
-use std::time::Instant;
+use std::time::{Duration as StdDuration, Instant};
 
 use crate::models::agents::{
-    AgentConversationSummary, AgentDefinition, AgentDirectorySettings, AgentExternalCliCallResult,
-    AgentExternalCliTool, AgentMemory, AgentMemoryProposal, AgentMessage, AgentMigrationStatus,
-    AgentRagChunk, AgentSafeFileRootSettings, AgentSession, AgentToolAction, AgentUserIdentity,
-    SaveAgentDirectorySettings, SaveAgentExternalCliTool, SaveAgentMemory,
-    SaveAgentSafeFileRootSettings, SaveAgentUserIdentity,
+    AgentConversationSummary, AgentDefaultSettings, AgentDefinition, AgentDirectorySettings,
+    AgentExternalCliCallResult, AgentExternalCliTool, AgentMemory, AgentMemoryProposal,
+    AgentMessage, AgentMigrationStatus, AgentRagChunk, AgentSafeFileRootSettings, AgentSession,
+    AgentToolAction, AgentUserIdentity, SaveAgentDefaultSettings, SaveAgentDirectorySettings,
+    SaveAgentExternalCliTool, SaveAgentMemory, SaveAgentSafeFileRootSettings, SaveAgentUserIdentity,
 };
 use crate::models::note::StickyNote;
 use crate::models::pomodoro::{DayStat, PomodoroMilestone, PomodoroSettings};
@@ -21,7 +22,7 @@ use crate::models::secretary::{
 };
 use crate::models::settings::AppSettings;
 use crate::models::todo::Todo;
-use crate::models::toolbox::DatabaseQueryResult;
+use crate::models::toolbox::{DatabaseExecuteResult, DatabaseQueryResult};
 
 pub struct Database {
     conn: Mutex<Connection>,
@@ -79,6 +80,74 @@ fn query_connection_readonly(
         truncated,
         elapsed_ms: started.elapsed().as_millis(),
     })
+}
+
+fn execute_connection_in_transaction(
+    conn: &mut Connection,
+    sql: &str,
+    statement_kind: &str,
+    commit: bool,
+    source_path: &Path,
+) -> std::result::Result<DatabaseExecuteResult, String> {
+    let started = Instant::now();
+    let backup_path = if commit {
+        backup_sqlite_file(source_path).map_err(|error| {
+            format!("Refusing to commit: backup failed: {error}")
+        })?
+    } else {
+        PathBuf::new()
+    };
+    let tx = conn.transaction().map_err(|error| error.to_string())?;
+    let rows_affected = tx.execute(sql, []).map_err(|error| error.to_string())?;
+    if commit {
+        tx.commit().map_err(|error| error.to_string())?;
+    } else {
+        tx.rollback().map_err(|error| error.to_string())?;
+    }
+    Ok(DatabaseExecuteResult {
+        statement_kind: statement_kind.to_string(),
+        rows_affected,
+        committed: commit,
+        elapsed_ms: started.elapsed().as_millis(),
+        backup_path: backup_path.to_string_lossy().to_string(),
+    })
+}
+
+fn backup_sqlite_file(source_path: &Path) -> std::result::Result<PathBuf, String> {
+    let stamp = Local::now().format("%Y%m%d-%H%M%S").to_string();
+    let file_name = source_path
+        .file_name()
+        .map(|name| name.to_string_lossy().to_string())
+        .unwrap_or_else(|| "database.db".to_string());
+    let backup_dir = source_path.parent().unwrap_or_else(|| Path::new("."));
+    let mut backup_path = backup_dir.join(format!("{file_name}.bak-{stamp}"));
+    let mut suffix = 1u32;
+    while backup_path.exists() {
+        backup_path = backup_dir.join(format!("{file_name}.bak-{stamp}-{suffix}"));
+        suffix += 1;
+        if suffix > 1_000 {
+            return Err("Could not allocate a unique backup file name.".to_string());
+        }
+    }
+    let source_conn =
+        Connection::open_with_flags(source_path, OpenFlags::SQLITE_OPEN_READ_ONLY)
+            .map_err(|error| error.to_string())?;
+    let mut dest_conn =
+        Connection::open(&backup_path).map_err(|error| error.to_string())?;
+    {
+        let backup = Backup::new_with_names(
+            &source_conn,
+            DatabaseName::Main,
+            &mut dest_conn,
+            DatabaseName::Main,
+        )
+        .map_err(|error| error.to_string())?;
+        backup
+            .run_to_completion(64, StdDuration::from_millis(250), None)
+            .map_err(|error| error.to_string())?;
+    }
+    dest_conn.close().map_err(|(_, error)| error.to_string())?;
+    Ok(backup_path)
 }
 
 fn normalize_recurrence(value: Option<&str>) -> String {
@@ -437,6 +506,34 @@ impl Database {
             )?;
         }
 
+        if !column_names.iter().any(|name| name == "default_agent_id") {
+            conn.execute(
+                "ALTER TABLE agent_settings ADD COLUMN default_agent_id TEXT NOT NULL DEFAULT ''",
+                [],
+            )?;
+        }
+
+        Ok(())
+    }
+
+    fn ensure_secretary_settings_schema(conn: &Connection) -> Result<()> {
+        if !Self::table_exists(conn, "secretary_settings")? {
+            return Ok(());
+        }
+        let mut stmt = conn.prepare("PRAGMA table_info(secretary_settings)")?;
+        let column_names = stmt
+            .query_map([], |row| row.get::<_, String>(1))?
+            .collect::<Result<Vec<_>>>()?;
+        for column in ["search_model", "embedding_model", "image_model"] {
+            if !column_names.iter().any(|name| name == column) {
+                conn.execute(
+                    &format!(
+                        "ALTER TABLE secretary_settings ADD COLUMN {column} TEXT NOT NULL DEFAULT ''"
+                    ),
+                    [],
+                )?;
+            }
+        }
         Ok(())
     }
 
@@ -573,7 +670,10 @@ impl Database {
                 skill_folder        TEXT NOT NULL DEFAULT '',
                 conversation_folder TEXT NOT NULL DEFAULT '',
                 active_persona_id   INTEGER,
-                active_profile_id   INTEGER
+                active_profile_id   INTEGER,
+                search_model        TEXT NOT NULL DEFAULT '',
+                embedding_model     TEXT NOT NULL DEFAULT '',
+                image_model         TEXT NOT NULL DEFAULT ''
             );
             CREATE TABLE IF NOT EXISTS secretary_personas (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -637,7 +737,8 @@ impl Database {
             CREATE TABLE IF NOT EXISTS agent_settings (
                 id               INTEGER PRIMARY KEY CHECK (id = 1),
                 agent_directory TEXT NOT NULL DEFAULT '',
-                safe_file_roots_json TEXT NOT NULL DEFAULT '[]'
+                safe_file_roots_json TEXT NOT NULL DEFAULT '[]',
+                default_agent_id TEXT NOT NULL DEFAULT ''
             );
             CREATE TABLE IF NOT EXISTS agent_definitions (
                 agent_id              TEXT PRIMARY KEY,
@@ -848,6 +949,7 @@ impl Database {
         Self::ensure_pomodoro_settings_schema(&conn)?;
         Self::ensure_app_settings_schema(&conn)?;
         Self::ensure_agent_settings_schema(&conn)?;
+        Self::ensure_secretary_settings_schema(&conn)?;
         Self::ensure_agent_definition_schema(&conn)?;
         Self::ensure_agent_rag_schema(&conn)?;
 
@@ -890,6 +992,43 @@ impl Database {
         let conn = Connection::open_with_flags(path, OpenFlags::SQLITE_OPEN_READ_ONLY)
             .map_err(|error| format!("Cannot open SQLite database {}: {error}", path.display()))?;
         query_connection_readonly(&conn, sql, max_rows)
+    }
+
+    pub fn execute_database_writable(
+        &self,
+        sql: &str,
+        statement_kind: &str,
+        commit: bool,
+    ) -> std::result::Result<DatabaseExecuteResult, String> {
+        let mut conn = self.conn.lock().expect("db lock poisoned");
+        let source_path = self.db_path.clone();
+        execute_connection_in_transaction(&mut conn, sql, statement_kind, commit, &source_path)
+    }
+
+    pub fn execute_database_file_writable(
+        path: &Path,
+        sql: &str,
+        statement_kind: &str,
+        commit: bool,
+    ) -> std::result::Result<DatabaseExecuteResult, String> {
+        let metadata = std::fs::metadata(path).map_err(|error| {
+            format!(
+                "Cannot access SQLite database path {}: {error}",
+                path.display()
+            )
+        })?;
+        if !metadata.is_file() {
+            return Err(format!(
+                "SQLite database path is not a file: {}",
+                path.display()
+            ));
+        }
+        let mut conn = Connection::open_with_flags(
+            path,
+            OpenFlags::SQLITE_OPEN_READ_WRITE | OpenFlags::SQLITE_OPEN_NO_MUTEX,
+        )
+        .map_err(|error| format!("Cannot open SQLite database {}: {error}", path.display()))?;
+        execute_connection_in_transaction(&mut conn, sql, statement_kind, commit, path)
     }
 
     pub fn get_agent_directory_settings(&self) -> Result<AgentDirectorySettings> {
@@ -950,6 +1089,34 @@ impl Database {
         )?;
         drop(conn);
         self.get_agent_safe_file_root_settings()
+    }
+
+    pub fn get_agent_default_settings(&self) -> Result<AgentDefaultSettings> {
+        let conn = self.conn.lock().expect("db lock poisoned");
+        conn.execute("INSERT OR IGNORE INTO agent_settings (id) VALUES (1)", [])?;
+        conn.query_row(
+            "SELECT default_agent_id FROM agent_settings WHERE id = 1",
+            [],
+            |row| {
+                Ok(AgentDefaultSettings {
+                    default_agent_id: row.get(0)?,
+                })
+            },
+        )
+    }
+
+    pub fn save_agent_default_settings(
+        &self,
+        input: &SaveAgentDefaultSettings,
+    ) -> Result<AgentDefaultSettings> {
+        let conn = self.conn.lock().expect("db lock poisoned");
+        conn.execute("INSERT OR IGNORE INTO agent_settings (id) VALUES (1)", [])?;
+        conn.execute(
+            "UPDATE agent_settings SET default_agent_id = ?1 WHERE id = 1",
+            params![input.default_agent_id.trim()],
+        )?;
+        drop(conn);
+        self.get_agent_default_settings()
     }
 
     pub fn list_agent_external_cli_tools(&self) -> Result<Vec<AgentExternalCliTool>> {
@@ -2802,7 +2969,7 @@ impl Database {
         self.ensure_default_secretary()?;
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.query_row(
-            "SELECT base_url, model, api_key, skill_folder, conversation_folder, active_persona_id, active_profile_id
+            "SELECT base_url, model, api_key, skill_folder, conversation_folder, active_persona_id, active_profile_id, search_model, embedding_model, image_model
              FROM secretary_settings WHERE id = 1",
             [],
             |row| {
@@ -2815,6 +2982,9 @@ impl Database {
                     conversation_folder: row.get(4)?,
                     active_persona_id: row.get(5)?,
                     active_profile_id: row.get(6)?,
+                    search_model: row.get(7)?,
+                    embedding_model: row.get(8)?,
+                    image_model: row.get(9)?,
                 })
             },
         )
@@ -2863,6 +3033,24 @@ impl Database {
             conn.execute(
                 "UPDATE secretary_settings SET conversation_folder = ?1 WHERE id = 1",
                 params![conversation_folder.trim()],
+            )?;
+        }
+        if let Some(search_model) = &input.search_model {
+            conn.execute(
+                "UPDATE secretary_settings SET search_model = ?1 WHERE id = 1",
+                params![search_model.trim()],
+            )?;
+        }
+        if let Some(embedding_model) = &input.embedding_model {
+            conn.execute(
+                "UPDATE secretary_settings SET embedding_model = ?1 WHERE id = 1",
+                params![embedding_model.trim()],
+            )?;
+        }
+        if let Some(image_model) = &input.image_model {
+            conn.execute(
+                "UPDATE secretary_settings SET image_model = ?1 WHERE id = 1",
+                params![image_model.trim()],
             )?;
         }
         conn.execute(
@@ -3802,6 +3990,64 @@ mod tests {
             .query_database_readonly("DELETE FROM sticky_notes", 10)
             .expect_err("write query should be rejected");
         assert!(error.contains("Only read-only SQL queries"));
+
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn toolbox_database_execute_rollback_and_commit() {
+        let dir = temp_db_dir("toolbox_database_execute");
+        let db = Database::new(&dir).expect("create db");
+        db.insert_note("note-a", "body-a", "blue")
+            .expect("insert note a");
+        db.insert_note("note-b", "body-b", "blue")
+            .expect("insert note b");
+
+        let preview = db
+            .execute_database_writable(
+                "DELETE FROM sticky_notes WHERE color = 'blue'",
+                "delete",
+                false,
+            )
+            .expect("rollback execute");
+        assert_eq!(preview.rows_affected, 2);
+        assert!(!preview.committed);
+        assert!(preview.backup_path.is_empty(), "dry-run must not back up");
+
+        let after_preview = db
+            .query_database_readonly("SELECT COUNT(*) FROM sticky_notes WHERE color = 'blue'", 1)
+            .expect("count after rollback");
+        assert_eq!(after_preview.rows[0], vec!["2"]);
+
+        let applied = db
+            .execute_database_writable(
+                "DELETE FROM sticky_notes WHERE color = 'blue'",
+                "delete",
+                true,
+            )
+            .expect("commit execute");
+        assert_eq!(applied.rows_affected, 2);
+        assert!(applied.committed);
+        assert!(!applied.backup_path.is_empty(), "commit must produce a backup");
+        let backup_file = std::path::PathBuf::from(&applied.backup_path);
+        assert!(backup_file.is_file(), "backup file should exist on disk");
+
+        let backup_view = Database::query_database_file_readonly(
+            &backup_file,
+            "SELECT COUNT(*) FROM sticky_notes WHERE color = 'blue'",
+            1,
+        )
+        .expect("query backup file");
+        assert_eq!(
+            backup_view.rows[0],
+            vec!["2"],
+            "backup must reflect pre-commit state"
+        );
+
+        let after_commit = db
+            .query_database_readonly("SELECT COUNT(*) FROM sticky_notes WHERE color = 'blue'", 1)
+            .expect("count after commit");
+        assert_eq!(after_commit.rows[0], vec!["0"]);
 
         let _ = std::fs::remove_dir_all(dir);
     }

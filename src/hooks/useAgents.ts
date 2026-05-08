@@ -3,6 +3,7 @@ import { listen } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api/core";
 import type {
   AgentBuiltinTool,
+  AgentDefaultSettings,
   AgentExternalCliTool,
   AgentExternalCliToolTestResult,
   AgentMemory,
@@ -10,6 +11,7 @@ import type {
   AgentMigrationStatus,
   AgentDefinition,
   AgentDefinitionDetail,
+  AgentPrompt,
   AgentDirectorySettings,
   AgentRagStatus,
   AgentSafeFileRootSettings,
@@ -20,6 +22,7 @@ import type {
   AgentUserIdentity,
   ConfirmAgentToolActionResult,
   ConfirmAgentMemoryProposalInput,
+  SaveAgentDefaultSettings,
   SaveAgentMemory,
   SaveAgentExternalCliTool,
   SaveAgentDirectorySettings,
@@ -28,6 +31,8 @@ import type {
   SendAgentMessageResult,
 } from "../types/agents";
 import { DEFAULT_SELECTED_CONTEXT } from "../types/secretary";
+
+const FALLBACK_DEFAULT_AGENT_ID = "english_teacher";
 
 export function useAgents() {
   const [agents, setAgents] = useState<AgentDefinition[]>([]);
@@ -38,6 +43,7 @@ export function useAgents() {
   const [memoryProposals, setMemoryProposals] = useState<AgentMemoryProposal[]>([]);
   const [agentDirectorySettings, setAgentDirectorySettings] = useState<AgentDirectorySettings | null>(null);
   const [safeFileRootSettings, setSafeFileRootSettings] = useState<AgentSafeFileRootSettings | null>(null);
+  const [agentDefaultSettings, setAgentDefaultSettings] = useState<AgentDefaultSettings | null>(null);
   const [builtinTools, setBuiltinTools] = useState<AgentBuiltinTool[]>([]);
   const [externalCliTools, setExternalCliTools] = useState<AgentExternalCliTool[]>([]);
   const [pendingToolActions, setPendingToolActions] = useState<AgentToolAction[]>([]);
@@ -46,6 +52,7 @@ export function useAgents() {
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
   const [selectedAgentIds, setSelectedAgentIds] = useState<string[]>([]);
   const [ragStatus, setRagStatus] = useState<AgentRagStatus | null>(null);
+  const [agentPrompts, setAgentPrompts] = useState<AgentPrompt[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,7 +83,18 @@ export function useAgents() {
   const refresh = useCallback(async () => {
     setError(null);
     try {
-      const [nextAgents, nextSessions, nextTools, nextExternalCliTools, nextActions, nextMemoryProposals, nextAgentDirectory, nextSafeFileRoots, nextMigrationStatus] = await Promise.all([
+      const [
+        nextAgents,
+        nextSessions,
+        nextTools,
+        nextExternalCliTools,
+        nextActions,
+        nextMemoryProposals,
+        nextAgentDirectory,
+        nextSafeFileRoots,
+        nextAgentDefault,
+        nextMigrationStatus,
+      ] = await Promise.all([
         invoke<AgentDefinition[]>("list_agents"),
         invoke<AgentSession[]>("list_agent_sessions"),
         invoke<AgentBuiltinTool[]>("list_agent_builtin_tools"),
@@ -85,6 +103,7 @@ export function useAgents() {
         invoke<AgentMemoryProposal[]>("list_agent_memory_proposals"),
         invoke<AgentDirectorySettings>("get_agent_directory_settings"),
         invoke<AgentSafeFileRootSettings>("get_agent_safe_file_root_settings"),
+        invoke<AgentDefaultSettings>("get_agent_default_settings"),
         invoke<AgentMigrationStatus>("get_agent_migration_status"),
       ]);
       setAgents(nextAgents);
@@ -95,10 +114,20 @@ export function useAgents() {
       setMemoryProposals(nextMemoryProposals);
       setAgentDirectorySettings(nextAgentDirectory);
       setSafeFileRootSettings(nextSafeFileRoots);
+      setAgentDefaultSettings(nextAgentDefault);
       setMigrationStatus(nextMigrationStatus);
-      const firstEnabled = nextAgents.find((agent) => agent.enabled)?.agent_id ?? null;
-      setSelectedAgentId((current) => current ?? firstEnabled);
-      setSelectedAgentIds((current) => current.length > 0 ? current : firstEnabled ? [firstEnabled] : []);
+      const enabledAgents = nextAgents.filter((agent) => agent.enabled);
+      const configuredDefault = nextAgentDefault.default_agent_id?.trim() || "";
+      const preferredAgent =
+        (configuredDefault &&
+          enabledAgents.find((agent) => agent.agent_id === configuredDefault)) ||
+        enabledAgents.find((agent) => agent.agent_id === FALLBACK_DEFAULT_AGENT_ID) ||
+        enabledAgents[0];
+      const defaultAgentId = preferredAgent?.agent_id ?? null;
+      setSelectedAgentId((current) => current ?? defaultAgentId);
+      setSelectedAgentIds((current) =>
+        current.length > 0 ? current : defaultAgentId ? [defaultAgentId] : []
+      );
       if (!session && nextSessions.length > 0) {
         setSession(nextSessions[0]);
       }
@@ -116,6 +145,7 @@ export function useAgents() {
   useEffect(() => {
     if (!selectedAgent) {
       setRagStatus(null);
+      setAgentPrompts([]);
       return;
     }
     invoke<AgentRagStatus>("get_agent_rag_status", { agentId: selectedAgent.agent_id })
@@ -124,6 +154,9 @@ export function useAgents() {
     invoke<AgentMemory[]>("list_agent_memories", { agentId: selectedAgent.agent_id })
       .then(setMemories)
       .catch(() => setMemories([]));
+    invoke<AgentPrompt[]>("list_agent_prompts", { agentId: selectedAgent.agent_id })
+      .then(setAgentPrompts)
+      .catch(() => setAgentPrompts([]));
   }, [selectedAgent]);
 
   useEffect(() => {
@@ -362,6 +395,12 @@ export function useAgents() {
     return next;
   }, []);
 
+  const saveAgentDefaultSettings = useCallback(async (input: SaveAgentDefaultSettings) => {
+    const next = await invoke<AgentDefaultSettings>("save_agent_default_settings", { input });
+    setAgentDefaultSettings(next);
+    return next;
+  }, []);
+
   const confirmToolAction = useCallback(async (actionId: string, accepted: boolean) => {
     const result = await invoke<ConfirmAgentToolActionResult>("confirm_agent_tool_action", {
       input: { action_id: actionId, accepted },
@@ -431,6 +470,7 @@ export function useAgents() {
     memoryProposals,
     agentDirectorySettings,
     safeFileRootSettings,
+    agentDefaultSettings,
     migrationStatus,
     builtinTools,
     externalCliTools,
@@ -441,6 +481,7 @@ export function useAgents() {
     selectedAgents,
     selectedAgentIds,
     ragStatus,
+    agentPrompts,
     loading,
     sending,
     error,
@@ -469,6 +510,7 @@ export function useAgents() {
     saveMemory,
     saveAgentDirectorySettings,
     saveSafeFileRootSettings,
+    saveAgentDefaultSettings,
     confirmToolAction,
     confirmMemoryProposal,
     runSecretaryMigration,

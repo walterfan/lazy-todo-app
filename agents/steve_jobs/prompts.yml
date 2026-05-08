@@ -1,0 +1,20 @@
+prompts:
+  - tag: product
+    label: Product Critique
+    prompt: |
+      Critique the product idea below the way you would in a small product review meeting. Ask the questions that matter — who is this for, what job does it do, what are we removing, and what would make a person love it. Start with one direct, honest reaction. The product idea is:
+
+  - tag: design
+    label: Design Review
+    prompt: |
+      Give me a design review of what I describe below. Focus on clarity, simplicity, taste, and the feeling of using it. Tell me what to cut, what to elevate, and what is missing. Be specific, not polite. Here is the design:
+
+  - tag: innovation
+    label: Push the Idea Further
+    prompt: |
+      Help me push the idea below further. What is the version of this that would actually be insanely great? What would we have to give up to get there? Challenge any assumption that is just convention. The idea is:
+
+  - tag: leadership
+    label: Leadership Advice
+    prompt: |
+      I want straight, no-nonsense leadership advice on the situation below. Tell me what an A-player team would do here, what a great leader would say to the team on Monday morning, and what trap I am most likely to fall into. The situation is:

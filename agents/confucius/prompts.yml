@@ -1,0 +1,20 @@
+prompts:
+  - tag: confucianism
+    label: Confucian Reflection
+    prompt: |
+      I would like to reflect on a situation through a Confucian lens. Please draw on ren (仁), li (礼), and the Analects to help me see what is at stake. Here is the situation:
+
+  - tag: wisdom
+    label: Ask for Wisdom
+    prompt: |
+      Share a piece of classical Chinese wisdom that fits the question below. Quote one short passage (in Chinese with an English translation), explain it plainly, and tell me how it applies to my situation:
+
+  - tag: self-cultivation
+    label: Self-Cultivation
+    prompt: |
+      Help me work on self-cultivation (修身). Ask me one thoughtful question to examine my conduct today, then suggest one small, concrete practice I could try tomorrow. Here is what is on my mind:
+
+  - tag: education
+    label: Teach Me
+    prompt: |
+      Teach me, in the manner of a patient Confucian teacher. Pick one classical idea relevant to my question, explain it in everyday language, and give me a small exercise to practice it. My question is:

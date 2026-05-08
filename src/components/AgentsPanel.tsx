@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from "react";
+import { useMemo, useRef, useState, type MouseEvent } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import type { AgentsController } from "../hooks/useAgents";
 import type { AgentMessage } from "../types/agents";
@@ -24,9 +24,34 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
   const [sessionActionStatus, setSessionActionStatus] = useState("");
   const [confirmingDeleteSessionId, setConfirmingDeleteSessionId] = useState<string | null>(null);
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const selectedAgents = agents.selectedAgents;
   const isGroupChat = selectedAgents.length > 1;
   const selectedAgentNames = selectedAgents.map((agent) => agent.agent_name).join(", ");
+  const promptsByTag = useMemo(() => {
+    const map = new Map<string, { label: string; prompt: string }>();
+    for (const item of agents.agentPrompts) {
+      const tag = item.tag.trim();
+      if (!tag || !item.prompt) continue;
+      map.set(tag, { label: item.label?.trim() || tag, prompt: item.prompt });
+    }
+    return map;
+  }, [agents.agentPrompts]);
+
+  const insertPrompt = (text: string) => {
+    setMessage((current) => {
+      if (!current.trim()) return text;
+      const separator = current.endsWith("\n") ? "" : "\n";
+      return `${current}${separator}${text}`;
+    });
+    requestAnimationFrame(() => {
+      const node = composerRef.current;
+      if (!node) return;
+      node.focus();
+      const end = node.value.length;
+      node.setSelectionRange(end, end);
+    });
+  };
 
   if (agents.loading) {
     return <div className="loading">{t("agentsLoading")}</div>;
@@ -156,7 +181,21 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
             )}
           </div>
           <div className="secretary-status">
-            {!isGroupChat && agents.selectedAgent?.tags.slice(0, 4).map((tag) => <span key={tag}>{tag}</span>)}
+            {!isGroupChat && agents.selectedAgent?.tags.slice(0, 4).map((tag) => {
+              const prompt = promptsByTag.get(tag);
+              if (!prompt) return <span key={tag}>{tag}</span>;
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  className="agent-tag-prompt"
+                  title={prompt.prompt}
+                  onClick={() => insertPrompt(prompt.prompt)}
+                >
+                  {prompt.label}
+                </button>
+              );
+            })}
             {isGroupChat && selectedAgents.slice(0, 4).map((agent) => <span key={agent.agent_id}>@{agent.agent_name}</span>)}
             {agents.ragStatus && <span>{agents.ragStatus.indexed_chunks} RAG chunks</span>}
             <span>{agents.memories.filter((memory) => memory.status === "active").length} memories</span>
@@ -319,6 +358,7 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
             </div>
           )}
           <textarea
+            ref={composerRef}
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             onKeyDown={(event) => {

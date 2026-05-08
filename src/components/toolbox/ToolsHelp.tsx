@@ -45,6 +45,14 @@ export function ToolsHelp() {
         <li>{t("toolHelpDatabaseLimit")}</li>
       </ul>
 
+      <h4>🧮 {t("utilities")}</h4>
+      <p>{t("toolHelpUtilitiesIntro")}</p>
+      <ul>
+        <li><b>{t("calculator")}</b> - {t("toolHelpCalculator")}</li>
+        <li><b>{t("cronExpression")}</b> - {t("toolHelpCronMeaning")}</li>
+        <li>{t("toolHelpCronBuilder")}</li>
+      </ul>
+
       <h4 style={{ color: "var(--warning)" }}>{t("privacy")}</h4>
       <p>{t("toolHelpPrivacyBody")}</p>
     </div>

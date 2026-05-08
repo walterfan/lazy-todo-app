@@ -6,7 +6,8 @@
   "description": "A bilingual English-learning Agent who teaches English, translates between English and Chinese, improves business communication, and shares practical phrases, meeting expressions, and common proverbs.",
   "tags": [
     "english-learning",
-    "translation",
+    "english-to-chinese",
+    "chinese-to-english",
     "business-english",
     "communication"
   ],

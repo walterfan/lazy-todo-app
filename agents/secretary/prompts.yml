@@ -1,0 +1,20 @@
+prompts:
+  - tag: productivity
+    label: Plan My Day
+    prompt: |
+      Help me plan a focused, realistic day. Look at my open todos and recent notes if you have access, ask me what one outcome would make today a win, and propose a short ordered plan with rough time blocks. Here is what I want to get done:
+
+  - tag: memory
+    label: Remember This
+    prompt: |
+      Please help me remember the following preference or fact about me, and use it in future conversations. Confirm what you understood, and ask one clarifying question if anything is ambiguous before saving it:
+
+  - tag: planning
+    label: Break Down a Goal
+    prompt: |
+      Help me turn the goal below into a concrete plan. Ask me about the deadline and constraints, then break it into milestones and a first set of next-step todos I could add today. The goal is:
+
+  - tag: personal
+    label: Personal Check-In
+    prompt: |
+      Give me a short personal check-in. Ask me how I am feeling about my work right now, what is weighing on me, and one thing I am looking forward to. Keep the tone discreet and supportive, and end with one suggestion for the rest of the day.

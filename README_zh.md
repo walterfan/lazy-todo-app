@@ -89,6 +89,18 @@ npm run tauri dev
 npm run tauri build
 ```
 
+### macOS：提示"应用已损坏，无法打开"
+
+GitHub Releases 发布的 DMG 没有经过 Apple Developer ID 公证，macOS 可能会将其加入隔离区并报错 *"Lazy Todo App 已损坏，无法打开"*。
+
+安装后执行一次以下命令清除隔离属性即可：
+
+```bash
+xattr -cr "/Applications/Lazy Todo App.app"
+```
+
+然后正常打开即可。（自 `v1.0.1` 起使用 ad-hoc 自签名，大多数用户无需手动处理。）
+
 ### 数据库路径
 
 默认数据库路径：

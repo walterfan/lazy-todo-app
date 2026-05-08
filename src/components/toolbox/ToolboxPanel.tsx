@@ -4,10 +4,11 @@ import { ChecksumTools } from "./ChecksumTools";
 import { GenerationTools } from "./GenerationTools";
 import { EncryptionTools } from "./EncryptionTools";
 import { DatabaseTools } from "./DatabaseTools";
+import { UtilityTools } from "./UtilityTools";
 import { ToolsHelp } from "./ToolsHelp";
 import { useTranslation } from "react-i18next";
 
-type InnerTab = "conversion" | "checksum" | "generation" | "encryption" | "database" | "help";
+type InnerTab = "conversion" | "checksum" | "generation" | "encryption" | "database" | "utilities" | "help";
 
 const TABS: { key: InnerTab; icon: string; labelKey: string }[] = [
   { key: "conversion", icon: "🔄", labelKey: "conversion" },
@@ -15,6 +16,7 @@ const TABS: { key: InnerTab; icon: string; labelKey: string }[] = [
   { key: "generation", icon: "✨", labelKey: "generation" },
   { key: "encryption", icon: "🔐", labelKey: "encryption" },
   { key: "database", icon: "🗄️", labelKey: "database" },
+  { key: "utilities", icon: "🧮", labelKey: "utilities" },
   { key: "help", icon: "❔", labelKey: "help" },
 ];
 
@@ -79,6 +81,9 @@ export function ToolboxPanel() {
         </div>
         <div style={{ display: active === "database" ? "block" : "none" }}>
           <DatabaseTools />
+        </div>
+        <div style={{ display: active === "utilities" ? "block" : "none" }}>
+          <UtilityTools />
         </div>
         <div style={{ display: active === "help" ? "block" : "none" }}>
           <ToolsHelp />

@@ -24,11 +24,15 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
     base_url: "",
     model: "",
     api_key: "",
+    search_model: "",
+    embedding_model: "",
+    image_model: "",
   });
   const [agentDirectory, setAgentDirectory] = useState("");
   const [agentZipPath, setAgentZipPath] = useState("");
   const [agentDetail, setAgentDetail] = useState<AgentDefinitionDetail | null>(null);
   const [safeFileRootsText, setSafeFileRootsText] = useState("");
+  const [defaultAgentId, setDefaultAgentId] = useState("");
   const [cliDraft, setCliDraft] = useState({
     tool_id: "",
     display_name: "",
@@ -50,6 +54,9 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
       base_url: secretary.settings.saved.base_url,
       model: secretary.settings.saved.model,
       api_key: "",
+      search_model: secretary.settings.saved.search_model ?? "",
+      embedding_model: secretary.settings.saved.embedding_model ?? "",
+      image_model: secretary.settings.saved.image_model ?? "",
     });
   }, [secretary.settings]);
 
@@ -61,6 +68,10 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
     setSafeFileRootsText((agents.safeFileRootSettings?.safe_file_roots ?? []).join("\n"));
   }, [agents.safeFileRootSettings]);
 
+  useEffect(() => {
+    setDefaultAgentId(agents.agentDefaultSettings?.default_agent_id ?? "");
+  }, [agents.agentDefaultSettings]);
+
   const saveSecretarySettings = async () => {
     await secretary.saveSettings({
       base_url: secretaryDraft.base_url,
@@ -70,6 +81,9 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
       conversation_folder: secretary.settings?.saved.conversation_folder ?? "",
       active_persona_id: secretary.activePersona?.id ?? null,
       active_profile_id: secretary.activeProfile?.id ?? null,
+      search_model: secretaryDraft.search_model,
+      embedding_model: secretaryDraft.embedding_model,
+      image_model: secretaryDraft.image_model,
     });
   };
 
@@ -78,6 +92,17 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
     try {
       await agents.saveAgentDirectorySettings({ agent_directory: agentDirectory });
       setAgentSettingsStatus(t("agentFolderSaved"));
+    } catch (err) {
+      setAgentSettingsStatus(String(err));
+    }
+  };
+
+  const saveDefaultAgent = async (nextAgentId: string) => {
+    setDefaultAgentId(nextAgentId);
+    setAgentSettingsStatus("");
+    try {
+      await agents.saveAgentDefaultSettings({ default_agent_id: nextAgentId });
+      setAgentSettingsStatus(t("defaultAgentSaved"));
     } catch (err) {
       setAgentSettingsStatus(String(err));
     }
@@ -310,6 +335,36 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
               />
             </div>
 
+            <div className="settings-row">
+              <label>{t("searchModel")}</label>
+              <input
+                type="text"
+                value={secretaryDraft.search_model}
+                onChange={(e) => setSecretaryDraft({ ...secretaryDraft, search_model: e.target.value })}
+                placeholder={t("searchModelPlaceholder")}
+              />
+            </div>
+
+            <div className="settings-row">
+              <label>{t("embeddingModel")}</label>
+              <input
+                type="text"
+                value={secretaryDraft.embedding_model}
+                onChange={(e) => setSecretaryDraft({ ...secretaryDraft, embedding_model: e.target.value })}
+                placeholder="text-embedding-3-small"
+              />
+            </div>
+
+            <div className="settings-row">
+              <label>{t("imageModel")}</label>
+              <input
+                type="text"
+                value={secretaryDraft.image_model}
+                onChange={(e) => setSecretaryDraft({ ...secretaryDraft, image_model: e.target.value })}
+                placeholder="zoom_flux"
+              />
+            </div>
+
             <div className="settings-row settings-row-vertical">
               <label>{t("environmentOverrides")}</label>
               <div className="settings-chip-row">
@@ -392,6 +447,24 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
               <button className="settings-toggle" onClick={() => void agents.refreshAgents()}>
                 {t("refreshAgents")}
               </button>
+            </div>
+
+            <div className="settings-row settings-row-vertical">
+              <label>{t("defaultAgent")}</label>
+              <select
+                className="settings-path-input"
+                value={defaultAgentId}
+                onChange={(event) => void saveDefaultAgent(event.target.value)}
+              >
+                <option value="">{t("defaultAgentAuto")}</option>
+                {agents.agents
+                  .filter((agent) => agent.enabled)
+                  .map((agent) => (
+                    <option key={agent.agent_id} value={agent.agent_id}>
+                      {agent.agent_name}
+                    </option>
+                  ))}
+              </select>
             </div>
 
             <div className="settings-row settings-row-vertical">

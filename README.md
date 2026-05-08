@@ -89,6 +89,18 @@ npm run tauri dev
 npm run tauri build
 ```
 
+### macOS: "App is damaged and can't be opened"
+
+The DMGs published on GitHub Releases are not notarized with an Apple Developer ID, so macOS may quarantine them and refuse to launch with the misleading message *"Lazy Todo App is damaged and can't be opened"*.
+
+After installing the app, remove the quarantine attribute once:
+
+```bash
+xattr -cr "/Applications/Lazy Todo App.app"
+```
+
+Then open it normally. (Builds from `v1.0.1+` use ad-hoc code signing, which avoids this for most users.)
+
 ### Database Location
 
 Default database path:

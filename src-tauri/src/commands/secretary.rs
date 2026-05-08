@@ -555,6 +555,14 @@ fn resolve_effective_llm_settings(db: &Database) -> Result<EffectiveLlmSettings,
     } else {
         saved_api_key
     };
+
+    let (search_model, search_model_from_env) =
+        resolve_optional_model(&saved.search_model, "LLM_SEARCH_MODEL");
+    let (embedding_model, embedding_model_from_env) =
+        resolve_optional_model(&saved.embedding_model, "LLM_EMBEDDING_MODEL");
+    let (image_model, image_model_from_env) =
+        resolve_optional_model(&saved.image_model, "LLM_IMAGE_MODEL");
+
     Ok(EffectiveLlmSettings {
         base_url: if base_url_from_env {
             env_base_url
@@ -571,7 +579,27 @@ fn resolve_effective_llm_settings(db: &Database) -> Result<EffectiveLlmSettings,
         base_url_from_env,
         model_from_env,
         api_key_from_env,
+        search_model,
+        embedding_model,
+        image_model,
+        search_model_from_env,
+        embedding_model_from_env,
+        image_model_from_env,
     })
+}
+
+fn resolve_optional_model(saved: &str, env_key: &str) -> (String, bool) {
+    let saved = saved.trim();
+    if !saved.is_empty() {
+        return (saved.to_string(), false);
+    }
+    let from_env = std::env::var(env_key).unwrap_or_default();
+    let trimmed = from_env.trim();
+    if trimmed.is_empty() {
+        (String::new(), false)
+    } else {
+        (trimmed.to_string(), true)
+    }
 }
 
 fn skill_name_summary(path: &Path, content: &str) -> (String, String) {

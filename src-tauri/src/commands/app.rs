@@ -1,6 +1,8 @@
 use crate::db::Database;
 use crate::models::settings::AppSettings;
-use crate::models::toolbox::{DatabaseQueryInput, DatabaseQueryResult};
+use crate::models::toolbox::{
+    DatabaseExecuteInput, DatabaseExecuteResult, DatabaseQueryInput, DatabaseQueryResult,
+};
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, State, WebviewUrl, WebviewWindowBuilder};
 
@@ -26,6 +28,20 @@ pub fn query_database(
     match normalize_toolbox_db_path(input.db_path.as_deref()) {
         Some(path) => Database::query_database_file_readonly(&path, &sql, max_rows),
         None => db.query_database_readonly(&sql, max_rows),
+    }
+}
+
+#[tauri::command]
+pub fn execute_database(
+    db: State<'_, Database>,
+    input: DatabaseExecuteInput,
+) -> Result<DatabaseExecuteResult, String> {
+    let (sql, statement_kind) = normalize_toolbox_write_sql(&input.sql)?;
+    match normalize_toolbox_db_path(input.db_path.as_deref()) {
+        Some(path) => {
+            Database::execute_database_file_writable(&path, &sql, &statement_kind, input.commit)
+        }
+        None => db.execute_database_writable(&sql, &statement_kind, input.commit),
     }
 }
 
@@ -103,6 +119,55 @@ fn normalize_toolbox_sql(sql: &str) -> Result<String, String> {
         _ => {
             Err("Only read-only SELECT, WITH, PRAGMA, and EXPLAIN queries are allowed.".to_string())
         }
+    }
+}
+
+fn normalize_toolbox_write_sql(sql: &str) -> Result<(String, String), String> {
+    let trimmed = sql.trim();
+    if trimmed.is_empty() {
+        return Err("SQL is required.".to_string());
+    }
+    if trimmed.len() > MAX_TOOLBOX_SQL_CHARS {
+        return Err(format!(
+            "SQL is too long: {} characters > {} characters.",
+            trimmed.len(),
+            MAX_TOOLBOX_SQL_CHARS
+        ));
+    }
+
+    let sql = trimmed.strip_suffix(';').unwrap_or(trimmed).trim();
+    if sql.contains(';') {
+        return Err("Only one SQL statement can be run at a time.".to_string());
+    }
+
+    let first = sql
+        .split_whitespace()
+        .next()
+        .unwrap_or_default()
+        .to_ascii_lowercase();
+    match first.as_str() {
+        "insert" | "update" | "delete" | "replace" | "create" | "alter" | "drop" | "reindex" => {
+            Ok((sql.to_string(), first))
+        }
+        "vacuum" => {
+            let rest_lower = sql[first.len()..].trim_start().to_ascii_lowercase();
+            if rest_lower.starts_with("into") {
+                return Err(
+                    "VACUUM INTO is not allowed because it writes to an arbitrary file path."
+                        .to_string(),
+                );
+            }
+            Ok((sql.to_string(), first))
+        }
+        "select" | "with" | "pragma" | "explain" => Err(
+            "This is a read-only statement. Use the query button instead of execute.".to_string(),
+        ),
+        "attach" | "detach" => {
+            Err("ATTACH and DETACH are not allowed in Toolbox Database.".to_string())
+        }
+        _ => Err(format!(
+            "Unsupported statement '{first}'. Allowed: INSERT, UPDATE, DELETE, REPLACE, CREATE, ALTER, DROP, REINDEX, VACUUM."
+        )),
     }
 }
 

@@ -70,6 +70,14 @@ pub struct AgentDefinitionDetail {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentPrompt {
+    pub tag: String,
+    #[serde(default)]
+    pub label: Option<String>,
+    pub prompt: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AgentDirectorySettings {
     pub agent_directory: String,
 }
@@ -93,6 +101,17 @@ pub struct AgentSafeFileRootSettings {
 pub struct SaveAgentSafeFileRootSettings {
     #[serde(default)]
     pub safe_file_roots: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentDefaultSettings {
+    pub default_agent_id: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SaveAgentDefaultSettings {
+    #[serde(default)]
+    pub default_agent_id: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -1,0 +1,20 @@
+prompts:
+  - tag: philosophy
+    label: Philosophical Inquiry
+    prompt: |
+      I want to think philosophically about the topic below. Please begin by asking me what I take the key terms to mean, and then help me question my assumptions one step at a time. The topic is:
+
+  - tag: socratic-method
+    label: Socratic Dialogue
+    prompt: |
+      Please use the Socratic method on the claim below. Ask me a series of short questions, one at a time, that test the claim by examining its definitions, its consequences, and possible counter-examples. Begin by checking what I really mean. The claim is:
+
+  - tag: critical-thinking
+    label: Stress-Test My Reasoning
+    prompt: |
+      Below is an argument I am considering. Please act as a careful critical thinker — identify the unstated assumptions, point out any weak inferences or ambiguous terms, and offer the strongest possible counter-argument before giving your own view. The argument is:
+
+  - tag: ethics
+    label: Examine an Ethical Question
+    prompt: |
+      I am facing an ethical question and want to examine it slowly. Please help me name the values in tension, ask whether I am being consistent with what I claim to value, and explore who is affected. The question is:

@@ -11,10 +11,31 @@ interface DatabaseQueryResult {
   elapsed_ms: number;
 }
 
+interface DatabaseExecuteResult {
+  statement_kind: string;
+  rows_affected: number;
+  committed: boolean;
+  elapsed_ms: number;
+  backup_path: string;
+}
+
 const PRESET_QUERIES = [
   {
     labelKey: "dbPresetTables",
     sql: "SELECT name, type FROM sqlite_master WHERE type IN ('table', 'view') ORDER BY name;",
+  },
+  {
+    labelKey: "dbPresetTableDdl",
+    sql: "SELECT name, sql FROM sqlite_master WHERE type = 'table' AND sql IS NOT NULL ORDER BY name;",
+  },
+  {
+    labelKey: "dbPresetTableColumns",
+    sql:
+      "SELECT m.name AS table_name, p.cid, p.name AS column_name, p.type, p.\"notnull\", p.dflt_value, p.pk\n" +
+      "FROM sqlite_master AS m\n" +
+      "JOIN pragma_table_info(m.name) AS p\n" +
+      "WHERE m.type = 'table'\n" +
+      "ORDER BY m.name, p.cid;",
   },
   {
     labelKey: "dbPresetTodos",
@@ -78,6 +99,9 @@ export function DatabaseTools() {
   const [result, setResult] = useState<DatabaseQueryResult | null>(null);
   const [error, setError] = useState("");
   const [running, setRunning] = useState(false);
+  const [executeResult, setExecuteResult] = useState<DatabaseExecuteResult | null>(null);
+  const [executing, setExecuting] = useState(false);
+  const [commitWrite, setCommitWrite] = useState(false);
 
   useEffect(() => {
     invoke<string>("get_db_path")
@@ -94,6 +118,7 @@ export function DatabaseTools() {
   const runQuery = async () => {
     setRunning(true);
     setError("");
+    setExecuteResult(null);
     try {
       const data = await invoke<DatabaseQueryResult>("query_database", {
         input: { sql, db_path: dbPath, max_rows: maxRows },
@@ -105,6 +130,35 @@ export function DatabaseTools() {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
       setRunning(false);
+    }
+  };
+
+  const runExecute = async () => {
+    if (commitWrite) {
+      const trimmed = sql.trim().replace(/;$/, "").trim();
+      const firstWord = trimmed.split(/\s+/)[0]?.toUpperCase() ?? "";
+      const phrase = firstWord ? `COMMIT ${firstWord}` : "COMMIT";
+      const reply = window.prompt(t("dbExecuteCommitConfirm", { phrase }), "");
+      if (reply === null) return;
+      if (reply.trim() !== phrase) {
+        setError(t("dbExecuteCommitMismatch", { phrase }));
+        return;
+      }
+    }
+    setExecuting(true);
+    setError("");
+    setResult(null);
+    try {
+      const data = await invoke<DatabaseExecuteResult>("execute_database", {
+        input: { sql, db_path: dbPath, commit: commitWrite },
+      });
+      setExecuteResult(data);
+      rememberSql(sql);
+    } catch (err) {
+      setExecuteResult(null);
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setExecuting(false);
     }
   };
 
@@ -221,7 +275,7 @@ export function DatabaseTools() {
         <button type="button" className="tool-btn primary" onClick={runQuery} disabled={running}>
           {running ? t("running") : t("runQuery")}
         </button>
-        <button type="button" className="tool-btn danger" onClick={() => { setResult(null); setError(""); }}>
+        <button type="button" className="tool-btn danger" onClick={() => { setResult(null); setError(""); setExecuteResult(null); }}>
           {t("clear")}
         </button>
         <button type="button" className="tool-btn" onClick={copyRows} disabled={!result || result.rows.length === 0}>
@@ -229,7 +283,52 @@ export function DatabaseTools() {
         </button>
       </div>
 
+      <div className="tool-field-row">
+        <label className="database-commit-toggle">
+          <input
+            type="checkbox"
+            checked={commitWrite}
+            onChange={(event) => setCommitWrite(event.target.checked)}
+          />
+          {t("dbCommitWrite")}
+        </label>
+        <button
+          type="button"
+          className={`tool-btn ${commitWrite ? "danger" : ""}`}
+          onClick={runExecute}
+          disabled={executing}
+        >
+          {executing
+            ? t("running")
+            : commitWrite
+              ? t("dbExecuteCommit")
+              : t("dbExecuteDryRun")}
+        </button>
+        <span className="tool-hint">{t("dbExecuteHint")}</span>
+      </div>
+
       {error && <div className="tool-hint error">{error}</div>}
+
+      {executeResult && (
+        <div className="tool-hint">
+          {executeResult.committed
+            ? t("dbExecuteCommittedSummary", {
+                kind: executeResult.statement_kind.toUpperCase(),
+                rows: executeResult.rows_affected,
+                elapsed: executeResult.elapsed_ms,
+              })
+            : t("dbExecuteRolledBackSummary", {
+                kind: executeResult.statement_kind.toUpperCase(),
+                rows: executeResult.rows_affected,
+                elapsed: executeResult.elapsed_ms,
+              })}
+          {executeResult.committed && executeResult.backup_path && (
+            <div className="tool-hint">
+              {t("dbExecuteBackupPath", { path: executeResult.backup_path })}
+            </div>
+          )}
+        </div>
+      )}
 
       {result && (
         <div className="database-result">

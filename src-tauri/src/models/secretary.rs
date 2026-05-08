@@ -16,6 +16,12 @@ pub struct SecretarySettings {
     pub conversation_folder: String,
     pub active_persona_id: Option<i64>,
     pub active_profile_id: Option<i64>,
+    #[serde(default)]
+    pub search_model: String,
+    #[serde(default)]
+    pub embedding_model: String,
+    #[serde(default)]
+    pub image_model: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -27,6 +33,12 @@ pub struct SaveSecretarySettings {
     pub conversation_folder: Option<String>,
     pub active_persona_id: Option<i64>,
     pub active_profile_id: Option<i64>,
+    #[serde(default)]
+    pub search_model: Option<String>,
+    #[serde(default)]
+    pub embedding_model: Option<String>,
+    #[serde(default)]
+    pub image_model: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -39,6 +51,18 @@ pub struct EffectiveLlmSettings {
     pub model_from_env: bool,
     pub api_key_from_env: bool,
     pub has_api_key: bool,
+    #[serde(default)]
+    pub search_model: String,
+    #[serde(default)]
+    pub embedding_model: String,
+    #[serde(default)]
+    pub image_model: String,
+    #[serde(default)]
+    pub search_model_from_env: bool,
+    #[serde(default)]
+    pub embedding_model_from_env: bool,
+    #[serde(default)]
+    pub image_model_from_env: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

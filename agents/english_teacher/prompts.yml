@@ -1,0 +1,26 @@
+prompts:
+  - tag: english-learning
+    label: Practice English
+    prompt: |
+      I want to practice my English. Please give me a short conversational scenario, ask a question, and gently correct any grammar or word-choice issues in my reply.
+
+  - tag: english-to-chinese
+    label: English -> Chinese
+    prompt: |
+      Please translate the following text from English to Chinese while preserving the original tone and meaning:
+
+  - tag: chinese-to-english
+    label: Chinese -> English
+    prompt: |
+      Please translate the following text from Chinese to English while preserving the original tone and meaning:
+
+
+  - tag: business-english
+    label: Polish Business Writing
+    prompt: |
+      Please rewrite the following text into clear, polite, professional business English. Highlight what you changed and briefly explain why:
+
+  - tag: communication
+    label: Meeting Phrases
+    prompt: |
+      Suggest natural English phrases I can use in a work meeting for the situation below. Give 3 options ranging from casual to formal, and note when each one fits best:

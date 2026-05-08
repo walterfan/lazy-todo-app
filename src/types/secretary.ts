@@ -8,6 +8,9 @@ export interface SecretarySettings {
   conversation_folder: string;
   active_persona_id: number | null;
   active_profile_id: number | null;
+  search_model: string;
+  embedding_model: string;
+  image_model: string;
 }
 
 export interface MaskedSecretarySettings {
