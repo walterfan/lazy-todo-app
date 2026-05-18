@@ -1,0 +1,30 @@
+prompts:
+  - tag: software-architecture
+    label: Design a System
+    prompt: |
+      I need to design a software system. Please ask me about goals, users, scale, constraints, and team. Then propose 2-3 candidate architectures with trade-offs (cost of change, cognitive load, performance, risk), recommend one, and describe the smallest first slice we should build. The system is:
+
+  - tag: domain-driven-design
+    label: DDD Modeling
+    prompt: |
+      Help me model the following domain using Domain-Driven Design. Draft a ubiquitous language glossary, identify bounded contexts (core / supporting / generic), sketch aggregates with invariants, list domain events, and call out where an anti-corruption layer is needed. The domain is:
+
+  - tag: test-driven-development
+    label: TDD Next Step
+    prompt: |
+      I am working on the feature below using TDD. Please tell me the next single failing test I should write and why it is the smallest meaningful step. Then describe the minimal production change that should follow once it goes red. The feature is:
+
+  - tag: metrics-driven-design
+    label: Metrics-Driven Design
+    prompt: |
+      I want to make a design decision driven by metrics rather than opinion. For the situation below, help me name the decision the metric must drive, propose 1-3 candidate metrics (with unit, threshold, and review cadence), and explain how each metric could mislead us. The situation is:
+
+  - tag: refactoring
+    label: Refactor a Smell
+    prompt: |
+      Please help me refactor the code or design described below. First name the smell, then propose a sequence of small, behavior-preserving named refactorings (using Fowler's catalog where it fits), in safe order, and call out which tests must exist before we start. The code or design is:
+
+  - tag: clean-architecture
+    label: Clean Architecture Review
+    prompt: |
+      Review the architecture described below against Clean Architecture and SOLID. Check the dependency direction, separation of business rules from IO and frameworks, and testability. Point out concrete violations and the smallest change that would fix each one. The architecture is:

@@ -1,9 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import type { StickyNote, CreateNote, UpdateNote, ExportNotesResult } from "../types/note";
+import type {
+  StickyNote,
+  CreateNote,
+  UpdateNote,
+  ExportNotesResult,
+  NoteTemplate,
+} from "../types/note";
 
 export function useNotes() {
   const [notes, setNotes] = useState<StickyNote[]>([]);
+  const [templates, setTemplates] = useState<NoteTemplate[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
@@ -17,9 +24,19 @@ export function useNotes() {
     }
   }, []);
 
+  const refreshTemplates = useCallback(async () => {
+    try {
+      const data = await invoke<NoteTemplate[]>("list_note_templates");
+      setTemplates(data);
+    } catch (err) {
+      console.error("Failed to load note templates:", err);
+    }
+  }, []);
+
   useEffect(() => {
     refresh();
-  }, [refresh]);
+    refreshTemplates();
+  }, [refresh, refreshTemplates]);
 
   const addNote = async (input: CreateNote) => {
     await invoke("add_note", { input });
@@ -47,5 +64,16 @@ export function useNotes() {
     });
   };
 
-  return { notes, loading, addNote, updateNote, deleteNote, setNotePinned, exportNotes, refresh };
+  return {
+    notes,
+    templates,
+    loading,
+    addNote,
+    updateNote,
+    deleteNote,
+    setNotePinned,
+    exportNotes,
+    refresh,
+    refreshTemplates,
+  };
 }

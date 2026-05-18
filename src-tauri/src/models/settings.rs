@@ -6,9 +6,11 @@ pub struct AppSettings {
     pub note_page_size: i32,
     pub todo_display: String,  // "list" or "grid"
     pub note_display: String,  // "list" or "grid"
-    pub note_template: String, // default markdown template for new notes
-    pub note_folder: String,   // label/category for notes
+    pub note_template: String, // legacy default markdown template (preserved for migration)
+    pub note_folder: String,   // folder path where notes are mirrored as Markdown files
     pub language: String,      // "en" or "zh"
+    #[serde(default)]
+    pub note_template_files: Vec<String>, // explicit list of template file paths
 }
 
 impl Default for AppSettings {
@@ -21,6 +23,7 @@ impl Default for AppSettings {
             note_template: String::new(),
             note_folder: String::new(),
             language: "en".to_string(),
+            note_template_files: Vec::new(),
         }
     }
 }

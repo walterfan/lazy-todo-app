@@ -9,4 +9,5 @@ export interface AppSettings {
   note_template: string;
   note_folder: string;
   language: AppLanguage;
+  note_template_files: string[];
 }

@@ -447,7 +447,8 @@ body {
 .btn-edit,
 .btn-delete,
 .btn-pin-note,
-.btn-popout {
+.btn-popout,
+.btn-maximize-note {
   background: none;
   border: none;
   color: var(--text-muted);
@@ -479,6 +480,11 @@ body {
 }
 
 .btn-popout:hover {
+  color: var(--accent);
+  background: rgba(79, 195, 247, 0.1);
+}
+
+.btn-maximize-note:hover {
   color: var(--accent);
   background: rgba(79, 195, 247, 0.1);
 }
@@ -677,7 +683,16 @@ body {
   transition: border-color 0.2s;
 }
 
+.note-editor-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
 .note-editor-title {
+  flex: 1;
+  min-width: 0;
   width: 100%;
   padding: 6px 10px;
   border: 1px solid var(--border);
@@ -687,11 +702,18 @@ body {
   font-size: 0.9rem;
   font-weight: 600;
   outline: none;
-  margin-bottom: 6px;
+  margin-bottom: 0;
 }
 
 .note-editor-title:focus {
   border-color: var(--accent);
+}
+
+.note-editor-maximize {
+  align-self: stretch;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .note-editor-content {
@@ -723,6 +745,45 @@ body {
 .note-editor-actions {
   display: flex;
   gap: 8px;
+}
+
+.note-maximize-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: clamp(12px, 3vw, 32px);
+  background: rgba(5, 8, 18, 0.76);
+  backdrop-filter: blur(8px);
+}
+
+.note-card.note-card-maximized {
+  width: min(1120px, 100%);
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-color: var(--accent);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.note-card.note-card-maximized .note-editor-title {
+  padding: 10px 12px;
+  font-size: 1rem;
+}
+
+.note-card.note-card-maximized .note-editor-content {
+  flex: 1;
+  min-height: 0;
+  resize: none;
+  font-size: 0.95rem;
+}
+
+.note-card.note-card-maximized .note-editor-footer {
+  flex-shrink: 0;
 }
 
 /* Color Picker */
@@ -2445,6 +2506,67 @@ body {
   min-height: 0;
 }
 
+.secretary-shell-focus {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  height: 100vh;
+  padding: clamp(12px, 2.5vw, 28px);
+  background: var(--bg);
+}
+
+.secretary-shell-focus .secretary-main {
+  width: min(1040px, 100%);
+  margin: 0 auto;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.secretary-shell-focus .secretary-transcript {
+  min-height: 0;
+  padding-right: 4px;
+}
+
+.secretary-shell-focus .secretary-message {
+  padding: 12px 14px;
+}
+
+.secretary-shell-focus .secretary-message-body {
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.secretary-shell-focus .secretary-composer {
+  flex-shrink: 0;
+  padding: 10px;
+}
+
+.secretary-shell-focus .secretary-composer textarea {
+  min-height: 112px;
+  resize: none;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.agent-focus-toggle {
+  border-color: rgba(79, 195, 247, 0.45) !important;
+  color: var(--accent) !important;
+}
+
+.agent-focus-exit {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 1201;
+  border-color: rgba(79, 195, 247, 0.45) !important;
+  background: var(--surface) !important;
+  color: var(--accent) !important;
+}
+
 .secretary-main {
   display: flex;
   flex-direction: column;
@@ -2836,8 +2958,16 @@ body {
 .secretary-role-row {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
   margin-top: 7px;
+}
+
+.agent-token-status {
+  margin-right: auto;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 
 .secretary-shell button {

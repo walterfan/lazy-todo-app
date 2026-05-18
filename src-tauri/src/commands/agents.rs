@@ -17,17 +17,17 @@ use tauri::{AppHandle, Emitter, Manager, State};
 
 use crate::db::Database;
 use crate::models::agents::{
-    AgentBuiltinTool, AgentConfig, AgentConversationSummary, AgentDefaultSettings,
-    AgentDefinition, AgentDefinitionDetail, AgentDirectorySettings, AgentExternalCliCallInput,
+    AgentBuiltinTool, AgentConfig, AgentConversationSummary, AgentDefaultSettings, AgentDefinition,
+    AgentDefinitionDetail, AgentDirectorySettings, AgentExternalCliCallInput,
     AgentExternalCliCallResult, AgentExternalCliTool, AgentExternalCliToolTestResult,
     AgentManifest, AgentMemory, AgentMemoryProposal, AgentMessage, AgentMigrationStatus,
     AgentPrompt, AgentRagChunk, AgentRagStatus, AgentSafeFileRootSettings, AgentSession,
-    AgentToolAction, AgentToolCallInput, AgentToolCallResult, AgentUsedContext,
-    AgentUserIdentity, AgentValidationDiagnostic, ConfirmAgentMemoryProposalInput,
-    ConfirmAgentToolActionInput, ConfirmAgentToolActionResult, InstallAgentZipInput,
-    SaveAgentDefaultSettings, SaveAgentDirectorySettings, SaveAgentExternalCliTool,
-    SaveAgentMemory, SaveAgentSafeFileRootSettings, SaveAgentUserIdentity,
-    SendAgentGroupMessageInput, SendAgentMessageInput, SendAgentMessageResult,
+    AgentToolAction, AgentToolCallInput, AgentToolCallResult, AgentUsedContext, AgentUserIdentity,
+    AgentValidationDiagnostic, ConfirmAgentMemoryProposalInput, ConfirmAgentToolActionInput,
+    ConfirmAgentToolActionResult, InstallAgentZipInput, SaveAgentDefaultSettings,
+    SaveAgentDirectorySettings, SaveAgentExternalCliTool, SaveAgentMemory,
+    SaveAgentSafeFileRootSettings, SaveAgentUserIdentity, SendAgentGroupMessageInput,
+    SendAgentMessageInput, SendAgentMessageResult,
 };
 use crate::models::secretary::{
     EffectiveLlmSettings, MilestoneContext, NoteContext, SecretaryAppContext, SecretaryMessage,
@@ -91,6 +91,22 @@ struct AgentStreamFinish {
 struct LlmStreamOutput {
     content: String,
     tool_calls: Vec<LlmToolCall>,
+    usage: LlmTokenUsage,
+}
+
+#[derive(Debug, Clone, Default)]
+struct LlmTokenUsage {
+    prompt_tokens: i64,
+    completion_tokens: i64,
+    total_tokens: i64,
+}
+
+impl LlmTokenUsage {
+    fn add(&mut self, other: &LlmTokenUsage) {
+        self.prompt_tokens += other.prompt_tokens;
+        self.completion_tokens += other.completion_tokens;
+        self.total_tokens += other.total_tokens;
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -111,6 +127,7 @@ struct PartialLlmToolCall {
 struct LlmStreamEvent {
     content: Option<String>,
     tool_calls: Vec<(usize, PartialLlmToolCall)>,
+    usage: Option<LlmTokenUsage>,
 }
 
 #[tauri::command]
@@ -148,9 +165,7 @@ pub fn save_agent_safe_file_root_settings(
 }
 
 #[tauri::command]
-pub fn get_agent_default_settings(
-    db: State<'_, Database>,
-) -> Result<AgentDefaultSettings, String> {
+pub fn get_agent_default_settings(db: State<'_, Database>) -> Result<AgentDefaultSettings, String> {
     db.get_agent_default_settings().map_err(|e| e.to_string())
 }
 
@@ -1364,7 +1379,8 @@ fn text_embedding_tool(db: &Database, arguments: &Value) -> Result<Value, String
         ));
     }
     let argument_model = optional_string(arguments, "model");
-    let encoding_format = optional_string(arguments, "encoding_format").unwrap_or_else(|| "float".to_string());
+    let encoding_format =
+        optional_string(arguments, "encoding_format").unwrap_or_else(|| "float".to_string());
     let include_vector = arguments
         .get("include_vector")
         .and_then(Value::as_bool)
@@ -1379,7 +1395,11 @@ fn text_embedding_tool(db: &Database, arguments: &Value) -> Result<Value, String
         "encoding_format": encoding_format,
     });
     let response = call_llm_gateway(&settings, "/v1/embeddings", &payload)?;
-    Ok(summarize_embedding_response(&response, &model, include_vector))
+    Ok(summarize_embedding_response(
+        &response,
+        &model,
+        include_vector,
+    ))
 }
 
 fn generate_image_tool(db: &Database, arguments: &Value) -> Result<Value, String> {
@@ -1530,7 +1550,10 @@ fn call_llm_gateway(
         ));
     }
     if !status.is_success() {
-        let body_preview = String::from_utf8_lossy(&bytes).chars().take(512).collect::<String>();
+        let body_preview = String::from_utf8_lossy(&bytes)
+            .chars()
+            .take(512)
+            .collect::<String>();
         return Err(format!(
             "LLM gateway returned HTTP {status}: {body_preview}"
         ));
@@ -1552,8 +1575,8 @@ fn compose_llm_gateway_url(base_url: &str, path: &str) -> Result<String, String>
     } else {
         format!("{trimmed_base}/{trimmed_path}")
     };
-    let parsed = reqwest::Url::parse(&composed)
-        .map_err(|e| format!("LLM gateway URL is invalid: {e}"))?;
+    let parsed =
+        reqwest::Url::parse(&composed).map_err(|e| format!("LLM gateway URL is invalid: {e}"))?;
     if !matches!(parsed.scheme(), "http" | "https") {
         return Err("LLM gateway URL must use http or https".to_string());
     }
@@ -3425,6 +3448,9 @@ fn migrated_secretary_message(
         turn_index: (index + 1) as i64,
         stream_status: "final".to_string(),
         error_text: String::new(),
+        prompt_tokens: 0,
+        completion_tokens: 0,
+        total_tokens: 0,
         created_at: String::new(),
     }
 }
@@ -3989,6 +4015,9 @@ async fn send_agent_message_stream_inner(
         turn_index: next_turn,
         stream_status: "final".to_string(),
         error_text: String::new(),
+        prompt_tokens: 0,
+        completion_tokens: 0,
+        total_tokens: 0,
         created_at: String::new(),
     };
     db.append_agent_message(&user_message)
@@ -4002,7 +4031,7 @@ async fn send_agent_message_stream_inner(
         &input.selected_context,
         &input.message,
     )?;
-    let assistant_content = match call_agent_llm_stream(
+    let assistant_output = match call_agent_llm_stream(
         &db,
         &effective,
         &system_prompt,
@@ -4014,7 +4043,7 @@ async fn send_agent_message_stream_inner(
     )
     .await
     {
-        Ok(content) => content,
+        Ok(output) => output,
         Err(error) => {
             let error_message = AgentMessage {
                 message_id: format!(
@@ -4028,6 +4057,9 @@ async fn send_agent_message_stream_inner(
                 turn_index: next_turn,
                 stream_status: "error".to_string(),
                 error_text: error.clone(),
+                prompt_tokens: 0,
+                completion_tokens: 0,
+                total_tokens: 0,
                 created_at: String::new(),
             };
             db.append_agent_message(&error_message)
@@ -4044,10 +4076,13 @@ async fn send_agent_message_stream_inner(
         session_id: session.session_id.clone(),
         sender_type: 2,
         agent_id: Some(agent.agent_id.clone()),
-        content: assistant_content,
+        content: assistant_output.content,
         turn_index: next_turn,
         stream_status: "final".to_string(),
         error_text: String::new(),
+        prompt_tokens: assistant_output.usage.prompt_tokens,
+        completion_tokens: assistant_output.usage.completion_tokens,
+        total_tokens: assistant_output.usage.total_tokens,
         created_at: String::new(),
     };
     db.append_agent_message(&assistant_message)
@@ -4115,6 +4150,9 @@ async fn send_agent_group_message_stream_inner(
         turn_index: next_turn,
         stream_status: "final".to_string(),
         error_text: String::new(),
+        prompt_tokens: 0,
+        completion_tokens: 0,
+        total_tokens: 0,
         created_at: String::new(),
     };
     db.append_agent_message(&user_message)
@@ -4132,7 +4170,7 @@ async fn send_agent_group_message_stream_inner(
             &input.message,
         )?;
         merge_used_context(&mut merged_context, used_context);
-        let assistant_content = match call_agent_llm_stream(
+        let assistant_output = match call_agent_llm_stream(
             &db,
             &effective,
             &system_prompt,
@@ -4144,7 +4182,7 @@ async fn send_agent_group_message_stream_inner(
         )
         .await
         {
-            Ok(content) => content,
+            Ok(output) => output,
             Err(error) => {
                 let error_message = AgentMessage {
                     message_id: format!(
@@ -4158,6 +4196,9 @@ async fn send_agent_group_message_stream_inner(
                     turn_index: next_turn,
                     stream_status: "error".to_string(),
                     error_text: error.clone(),
+                    prompt_tokens: 0,
+                    completion_tokens: 0,
+                    total_tokens: 0,
                     created_at: String::new(),
                 };
                 db.append_agent_message(&error_message)
@@ -4174,10 +4215,13 @@ async fn send_agent_group_message_stream_inner(
             session_id: session.session_id.clone(),
             sender_type: 2,
             agent_id: Some(agent.agent_id.clone()),
-            content: assistant_content,
+            content: assistant_output.content,
             turn_index: next_turn,
             stream_status: "final".to_string(),
             error_text: String::new(),
+            prompt_tokens: assistant_output.usage.prompt_tokens,
+            completion_tokens: assistant_output.usage.completion_tokens,
+            total_tokens: assistant_output.usage.total_tokens,
             created_at: String::new(),
         };
         db.append_agent_message(&assistant_message)
@@ -4721,9 +4765,10 @@ async fn call_agent_llm_stream(
     agent_id: &str,
     app: &AppHandle,
     stream_id: &str,
-) -> Result<String, String> {
+) -> Result<LlmStreamOutput, String> {
     let mut payload_messages = agent_payload_messages(system_prompt, messages);
     let mut final_content = String::new();
+    let mut total_usage = LlmTokenUsage::default();
 
     if let Some(url) = messages
         .iter()
@@ -4740,6 +4785,7 @@ async fn call_agent_llm_stream(
         payload_messages.push(assistant_tool_call_message(&LlmStreamOutput {
             content: String::new(),
             tool_calls: vec![call.clone()],
+            usage: LlmTokenUsage::default(),
         }));
         payload_messages.push(json!({
             "role": "tool",
@@ -4765,8 +4811,13 @@ async fn call_agent_llm_stream(
         )
         .await?;
         final_content.push_str(&output.content);
+        total_usage.add(&output.usage);
         if output.tool_calls.is_empty() {
-            return Ok(final_content);
+            return Ok(LlmStreamOutput {
+                content: final_content,
+                tool_calls: Vec::new(),
+                usage: total_usage,
+            });
         }
 
         payload_messages.push(assistant_tool_call_message(&output));
@@ -4782,7 +4833,11 @@ async fn call_agent_llm_stream(
         }
     }
 
-    Ok(final_content)
+    Ok(LlmStreamOutput {
+        content: final_content,
+        tool_calls: Vec::new(),
+        usage: total_usage,
+    })
 }
 
 fn agent_payload_messages(system_prompt: &str, messages: &[AgentMessage]) -> Vec<Value> {
@@ -4901,6 +4956,7 @@ async fn stream_chat_completion(
         "model": settings.model,
         "messages": payload_messages,
         "stream": true,
+        "stream_options": { "include_usage": true },
     });
     if !tool_schemas.is_empty() {
         payload["tools"] = json!(tool_schemas);
@@ -4946,6 +5002,9 @@ async fn stream_chat_completion(
                     },
                 );
             }
+            if let Some(usage) = event.usage {
+                output.usage.add(&usage);
+            }
             merge_tool_call_deltas(&mut partial_tool_calls, event.tool_calls);
         }
     }
@@ -4961,6 +5020,9 @@ async fn stream_chat_completion(
                 content: delta,
             },
         );
+    }
+    if let Some(usage) = event.usage {
+        output.usage.add(&usage);
     }
     merge_tool_call_deltas(&mut partial_tool_calls, event.tool_calls);
     output.tool_calls = partial_tool_calls
@@ -5040,10 +5102,38 @@ fn parse_sse_event(line: &str) -> Result<LlmStreamEvent, String> {
                 .collect::<Vec<_>>()
         })
         .unwrap_or_default();
+    let usage = value.get("usage").and_then(parse_llm_token_usage);
     Ok(LlmStreamEvent {
         content,
         tool_calls,
+        usage,
     })
+}
+
+fn parse_llm_token_usage(value: &Value) -> Option<LlmTokenUsage> {
+    let prompt_tokens = value
+        .get("prompt_tokens")
+        .or_else(|| value.get("input_tokens"))
+        .and_then(Value::as_i64)
+        .unwrap_or(0);
+    let completion_tokens = value
+        .get("completion_tokens")
+        .or_else(|| value.get("output_tokens"))
+        .and_then(Value::as_i64)
+        .unwrap_or(0);
+    let total_tokens = value
+        .get("total_tokens")
+        .and_then(Value::as_i64)
+        .unwrap_or(prompt_tokens + completion_tokens);
+    if prompt_tokens == 0 && completion_tokens == 0 && total_tokens == 0 {
+        None
+    } else {
+        Some(LlmTokenUsage {
+            prompt_tokens,
+            completion_tokens,
+            total_tokens,
+        })
+    }
 }
 
 fn merge_tool_call_deltas(
@@ -5889,6 +5979,19 @@ mod tests {
         assert_eq!(partials[0].id, "call_abc");
         assert_eq!(partials[0].name, "read_todo_list");
         assert_eq!(partials[0].arguments, r#"{"include_completed":false}"#);
+    }
+
+    #[test]
+    fn parses_streamed_token_usage_chunks() {
+        let event = parse_sse_event(
+            r#"data: {"choices":[],"usage":{"prompt_tokens":17,"completion_tokens":5,"total_tokens":22}}"#,
+        )
+        .expect("usage chunk");
+
+        let usage = event.usage.expect("token usage");
+        assert_eq!(usage.prompt_tokens, 17);
+        assert_eq!(usage.completion_tokens, 5);
+        assert_eq!(usage.total_tokens, 22);
     }
 
     #[test]
@@ -6748,6 +6851,9 @@ mod tests {
             turn_index: 1,
             stream_status: "final".to_string(),
             error_text: String::new(),
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
             created_at: String::new(),
         })
         .expect("append old user");
@@ -6760,6 +6866,9 @@ mod tests {
             turn_index: 1,
             stream_status: "final".to_string(),
             error_text: String::new(),
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
             created_at: String::new(),
         })
         .expect("append old agent");
@@ -6823,6 +6932,9 @@ mod tests {
             turn_index: 1,
             stream_status: "final".to_string(),
             error_text: String::new(),
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
             created_at: String::new(),
         })
         .expect("append message");
@@ -7032,17 +7144,32 @@ mod tests {
         assert_eq!(preview["dim"], 100);
         assert_eq!(preview["vector_count"], 1);
         assert_eq!(preview["vector_preview"].as_array().unwrap().len(), 8);
-        assert!(preview.get("vectors").is_none(), "vectors hidden by default");
+        assert!(
+            preview.get("vectors").is_none(),
+            "vectors hidden by default"
+        );
 
         let full = summarize_embedding_response(&response, "text-embedding-3-small", true);
-        assert!(full.get("vectors").is_some(), "vectors included when requested");
+        assert!(
+            full.get("vectors").is_some(),
+            "vectors included when requested"
+        );
     }
 
     #[test]
     fn pick_tool_model_priority_argument_then_configured() {
-        assert_eq!(pick_tool_model(Some("gpt-4o-mini"), ""), Some("gpt-4o-mini".to_string()));
-        assert_eq!(pick_tool_model(None, "zoom_flux"), Some("zoom_flux".to_string()));
-        assert_eq!(pick_tool_model(Some("  "), "zoom_flux"), Some("zoom_flux".to_string()));
+        assert_eq!(
+            pick_tool_model(Some("gpt-4o-mini"), ""),
+            Some("gpt-4o-mini".to_string())
+        );
+        assert_eq!(
+            pick_tool_model(None, "zoom_flux"),
+            Some("zoom_flux".to_string())
+        );
+        assert_eq!(
+            pick_tool_model(Some("  "), "zoom_flux"),
+            Some("zoom_flux".to_string())
+        );
         assert_eq!(pick_tool_model(None, ""), None);
     }
 

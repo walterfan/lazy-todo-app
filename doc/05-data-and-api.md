@@ -45,8 +45,10 @@ Completion history for recurring todo occurrences.
 | `title` | TEXT | `''` | Required |
 | `content` | TEXT | `''` | Markdown body |
 | `color` | TEXT | `'yellow'` | One of the supported note colors |
+| `pinned` | INTEGER | `0` | Boolean flag |
 | `created_at` | TEXT | `datetime('now')` | UTC timestamp |
 | `updated_at` | TEXT | `datetime('now')` | Updated on each edit |
+| `file_path` | TEXT | NULL | Absolute path of the mirrored Markdown file when notes folder is configured |
 
 ### Table: `pomodoro_settings`
 
@@ -79,8 +81,9 @@ Singleton row (`id = 1`) for UI preferences.
 | `page_size` | INTEGER | `50` | Shared list size preference |
 | `todo_display` | TEXT | `'list'` | `list` or `grid` |
 | `note_display` | TEXT | `'grid'` | `list` or `grid` |
-| `note_template` | TEXT | `''` | Default Markdown template |
-| `note_folder` | TEXT | `''` | Label/category hint for notes |
+| `note_template` | TEXT | `''` | Legacy default Markdown template (retained for migration) |
+| `note_folder` | TEXT | `''` | Folder path where notes are mirrored as Markdown files |
+| `note_template_files_json` | TEXT | `'[]'` | JSON array of explicit Markdown template file paths |
 
 ## Tauri Commands (IPC API)
 
@@ -102,10 +105,13 @@ All commands are called from the frontend through `invoke()` and return `Result<
 
 | Command | Input | Output | Description |
 |---------|-------|--------|-------------|
-| `list_notes` | — | `StickyNote[]` | Returns notes ordered by `updated_at DESC` |
-| `add_note` | `CreateNote` | `StickyNote` | Inserts a note |
-| `update_note` | `UpdateNote` | `StickyNote` | Persists inline or window edits |
-| `delete_note` | `id` | `()` | Deletes a note |
+| `list_notes` | — | `StickyNote[]` | Returns notes ordered by pin then `updated_at DESC` |
+| `add_note` | `CreateNote` | `StickyNote` | Inserts a note and mirrors it to the configured notes folder when set |
+| `update_note` | `UpdateNote` | `StickyNote` | Persists inline or window edits and updates the mirrored file when set |
+| `set_note_pinned` | `id`, `pinned` | `StickyNote` | Toggles the pin flag |
+| `delete_note` | `id` | `()` | Deletes the note and removes its mirrored Markdown file when present |
+| `export_notes_to_folder` | `ExportNotesInput` | `ExportNotesResult` | Exports selected notes to a folder (defaults to configured notes folder) |
+| `list_note_templates` | — | `NoteTemplate[]` | Returns the built-in Daily Note plus parsed configured Markdown templates |
 
 ### Pomodoro Commands
 
@@ -142,13 +148,30 @@ Agent built-in tools are exposed to the LLM as OpenAI-style function schemas and
 
 ```typescript
 export type DisplayStyle = "list" | "grid";
+export type AppLanguage = "en" | "zh";
 
 export interface AppSettings {
   page_size: number;
+  note_page_size: number;
   todo_display: DisplayStyle;
   note_display: DisplayStyle;
   note_template: string;
   note_folder: string;
+  language: AppLanguage;
+  note_template_files: string[];
+}
+```
+
+### TypeScript: Note Template
+
+```typescript
+export interface NoteTemplate {
+  id: string;
+  name: string;
+  title: string;
+  body: string;
+  source: "builtin" | "file";
+  path?: string | null;
 }
 ```
 

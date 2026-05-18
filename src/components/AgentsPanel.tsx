@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type MouseEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import type { AgentsController } from "../hooks/useAgents";
 import type { AgentMessage } from "../types/agents";
@@ -24,7 +24,9 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
   const [sessionActionStatus, setSessionActionStatus] = useState("");
   const [confirmingDeleteSessionId, setConfirmingDeleteSessionId] = useState<string | null>(null);
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null);
+  const [focusMode, setFocusMode] = useState(false);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
+  const transcriptRef = useRef<HTMLDivElement | null>(null);
   const selectedAgents = agents.selectedAgents;
   const isGroupChat = selectedAgents.length > 1;
   const selectedAgentNames = selectedAgents.map((agent) => agent.agent_name).join(", ");
@@ -37,6 +39,33 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
     }
     return map;
   }, [agents.agentPrompts]);
+  const tokenUsage = useMemo(
+    () => sumTokenUsage(agents.session?.messages ?? []),
+    [agents.session?.messages],
+  );
+  const latestTranscriptKey = useMemo(() => {
+    const persisted = agents.session?.messages
+      .map((item) => `${item.message_id}:${item.content.length}:${item.stream_status}`)
+      .join("|") ?? "";
+    const streaming = Object.entries(agents.streamingMessages)
+      .map(([agentId, content]) => `${agentId}:${content.length}`)
+      .join("|");
+    return [
+      agents.session?.session_id ?? "",
+      persisted,
+      agents.pendingUserMessage ?? "",
+      agents.streamingMessage,
+      streaming,
+      focusMode ? "focus" : "normal",
+    ].join("::");
+  }, [
+    agents.pendingUserMessage,
+    agents.session?.messages,
+    agents.session?.session_id,
+    agents.streamingMessage,
+    agents.streamingMessages,
+    focusMode,
+  ]);
 
   const insertPrompt = (text: string) => {
     setMessage((current) => {
@@ -51,6 +80,31 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
       const end = node.value.length;
       node.setSelectionRange(end, end);
     });
+  };
+
+  useEffect(() => {
+    if (!focusMode) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setFocusMode(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [focusMode]);
+
+  useEffect(() => {
+    const node = transcriptRef.current;
+    if (!node) return;
+    const frame = window.requestAnimationFrame(() => {
+      node.scrollTop = node.scrollHeight;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [latestTranscriptKey]);
+
+  const enterFocusMode = () => {
+    setFocusMode(true);
+    requestAnimationFrame(() => composerRef.current?.focus());
   };
 
   if (agents.loading) {
@@ -149,11 +203,22 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
   };
 
   return (
-    <div className="secretary-shell">
-      {agents.error && <div className="secretary-error">{agents.error}</div>}
+    <div className={`secretary-shell ${focusMode ? "secretary-shell-focus" : ""}`}>
+      {focusMode && (
+        <button
+          type="button"
+          className="agent-focus-exit"
+          onClick={() => setFocusMode(false)}
+          title={t("exitFocusMode")}
+          aria-label={t("exitFocusMode")}
+        >
+          {t("exitFocusMode")}
+        </button>
+      )}
+      {agents.error && !focusMode && <div className="secretary-error">{agents.error}</div>}
 
       <section className="secretary-main">
-        <div className="secretary-identity">
+        {!focusMode && <div className="secretary-identity">
           {selectedAgents.length > 0 && (
             <div className="agent-avatar-stack" aria-hidden="true">
               {selectedAgents.slice(0, 4).map((agent) => (
@@ -199,10 +264,19 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
             {isGroupChat && selectedAgents.slice(0, 4).map((agent) => <span key={agent.agent_id}>@{agent.agent_name}</span>)}
             {agents.ragStatus && <span>{agents.ragStatus.indexed_chunks} RAG chunks</span>}
             <span>{agents.memories.filter((memory) => memory.status === "active").length} memories</span>
+            <button
+              type="button"
+              className="agent-focus-toggle"
+              onClick={enterFocusMode}
+              title={t("enterFocusMode")}
+              aria-label={t("enterFocusMode")}
+            >
+              ⛶ {t("focus")}
+            </button>
           </div>
-        </div>
+        </div>}
 
-        <div className="secretary-transcript">
+        <div className="secretary-transcript" ref={transcriptRef}>
           {agents.session?.messages.length ? (
             agents.session.messages.map((item) => (
               <div
@@ -266,7 +340,7 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
           )}
         </div>
 
-        {agents.pendingToolActions.map((action) => (
+        {!focusMode && agents.pendingToolActions.map((action) => (
           <div className="secretary-proposal" key={action.action_id}>
             <div className="secretary-note-edit-header">
               <strong>{toolActionTitle(action.tool_name, action.preview)}</strong>
@@ -293,7 +367,7 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
           </div>
         ))}
 
-        {agents.memoryProposals.map((proposal) => {
+        {!focusMode && agents.memoryProposals.map((proposal) => {
           const draft = memoryDrafts[proposal.proposal_id] ?? proposal.proposed_text;
           return (
             <div className="secretary-proposal" key={proposal.proposal_id}>
@@ -344,7 +418,7 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
         })}
 
         <div className="secretary-composer">
-          {selectedAgents.length > 1 && (
+          {!focusMode && selectedAgents.length > 1 && (
             <div className="agent-mention-row">
               {selectedAgents.map((agent) => (
                 <button
@@ -371,9 +445,16 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
             disabled={selectedAgents.length === 0 || agents.sending}
           />
           <div className="secretary-composer-actions">
-            <button onClick={() => void agents.startSession()} disabled={selectedAgents.length === 0 || agents.sending}>
+            <div className="agent-token-status" role="status">
+              {t("tokenUsageStatus", {
+                total: formatTokenCount(tokenUsage.total),
+                prompt: formatTokenCount(tokenUsage.prompt),
+                completion: formatTokenCount(tokenUsage.completion),
+              })}
+            </div>
+            {!focusMode && <button onClick={() => void agents.startSession()} disabled={selectedAgents.length === 0 || agents.sending}>
               {t("newChat")}
-            </button>
+            </button>}
             <button onClick={send} disabled={!message.trim() || selectedAgents.length === 0 || agents.sending}>
               {agents.sending ? t("sending") : t("send")}
             </button>
@@ -381,7 +462,7 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
         </div>
       </section>
 
-      <aside className="secretary-side">
+      {!focusMode && <aside className="secretary-side">
         <div className="secretary-panel">
           <h3>{t("agents")}</h3>
           <div className="secretary-list">
@@ -536,7 +617,7 @@ export function AgentsPanel({ agents, onRecordMessageToNote, t }: AgentsPanelPro
             {agents.sessions.length === 0 && <div className="secretary-list-item">{t("noSessions")}</div>}
           </div>
         </div>
-      </aside>
+      </aside>}
     </div>
   );
 }
@@ -582,4 +663,19 @@ function toolActionTitle(toolName: string, preview: unknown): string {
     return `${preview.display_name || preview.tool_id} external CLI`;
   }
   return toolName;
+}
+
+function sumTokenUsage(messages: AgentMessage[]) {
+  return messages.reduce(
+    (total, message) => ({
+      prompt: total.prompt + (message.prompt_tokens ?? 0),
+      completion: total.completion + (message.completion_tokens ?? 0),
+      total: total.total + (message.total_tokens ?? 0),
+    }),
+    { prompt: 0, completion: 0, total: 0 },
+  );
+}
+
+function formatTokenCount(count: number): string {
+  return new Intl.NumberFormat().format(count);
 }

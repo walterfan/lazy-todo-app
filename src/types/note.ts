@@ -8,6 +8,7 @@ export interface StickyNote {
   pinned: boolean;
   created_at: string;
   updated_at: string;
+  file_path?: string | null;
 }
 
 export interface CreateNote {
@@ -26,4 +27,13 @@ export interface UpdateNote {
 export interface ExportNotesResult {
   folder: string;
   files: string[];
+}
+
+export interface NoteTemplate {
+  id: string;
+  name: string;
+  title: string;
+  body: string;
+  source: 'builtin' | 'file';
+  path?: string | null;
 }

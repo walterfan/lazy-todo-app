@@ -11,7 +11,8 @@ use crate::models::agents::{
     AgentExternalCliCallResult, AgentExternalCliTool, AgentMemory, AgentMemoryProposal,
     AgentMessage, AgentMigrationStatus, AgentRagChunk, AgentSafeFileRootSettings, AgentSession,
     AgentToolAction, AgentUserIdentity, SaveAgentDefaultSettings, SaveAgentDirectorySettings,
-    SaveAgentExternalCliTool, SaveAgentMemory, SaveAgentSafeFileRootSettings, SaveAgentUserIdentity,
+    SaveAgentExternalCliTool, SaveAgentMemory, SaveAgentSafeFileRootSettings,
+    SaveAgentUserIdentity,
 };
 use crate::models::note::StickyNote;
 use crate::models::pomodoro::{DayStat, PomodoroMilestone, PomodoroSettings};
@@ -91,9 +92,8 @@ fn execute_connection_in_transaction(
 ) -> std::result::Result<DatabaseExecuteResult, String> {
     let started = Instant::now();
     let backup_path = if commit {
-        backup_sqlite_file(source_path).map_err(|error| {
-            format!("Refusing to commit: backup failed: {error}")
-        })?
+        backup_sqlite_file(source_path)
+            .map_err(|error| format!("Refusing to commit: backup failed: {error}"))?
     } else {
         PathBuf::new()
     };
@@ -129,11 +129,9 @@ fn backup_sqlite_file(source_path: &Path) -> std::result::Result<PathBuf, String
             return Err("Could not allocate a unique backup file name.".to_string());
         }
     }
-    let source_conn =
-        Connection::open_with_flags(source_path, OpenFlags::SQLITE_OPEN_READ_ONLY)
-            .map_err(|error| error.to_string())?;
-    let mut dest_conn =
-        Connection::open(&backup_path).map_err(|error| error.to_string())?;
+    let source_conn = Connection::open_with_flags(source_path, OpenFlags::SQLITE_OPEN_READ_ONLY)
+        .map_err(|error| error.to_string())?;
+    let mut dest_conn = Connection::open(&backup_path).map_err(|error| error.to_string())?;
     {
         let backup = Backup::new_with_names(
             &source_conn,
@@ -452,6 +450,9 @@ impl Database {
                 [],
             )?;
         }
+        if !column_names.iter().any(|name| name == "file_path") {
+            conn.execute("ALTER TABLE sticky_notes ADD COLUMN file_path TEXT", [])?;
+        }
 
         Ok(())
     }
@@ -556,6 +557,21 @@ impl Database {
         Ok(())
     }
 
+    fn ensure_agent_messages_schema(conn: &Connection) -> Result<()> {
+        let column_names = Self::table_columns(conn, "agent_messages")?;
+        for column in ["prompt_tokens", "completion_tokens", "total_tokens"] {
+            if !column_names.iter().any(|name| name == column) {
+                conn.execute(
+                    &format!(
+                        "ALTER TABLE agent_messages ADD COLUMN {column} INTEGER NOT NULL DEFAULT 0"
+                    ),
+                    [],
+                )?;
+            }
+        }
+        Ok(())
+    }
+
     fn ensure_agent_rag_schema(conn: &Connection) -> Result<()> {
         let column_names = Self::table_columns(conn, "agent_rag_chunks")?;
         if !column_names.iter().any(|name| name == "agent_id") {
@@ -611,6 +627,15 @@ impl Database {
                 [],
             )?;
         }
+        if !column_names
+            .iter()
+            .any(|name| name == "note_template_files_json")
+        {
+            conn.execute(
+                "ALTER TABLE app_settings ADD COLUMN note_template_files_json TEXT NOT NULL DEFAULT '[]'",
+                [],
+            )?;
+        }
 
         Ok(())
     }
@@ -637,7 +662,8 @@ impl Database {
                 color       TEXT NOT NULL DEFAULT 'yellow',
                 pinned      INTEGER NOT NULL DEFAULT 0,
                 created_at  TEXT NOT NULL DEFAULT (datetime('now')),
-                updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
+                updated_at  TEXT NOT NULL DEFAULT (datetime('now')),
+                file_path   TEXT
             );
             CREATE TABLE IF NOT EXISTS pomodoro_settings (
                 id               INTEGER PRIMARY KEY CHECK (id = 1),
@@ -653,14 +679,15 @@ impl Database {
                 duration_min INTEGER NOT NULL
             );
             CREATE TABLE IF NOT EXISTS app_settings (
-                id              INTEGER PRIMARY KEY CHECK (id = 1),
-                page_size       INTEGER NOT NULL DEFAULT 10,
-                note_page_size  INTEGER NOT NULL DEFAULT 10,
-                todo_display    TEXT NOT NULL DEFAULT 'list',
-                note_display    TEXT NOT NULL DEFAULT 'list',
-                note_template   TEXT NOT NULL DEFAULT '',
-                note_folder     TEXT NOT NULL DEFAULT '',
-                language        TEXT NOT NULL DEFAULT 'en'
+                id                       INTEGER PRIMARY KEY CHECK (id = 1),
+                page_size                INTEGER NOT NULL DEFAULT 10,
+                note_page_size           INTEGER NOT NULL DEFAULT 10,
+                todo_display             TEXT NOT NULL DEFAULT 'list',
+                note_display             TEXT NOT NULL DEFAULT 'list',
+                note_template            TEXT NOT NULL DEFAULT '',
+                note_folder              TEXT NOT NULL DEFAULT '',
+                language                 TEXT NOT NULL DEFAULT 'en',
+                note_template_files_json TEXT NOT NULL DEFAULT '[]'
             );
             CREATE TABLE IF NOT EXISTS secretary_settings (
                 id                  INTEGER PRIMARY KEY CHECK (id = 1),
@@ -784,6 +811,9 @@ impl Database {
                 turn_index       INTEGER NOT NULL DEFAULT 0,
                 stream_status    TEXT NOT NULL DEFAULT 'final',
                 error_text       TEXT NOT NULL DEFAULT '',
+                prompt_tokens    INTEGER NOT NULL DEFAULT 0,
+                completion_tokens INTEGER NOT NULL DEFAULT 0,
+                total_tokens     INTEGER NOT NULL DEFAULT 0,
                 created_at       TEXT NOT NULL DEFAULT (datetime('now'))
             );
             CREATE TABLE IF NOT EXISTS agent_user_identity (
@@ -951,6 +981,7 @@ impl Database {
         Self::ensure_agent_settings_schema(&conn)?;
         Self::ensure_secretary_settings_schema(&conn)?;
         Self::ensure_agent_definition_schema(&conn)?;
+        Self::ensure_agent_messages_schema(&conn)?;
         Self::ensure_agent_rag_schema(&conn)?;
 
         Ok(Self {
@@ -1534,9 +1565,10 @@ impl Database {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.execute(
             "INSERT INTO agent_messages (
-                message_id, session_id, sender_type, agent_id, content, turn_index, stream_status, error_text
+                message_id, session_id, sender_type, agent_id, content, turn_index, stream_status,
+                error_text, prompt_tokens, completion_tokens, total_tokens
              )
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
             params![
                 message.message_id,
                 message.session_id,
@@ -1546,6 +1578,9 @@ impl Database {
                 message.turn_index,
                 message.stream_status,
                 message.error_text,
+                message.prompt_tokens,
+                message.completion_tokens,
+                message.total_tokens,
             ],
         )?;
         conn.execute(
@@ -1559,9 +1594,10 @@ impl Database {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.execute(
             "INSERT OR IGNORE INTO agent_messages (
-                message_id, session_id, sender_type, agent_id, content, turn_index, stream_status, error_text
+                message_id, session_id, sender_type, agent_id, content, turn_index, stream_status,
+                error_text, prompt_tokens, completion_tokens, total_tokens
              )
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
             params![
                 message.message_id,
                 message.session_id,
@@ -1571,6 +1607,9 @@ impl Database {
                 message.turn_index,
                 message.stream_status,
                 message.error_text,
+                message.prompt_tokens,
+                message.completion_tokens,
+                message.total_tokens,
             ],
         )?;
         conn.execute(
@@ -1584,7 +1623,8 @@ impl Database {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.query_row(
             "SELECT message_id, session_id, sender_type, agent_id, content, turn_index,
-                    stream_status, error_text, created_at
+                    stream_status, error_text, prompt_tokens, completion_tokens, total_tokens,
+                    created_at
              FROM agent_messages
              WHERE message_id = ?1",
             params![message_id],
@@ -1598,7 +1638,10 @@ impl Database {
                     turn_index: row.get(5)?,
                     stream_status: row.get(6)?,
                     error_text: row.get(7)?,
-                    created_at: row.get(8)?,
+                    prompt_tokens: row.get(8)?,
+                    completion_tokens: row.get(9)?,
+                    total_tokens: row.get(10)?,
+                    created_at: row.get(11)?,
                 })
             },
         )
@@ -1760,7 +1803,8 @@ impl Database {
         )?;
         let mut stmt = conn.prepare(
             "SELECT message_id, session_id, sender_type, agent_id, content, turn_index,
-                    stream_status, error_text, created_at
+                    stream_status, error_text, prompt_tokens, completion_tokens, total_tokens,
+                    created_at
              FROM agent_messages
              WHERE session_id = ?1
              ORDER BY turn_index ASC, created_at ASC",
@@ -1776,7 +1820,10 @@ impl Database {
                     turn_index: row.get(5)?,
                     stream_status: row.get(6)?,
                     error_text: row.get(7)?,
-                    created_at: row.get(8)?,
+                    prompt_tokens: row.get(8)?,
+                    completion_tokens: row.get(9)?,
+                    total_tokens: row.get(10)?,
+                    created_at: row.get(11)?,
                 })
             })?
             .collect::<Result<Vec<_>>>()?;
@@ -2101,7 +2148,8 @@ impl Database {
         let conn = self.conn.lock().expect("db lock poisoned");
         let mut stmt = conn.prepare(
             "SELECT m.message_id, m.session_id, m.sender_type, m.agent_id, m.content, m.turn_index,
-                    m.stream_status, m.error_text, m.created_at
+                    m.stream_status, m.error_text, m.prompt_tokens, m.completion_tokens,
+                    m.total_tokens, m.created_at
              FROM agent_messages m
              INNER JOIN agent_session_participants p ON p.session_id = m.session_id
              WHERE p.agent_id = ?1 AND m.session_id != ?2 AND m.content != ''
@@ -2119,7 +2167,10 @@ impl Database {
                     turn_index: row.get(5)?,
                     stream_status: row.get(6)?,
                     error_text: row.get(7)?,
-                    created_at: row.get(8)?,
+                    prompt_tokens: row.get(8)?,
+                    completion_tokens: row.get(9)?,
+                    total_tokens: row.get(10)?,
+                    created_at: row.get(11)?,
                 })
             })?
             .collect::<Result<Vec<_>>>()?;
@@ -2692,7 +2743,7 @@ impl Database {
     pub fn list_notes(&self) -> Result<Vec<StickyNote>> {
         let conn = self.conn.lock().expect("db lock poisoned");
         let mut stmt = conn.prepare(
-            "SELECT id, title, content, color, pinned, created_at, updated_at
+            "SELECT id, title, content, color, pinned, created_at, updated_at, file_path
              FROM sticky_notes ORDER BY pinned DESC, updated_at DESC",
         )?;
 
@@ -2706,6 +2757,7 @@ impl Database {
                     pinned: row.get::<_, i32>(4)? != 0,
                     created_at: row.get(5)?,
                     updated_at: row.get(6)?,
+                    file_path: row.get(7)?,
                 })
             })?
             .collect::<Result<Vec<_>>>()?;
@@ -2722,7 +2774,7 @@ impl Database {
         let id = conn.last_insert_rowid();
 
         let mut stmt = conn.prepare(
-            "SELECT id, title, content, color, pinned, created_at, updated_at FROM sticky_notes WHERE id = ?1"
+            "SELECT id, title, content, color, pinned, created_at, updated_at, file_path FROM sticky_notes WHERE id = ?1"
         )?;
         stmt.query_row(params![id], |row| {
             Ok(StickyNote {
@@ -2733,6 +2785,7 @@ impl Database {
                 pinned: row.get::<_, i32>(4)? != 0,
                 created_at: row.get(5)?,
                 updated_at: row.get(6)?,
+                file_path: row.get(7)?,
             })
         })
     }
@@ -2766,7 +2819,7 @@ impl Database {
         }
 
         let mut stmt = conn.prepare(
-            "SELECT id, title, content, color, pinned, created_at, updated_at FROM sticky_notes WHERE id = ?1"
+            "SELECT id, title, content, color, pinned, created_at, updated_at, file_path FROM sticky_notes WHERE id = ?1"
         )?;
         stmt.query_row(params![id], |row| {
             Ok(StickyNote {
@@ -2777,6 +2830,7 @@ impl Database {
                 pinned: row.get::<_, i32>(4)? != 0,
                 created_at: row.get(5)?,
                 updated_at: row.get(6)?,
+                file_path: row.get(7)?,
             })
         })
     }
@@ -2789,7 +2843,7 @@ impl Database {
         )?;
 
         let mut stmt = conn.prepare(
-            "SELECT id, title, content, color, pinned, created_at, updated_at FROM sticky_notes WHERE id = ?1"
+            "SELECT id, title, content, color, pinned, created_at, updated_at, file_path FROM sticky_notes WHERE id = ?1"
         )?;
         stmt.query_row(params![id], |row| {
             Ok(StickyNote {
@@ -2800,6 +2854,30 @@ impl Database {
                 pinned: row.get::<_, i32>(4)? != 0,
                 created_at: row.get(5)?,
                 updated_at: row.get(6)?,
+                file_path: row.get(7)?,
+            })
+        })
+    }
+
+    pub fn set_note_file_path(&self, id: i64, file_path: Option<&str>) -> Result<StickyNote> {
+        let conn = self.conn.lock().expect("db lock poisoned");
+        conn.execute(
+            "UPDATE sticky_notes SET file_path = ?1 WHERE id = ?2",
+            params![file_path, id],
+        )?;
+        let mut stmt = conn.prepare(
+            "SELECT id, title, content, color, pinned, created_at, updated_at, file_path FROM sticky_notes WHERE id = ?1"
+        )?;
+        stmt.query_row(params![id], |row| {
+            Ok(StickyNote {
+                id: row.get(0)?,
+                title: row.get(1)?,
+                content: row.get(2)?,
+                color: row.get(3)?,
+                pinned: row.get::<_, i32>(4)? != 0,
+                created_at: row.get(5)?,
+                updated_at: row.get(6)?,
+                file_path: row.get(7)?,
             })
         })
     }
@@ -3569,10 +3647,14 @@ impl Database {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.execute("INSERT OR IGNORE INTO app_settings (id) VALUES (1)", [])?;
         let mut stmt = conn.prepare(
-            "SELECT page_size, note_page_size, todo_display, note_display, note_template, note_folder, language
+            "SELECT page_size, note_page_size, todo_display, note_display, note_template,
+                    note_folder, language, note_template_files_json
              FROM app_settings WHERE id = 1",
         )?;
         stmt.query_row([], |row| {
+            let template_files_json: String = row.get(7)?;
+            let note_template_files: Vec<String> =
+                serde_json::from_str(&template_files_json).unwrap_or_default();
             Ok(AppSettings {
                 page_size: row.get(0)?,
                 note_page_size: row.get(1)?,
@@ -3581,15 +3663,19 @@ impl Database {
                 note_template: row.get(4)?,
                 note_folder: row.get(5)?,
                 language: row.get(6)?,
+                note_template_files,
             })
         })
     }
 
     pub fn save_app_settings(&self, s: &AppSettings) -> Result<()> {
         let conn = self.conn.lock().expect("db lock poisoned");
+        let template_files_json =
+            serde_json::to_string(&s.note_template_files).unwrap_or_else(|_| "[]".to_string());
         conn.execute(
-            "INSERT INTO app_settings (id, page_size, note_page_size, todo_display, note_display, note_template, note_folder, language)
-             VALUES (1, ?1, ?2, ?3, ?4, ?5, ?6, ?7)
+            "INSERT INTO app_settings (id, page_size, note_page_size, todo_display, note_display,
+                                       note_template, note_folder, language, note_template_files_json)
+             VALUES (1, ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
              ON CONFLICT(id) DO UPDATE SET
                page_size = excluded.page_size,
                note_page_size = excluded.note_page_size,
@@ -3597,7 +3683,8 @@ impl Database {
                note_display = excluded.note_display,
                note_template = excluded.note_template,
                note_folder = excluded.note_folder,
-               language = excluded.language",
+               language = excluded.language,
+               note_template_files_json = excluded.note_template_files_json",
             params![
                 s.page_size,
                 s.note_page_size,
@@ -3606,6 +3693,7 @@ impl Database {
                 s.note_template,
                 s.note_folder,
                 if s.language == "zh" { "zh" } else { "en" },
+                template_files_json,
             ],
         )?;
         Ok(())
@@ -3623,6 +3711,83 @@ mod tests {
             .expect("system time before unix epoch")
             .as_nanos();
         std::env::temp_dir().join(format!("lazy_todo_db_{name}_{suffix}"))
+    }
+
+    #[test]
+    fn settings_and_notes_schema_include_template_files_and_note_file_path() {
+        let dir = temp_db_dir("note_template_storage_schema");
+        let db = Database::new(&dir).expect("create db");
+        let conn = db.conn.lock().expect("db lock poisoned");
+
+        let app_columns = table_column_names(&conn, "app_settings");
+        assert!(app_columns.contains(&"note_template_files_json".to_string()));
+
+        let note_columns = table_column_names(&conn, "sticky_notes");
+        assert!(note_columns.contains(&"file_path".to_string()));
+
+        drop(conn);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn legacy_schema_migration_adds_template_files_and_note_file_path() {
+        let dir = temp_db_dir("note_template_storage_migration");
+        std::fs::create_dir_all(&dir).expect("create temp db dir");
+        {
+            let conn = Connection::open(dir.join("todos.db")).expect("open old db");
+            conn.execute_batch(
+                "CREATE TABLE sticky_notes (
+                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title       TEXT NOT NULL DEFAULT '',
+                    content     TEXT NOT NULL DEFAULT '',
+                    color       TEXT NOT NULL DEFAULT 'yellow',
+                    pinned      INTEGER NOT NULL DEFAULT 0,
+                    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+                    updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
+                );
+                INSERT INTO sticky_notes (title, content, color)
+                VALUES ('Legacy note', 'Keep me', 'yellow');
+                CREATE TABLE app_settings (
+                    id              INTEGER PRIMARY KEY CHECK (id = 1),
+                    page_size       INTEGER NOT NULL DEFAULT 10,
+                    todo_display    TEXT NOT NULL DEFAULT 'list',
+                    note_display    TEXT NOT NULL DEFAULT 'list',
+                    note_template   TEXT NOT NULL DEFAULT '',
+                    note_folder     TEXT NOT NULL DEFAULT ''
+                );
+                INSERT INTO app_settings (id, note_template)
+                VALUES (1, '# Old Template');",
+            )
+            .expect("create legacy notes/settings schema");
+        }
+
+        let db = Database::new(&dir).expect("migrate db");
+        let conn = db.conn.lock().expect("db lock poisoned");
+        let app_columns = table_column_names(&conn, "app_settings");
+        assert!(app_columns.contains(&"note_template_files_json".to_string()));
+        let note_columns = table_column_names(&conn, "sticky_notes");
+        assert!(note_columns.contains(&"file_path".to_string()));
+        let file_path: Option<String> = conn
+            .query_row(
+                "SELECT file_path FROM sticky_notes WHERE title = 'Legacy note'",
+                [],
+                |row| row.get(0),
+            )
+            .expect("read migrated note file path");
+        assert_eq!(file_path, None);
+
+        drop(conn);
+        let _ = std::fs::remove_dir_all(dir);
+    }
+
+    fn table_column_names(conn: &Connection, table: &str) -> Vec<String> {
+        let mut stmt = conn
+            .prepare(&format!("PRAGMA table_info({table})"))
+            .expect("prepare table info");
+        stmt.query_map([], |row| row.get::<_, String>(1))
+            .expect("query table info")
+            .collect::<Result<Vec<_>>>()
+            .expect("collect table info")
     }
 
     #[test]
@@ -4028,7 +4193,10 @@ mod tests {
             .expect("commit execute");
         assert_eq!(applied.rows_affected, 2);
         assert!(applied.committed);
-        assert!(!applied.backup_path.is_empty(), "commit must produce a backup");
+        assert!(
+            !applied.backup_path.is_empty(),
+            "commit must produce a backup"
+        );
         let backup_file = std::path::PathBuf::from(&applied.backup_path);
         assert!(backup_file.is_file(), "backup file should exist on disk");
 
@@ -4106,6 +4274,9 @@ mod tests {
             turn_index: 1,
             stream_status: "final".to_string(),
             error_text: String::new(),
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
             created_at: String::new(),
         })
         .expect("append user message");
@@ -4118,6 +4289,9 @@ mod tests {
             turn_index: 1,
             stream_status: "final".to_string(),
             error_text: String::new(),
+            prompt_tokens: 12,
+            completion_tokens: 4,
+            total_tokens: 16,
             created_at: String::new(),
         })
         .expect("append agent message");
@@ -4130,6 +4304,9 @@ mod tests {
             turn_index: 2,
             stream_status: "error".to_string(),
             error_text: "stream failed".to_string(),
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
             created_at: String::new(),
         })
         .expect("append error message");
@@ -4139,6 +4316,9 @@ mod tests {
         assert_eq!(loaded.messages.len(), 3);
         assert_eq!(loaded.messages[0].content, "hello");
         assert_eq!(loaded.messages[1].agent_id.as_deref(), Some("secretary"));
+        assert_eq!(loaded.messages[1].prompt_tokens, 12);
+        assert_eq!(loaded.messages[1].completion_tokens, 4);
+        assert_eq!(loaded.messages[1].total_tokens, 16);
         assert_eq!(loaded.messages[2].stream_status, "error");
         assert_eq!(loaded.messages[2].error_text, "stream failed");
         let _ = std::fs::remove_dir_all(dir);
@@ -4169,6 +4349,9 @@ mod tests {
             turn_index: 1,
             stream_status: "final".to_string(),
             error_text: String::new(),
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
             created_at: String::new(),
         })
         .expect("append message");
@@ -4342,6 +4525,9 @@ mod tests {
             turn_index: 1,
             stream_status: "final".to_string(),
             error_text: String::new(),
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
             created_at: String::new(),
         })
         .expect("append previous");
@@ -4354,6 +4540,9 @@ mod tests {
             turn_index: 1,
             stream_status: "final".to_string(),
             error_text: String::new(),
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
             created_at: String::new(),
         })
         .expect("append current");

@@ -119,6 +119,20 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
     }
   };
 
+  const uninstallAgent = async (agentId: string, agentName: string) => {
+    setAgentSettingsStatus("");
+    if (!window.confirm(t("confirmUninstallAgent", { name: agentName }))) {
+      return;
+    }
+    try {
+      await agents.uninstallAgent(agentId);
+      setAgentDetail((current) => (current?.agent.agent_id === agentId ? null : current));
+      setAgentSettingsStatus(t("uninstalledAgent", { name: agentName }));
+    } catch (err) {
+      setAgentSettingsStatus(String(err));
+    }
+  };
+
   const loadAgentDetail = async (agentId: string) => {
     setAgentSettingsStatus("");
     try {
@@ -283,18 +297,51 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
             type="text"
             value={settings.note_folder}
             onChange={(e) => onUpdate({ note_folder: e.target.value })}
-            placeholder={t("defaultValue")}
+            placeholder={t("noteFolderPlaceholder")}
           />
         </div>
 
         <div className="settings-row settings-row-vertical">
-          <label>{t("noteTemplate")}</label>
-          <textarea
-            value={settings.note_template}
-            onChange={(e) => onUpdate({ note_template: e.target.value })}
-            placeholder={t("noteTemplatePlaceholder")}
-            rows={4}
-          />
+          <label>{t("noteTemplateFiles")}</label>
+          <div className="settings-value">{t("noteTemplateFilesHint")}</div>
+          {settings.note_template_files.map((path, index) => (
+            <div className="settings-template-row" key={`${index}-${path}`}>
+              <input
+                type="text"
+                className="settings-path-input"
+                value={path}
+                onChange={(e) => {
+                  const next = [...settings.note_template_files];
+                  next[index] = e.target.value;
+                  void onUpdate({ note_template_files: next });
+                }}
+                placeholder={t("noteTemplatePathPlaceholder")}
+              />
+              <button
+                type="button"
+                className="settings-toggle"
+                onClick={() => {
+                  const next = settings.note_template_files.filter((_, i) => i !== index);
+                  void onUpdate({ note_template_files: next });
+                }}
+              >
+                {t("remove")}
+              </button>
+            </div>
+          ))}
+          <div className="settings-actions">
+            <button
+              type="button"
+              className="settings-toggle active"
+              onClick={() => {
+                void onUpdate({
+                  note_template_files: [...settings.note_template_files, ""],
+                });
+              }}
+            >
+              {t("addTemplateFile")}
+            </button>
+          </div>
         </div>
       </section>
 
@@ -512,7 +559,7 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
                       </button>
                       <button
                         className="settings-toggle"
-                        onClick={() => void agents.uninstallAgent(agent.agent_id)}
+                        onClick={() => void uninstallAgent(agent.agent_id, agent.agent_name)}
                         disabled={agent.bundled}
                       >
                         {t("uninstall")}

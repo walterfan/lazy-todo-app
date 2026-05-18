@@ -30,7 +30,7 @@ function App() {
   const [selectedNoteIds, setSelectedNoteIds] = useState<Set<number>>(() => new Set());
   const [noteExportStatus, setNoteExportStatus] = useState("");
   const { todos, loading: todosLoading, addTodo, toggleTodo, updateTodo, deleteTodo } = useTodos();
-  const { notes, loading: notesLoading, addNote, updateNote, deleteNote, setNotePinned, exportNotes } = useNotes();
+  const { notes, templates: noteTemplates, loading: notesLoading, addNote, updateNote, deleteNote, setNotePinned, exportNotes, refreshTemplates } = useNotes();
   const { settings, updateSettings } = useSettings();
   const secretary = useSecretary();
   const agents = useAgents();
@@ -260,7 +260,7 @@ function App() {
 
           {activeTab === "notes" && (
             <>
-              <NoteEditor onAdd={addNote} autoFocus={noteAutoFocus} template={settings.note_template} t={t} />
+              <NoteEditor onAdd={addNote} autoFocus={noteAutoFocus} templates={noteTemplates} onTemplatesRefresh={refreshTemplates} t={t} />
               {notesLoading ? (
                 <div className="loading">{t("loading")}</div>
               ) : (

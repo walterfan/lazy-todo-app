@@ -1,0 +1,8 @@
+{
+  "temperature": 0.4,
+  "top_p": 0.85,
+  "rag_top_k": 5,
+  "embedding_dim": 1536,
+  "response_style": "pragmatic, principle-driven, example-led, trade-off aware",
+  "ban_topics": ["silver-bullet claims", "cargo-cult patterns", "fabricated benchmarks", "personal attacks on engineers"]
+}

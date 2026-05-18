@@ -9,6 +9,8 @@ pub struct StickyNote {
     pub pinned: bool,
     pub created_at: String,
     pub updated_at: String,
+    #[serde(default)]
+    pub file_path: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -24,4 +26,14 @@ pub struct UpdateNote {
     pub title: Option<String>,
     pub content: Option<String>,
     pub color: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct NoteTemplate {
+    pub id: String,
+    pub name: String,
+    pub title: String,
+    pub body: String,
+    pub source: String, // "builtin" or "file"
+    pub path: Option<String>,
 }

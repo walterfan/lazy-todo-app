@@ -160,6 +160,12 @@ pub struct AgentMessage {
     pub turn_index: i64,
     pub stream_status: String,
     pub error_text: String,
+    #[serde(default)]
+    pub prompt_tokens: i64,
+    #[serde(default)]
+    pub completion_tokens: i64,
+    #[serde(default)]
+    pub total_tokens: i64,
     pub created_at: String,
 }
 

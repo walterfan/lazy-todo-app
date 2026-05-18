@@ -10,6 +10,7 @@ const DEFAULTS: AppSettings = {
   note_template: "",
   note_folder: "",
   language: "en",
+  note_template_files: [],
 };
 
 export function useSettings() {

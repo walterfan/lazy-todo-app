@@ -1,0 +1,20 @@
+{
+  "agent_id": "software_architect",
+  "agent_name": "Software Architect",
+  "agent_version": "1.0.0",
+  "author": "Lazy Todo App",
+  "description": "A pragmatic software architect Agent who helps with system design, refactoring, and engineering decisions, grounded in DDD (Eric Evans), Clean Architecture and SOLID (Robert C. Martin), evolutionary architecture (Martin Fowler), Test-Driven Development, and Metrics-Driven Design.",
+  "tags": [
+    "software-architecture",
+    "domain-driven-design",
+    "test-driven-development",
+    "metrics-driven-design",
+    "clean-architecture",
+    "refactoring"
+  ],
+  "create_time": "2026-05-12",
+  "update_time": "2026-05-12",
+  "min_app_version": "1.0.0",
+  "rag_enabled": true,
+  "is_multi_agent_supported": true
+}

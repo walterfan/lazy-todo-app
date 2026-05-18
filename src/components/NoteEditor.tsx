@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import type { CreateNote, NoteColor } from "../types/note";
+import type { CreateNote, NoteColor, NoteTemplate } from "../types/note";
 import type { Translator } from "../i18n";
 
 const COLORS: NoteColor[] = ["yellow", "green", "blue", "pink", "purple", "orange"];
@@ -7,15 +7,25 @@ const COLORS: NoteColor[] = ["yellow", "green", "blue", "pink", "purple", "orang
 interface NoteEditorProps {
   onAdd: (input: CreateNote) => Promise<void>;
   autoFocus?: boolean;
-  template?: string;
+  templates?: NoteTemplate[];
+  onTemplatesRefresh?: () => Promise<void> | void;
   t: Translator;
 }
 
-export function NoteEditor({ onAdd, autoFocus, template = "", t }: NoteEditorProps) {
+export function NoteEditor({
+  onAdd,
+  autoFocus,
+  templates = [],
+  onTemplatesRefresh,
+  t,
+}: NoteEditorProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [color, setColor] = useState<NoteColor>("yellow");
   const [expanded, setExpanded] = useState(false);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>(
+    templates[0]?.id ?? "",
+  );
   const titleRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -25,11 +35,32 @@ export function NoteEditor({ onAdd, autoFocus, template = "", t }: NoteEditorPro
     }
   }, [autoFocus]);
 
+  useEffect(() => {
+    if (!selectedTemplateId && templates.length > 0) {
+      setSelectedTemplateId(templates[0].id);
+    }
+  }, [templates, selectedTemplateId]);
+
+  const applyTemplate = (template: NoteTemplate | undefined) => {
+    if (!template) return;
+    if (!title.trim()) {
+      setTitle(template.title);
+    }
+    if (!content.trim()) {
+      setContent(template.body);
+    }
+  };
+
   const handleExpand = () => {
     setExpanded(true);
-    if (template && !content) {
-      setContent(template);
-    }
+    const template = templates.find((tpl) => tpl.id === selectedTemplateId) ?? templates[0];
+    applyTemplate(template);
+  };
+
+  const handleTemplateChange = (nextId: string) => {
+    setSelectedTemplateId(nextId);
+    const template = templates.find((tpl) => tpl.id === nextId);
+    applyTemplate(template);
   };
 
   const handleSubmit = async () => {
@@ -51,6 +82,24 @@ export function NoteEditor({ onAdd, autoFocus, template = "", t }: NoteEditorPro
 
   return (
     <div className={`note-editor note-color-${color}`}>
+      {templates.length > 0 && (
+        <div className="note-editor-template-row">
+          <label htmlFor="note-template-select">{t("noteTemplate")}</label>
+          <select
+            id="note-template-select"
+            className="note-editor-template-select"
+            value={selectedTemplateId}
+            onChange={(e) => handleTemplateChange(e.target.value)}
+            onFocus={() => onTemplatesRefresh?.()}
+          >
+            {templates.map((tpl) => (
+              <option key={tpl.id} value={tpl.id}>
+                {tpl.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
       <input
         ref={titleRef}
         className="note-editor-title"

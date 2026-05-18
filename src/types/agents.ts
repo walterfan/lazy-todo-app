@@ -97,6 +97,9 @@ export interface AgentMessage {
   turn_index: number;
   stream_status: string;
   error_text: string;
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
   created_at: string;
 }
 

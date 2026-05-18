@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,16 @@ import { useSettings } from "../hooks/useSettings";
 import "../i18n";
 
 const COLORS: NoteColor[] = ["yellow", "green", "blue", "pink", "purple", "orange"];
+
+type NoteDraft = {
+  title: string;
+  content: string;
+  color: NoteColor;
+};
+
+function sameDraft(a: NoteDraft, b: NoteDraft) {
+  return a.title === b.title && a.content === b.content && a.color === b.color;
+}
 
 interface NoteWindowProps {
   noteId: number;
@@ -24,6 +34,10 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
   const [color, setColor] = useState<NoteColor>("yellow");
   const [error, setError] = useState("");
   const { pinned, toggle: togglePinned } = useAlwaysOnTop();
+  const draftRef = useRef<NoteDraft>({ title: "", content: "", color: "yellow" });
+  const lastSavedRef = useRef<NoteDraft>({ title: "", content: "", color: "yellow" });
+  const savePromiseRef = useRef<Promise<void> | null>(null);
+  draftRef.current = { title, content, color };
 
   useEffect(() => {
     void i18n.changeLanguage(settings.language || "en");
@@ -35,37 +49,92 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
       const found = notes.find((n) => n.id === noteId);
       if (found) {
         setNote(found);
-        setTitle(found.title);
-        setContent(found.content);
-        setColor(found.color);
+        const latest = { title: found.title, content: found.content, color: found.color };
+        lastSavedRef.current = latest;
+        if (!editing) {
+          setTitle(found.title);
+          setContent(found.content);
+          setColor(found.color);
+        }
       } else {
         setError(t("noteNotFound"));
       }
     } catch (err) {
       setError(String(err));
     }
-  }, [noteId, t]);
+  }, [editing, noteId, t]);
 
   useEffect(() => {
     loadNote();
   }, [loadNote]);
 
+  const saveCurrentDraft = useCallback(async (rethrow = false) => {
+    if (!note) {
+      return;
+    }
+    if (savePromiseRef.current) {
+      try {
+        await savePromiseRef.current;
+      } catch (error) {
+        if (rethrow) {
+          throw error;
+        }
+        return;
+      }
+    }
+
+    const draft = draftRef.current;
+    if (sameDraft(draft, lastSavedRef.current)) {
+      return;
+    }
+    const savedDraft = { ...draft };
+    const savePromise = invoke("update_note", {
+      input: { id: noteId, ...savedDraft },
+    }).then(() => {
+      lastSavedRef.current = savedDraft;
+      setNote((current) => (current ? { ...current, ...savedDraft } : current));
+    });
+    savePromiseRef.current = savePromise;
+
+    try {
+      await savePromise;
+    } catch (err) {
+      console.error("Failed to autosave note:", err);
+      if (rethrow) {
+        throw err;
+      }
+    } finally {
+      if (savePromiseRef.current === savePromise) {
+        savePromiseRef.current = null;
+      }
+    }
+  }, [note, noteId]);
+
+  useEffect(() => {
+    if (!editing) {
+      return;
+    }
+    const timer = window.setInterval(() => {
+      void saveCurrentDraft();
+    }, 3_000);
+    return () => window.clearInterval(timer);
+  }, [editing, saveCurrentDraft]);
+
   const handleSave = async () => {
-    await invoke("update_note", { input: { id: noteId, title, content, color } });
+    await saveCurrentDraft(true);
     await loadNote();
     setEditing(false);
     const win = getCurrentWindow();
-    if (title) {
-      win.setTitle(title);
+    const savedTitle = draftRef.current.title;
+    if (savedTitle) {
+      win.setTitle(savedTitle);
     }
   };
 
   const handleCancel = () => {
-    if (note) {
-      setTitle(note.title);
-      setContent(note.content);
-      setColor(note.color);
-    }
+    setTitle(lastSavedRef.current.title);
+    setContent(lastSavedRef.current.content);
+    setColor(lastSavedRef.current.color);
     setEditing(false);
   };
 
@@ -87,6 +156,9 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
               className={`color-dot color-dot-${c} ${c === color ? "active" : ""}`}
               onClick={async () => {
                 setColor(c);
+                if (editing) {
+                  return;
+                }
                 await invoke("update_note", { input: { id: noteId, color: c } });
                 await loadNote();
               }}

@@ -137,6 +137,7 @@ pub fn run() {
             commands::note::set_note_pinned,
             commands::note::delete_note,
             commands::note::export_notes_to_folder,
+            commands::note::list_note_templates,
             commands::app::query_database,
             commands::app::execute_database,
             commands::pomodoro::get_pomodoro_settings,
