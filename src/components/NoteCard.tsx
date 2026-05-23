@@ -1,10 +1,13 @@
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import type { StickyNote, UpdateNote, NoteColor } from "../types/note";
 import type { Translator } from "../i18n";
 import { MarkdownPreview } from "./MarkdownPreview";
-
-const COLORS: NoteColor[] = ["yellow", "green", "blue", "pink", "purple", "orange"];
+import {
+  getNoteEditorFieldBackground,
+  NOTE_COLORS,
+  NOTE_EDITOR_FIELD_TEXT_COLOR,
+} from "../utils/noteColors";
 
 type NoteDraft = {
   title: string;
@@ -39,6 +42,10 @@ export function NoteCard({ note, onUpdate, onDelete, onPinChange, selected = fal
   const draftRef = useRef<NoteDraft>({ title: note.title, content: note.content, color: note.color });
   const lastSavedRef = useRef<NoteDraft>({ title: note.title, content: note.content, color: note.color });
   const savePromiseRef = useRef<Promise<void> | null>(null);
+  const editorStyle = {
+    "--note-editor-field-bg": getNoteEditorFieldBackground(color),
+    "--note-editor-field-text": NOTE_EDITOR_FIELD_TEXT_COLOR,
+  } as CSSProperties;
   draftRef.current = { title, content, color };
 
   useEffect(() => {
@@ -176,8 +183,9 @@ export function NoteCard({ note, onUpdate, onDelete, onPinChange, selected = fal
 
   const editor = (
     <div
-      className={`note-card note-color-${color} editing ${maximized ? "note-card-maximized" : ""}`}
+      className={`note-card editing ${maximized ? "note-card-maximized" : ""}`}
       onClick={(event) => event.stopPropagation()}
+      style={editorStyle}
     >
       <div className="note-editor-title-row">
         <input
@@ -205,7 +213,7 @@ export function NoteCard({ note, onUpdate, onDelete, onPinChange, selected = fal
       />
       <div className="note-editor-footer">
         <div className="color-picker">
-          {COLORS.map((c) => (
+          {NOTE_COLORS.map((c) => (
             <button
               key={c}
               className={`color-dot color-dot-${c} ${c === color ? "active" : ""}`}

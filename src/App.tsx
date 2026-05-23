@@ -20,6 +20,13 @@ import "./i18n";
 import "./App.css";
 
 type Tab = "todos" | "notes" | "pomodoro" | "toolbox" | "agents" | "settings";
+const DEFAULT_APP_BG_COLOR = "#2f3a33";
+
+function normalizeBackgroundColor(color: string | undefined): string {
+  if (!color) return DEFAULT_APP_BG_COLOR;
+  const candidate = color.trim();
+  return /^#[0-9a-fA-F]{6}$/.test(candidate) ? candidate : DEFAULT_APP_BG_COLOR;
+}
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>("todos");
@@ -93,6 +100,13 @@ function App() {
   useEffect(() => {
     void i18n.changeLanguage(settings.language || "en");
   }, [i18n, settings.language]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty(
+      "--bg",
+      normalizeBackgroundColor(settings.app_background_color)
+    );
+  }, [settings.app_background_color]);
 
   const visibleSelectedNoteIds = useMemo(
     () => paginatedNotes.filter((note) => selectedNoteIds.has(note.id)).map((note) => note.id),

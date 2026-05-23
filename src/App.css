@@ -1,5 +1,5 @@
 :root {
-  --bg: #1a1a2e;
+  --bg: #2f3a33;
   --surface: #16213e;
   --surface-hover: #1a2745;
   --border: #2a3a5c;
@@ -721,8 +721,8 @@ body {
   padding: 6px 10px;
   border: 1px solid var(--border);
   border-radius: 6px;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--note-editor-field-bg, var(--bg));
+  color: var(--note-editor-field-text, var(--text));
   font-size: 0.85rem;
   font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
   outline: none;
@@ -811,7 +811,7 @@ body {
 }
 
 .color-dot-yellow  { background: #fdd835; }
-.color-dot-green   { background: #66bb6a; }
+.color-dot-green   { background: #9acd32; }
 .color-dot-blue    { background: #42a5f5; }
 .color-dot-pink    { background: #ec407a; }
 .color-dot-purple  { background: #ab47bc; }
@@ -1780,13 +1780,13 @@ body {
 
 .note-window-content-input {
   flex: 1;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--note-editor-field-bg, rgba(255, 255, 255, 0.5));
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 0.95rem;
   font-family: "SF Mono", "Fira Code", monospace;
-  color: inherit;
+  color: var(--note-editor-field-text, inherit);
   outline: none;
   resize: none;
   line-height: 1.5;
@@ -1901,6 +1901,26 @@ body {
   background: var(--bg);
   color: var(--text);
   font-size: 0.85rem;
+}
+
+.settings-color-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-color-controls input[type="color"] {
+  width: 36px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.settings-color-controls input[type="text"] {
+  width: 110px;
 }
 
 .settings-row .settings-path-input {

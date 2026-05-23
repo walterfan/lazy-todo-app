@@ -636,6 +636,15 @@ impl Database {
                 [],
             )?;
         }
+        if !column_names
+            .iter()
+            .any(|name| name == "app_background_color")
+        {
+            conn.execute(
+                "ALTER TABLE app_settings ADD COLUMN app_background_color TEXT NOT NULL DEFAULT '#2f3a33'",
+                [],
+            )?;
+        }
 
         Ok(())
     }
@@ -684,6 +693,7 @@ impl Database {
                 note_page_size           INTEGER NOT NULL DEFAULT 10,
                 todo_display             TEXT NOT NULL DEFAULT 'list',
                 note_display             TEXT NOT NULL DEFAULT 'list',
+                app_background_color     TEXT NOT NULL DEFAULT '#2f3a33',
                 note_template            TEXT NOT NULL DEFAULT '',
                 note_folder              TEXT NOT NULL DEFAULT '',
                 language                 TEXT NOT NULL DEFAULT 'en',
@@ -1424,27 +1434,94 @@ impl Database {
 
     pub fn replace_agent_rag_chunks(&self, agent_id: &str, chunks: &[AgentRagChunk]) -> Result<()> {
         let conn = self.conn.lock().expect("db lock poisoned");
+        let column_names = Self::table_columns(&conn, "agent_rag_chunks")?;
+        let has_plugin_id = column_names.iter().any(|name| name == "plugin_id");
+        let has_plugin_version = column_names.iter().any(|name| name == "plugin_version");
         conn.execute(
             "DELETE FROM agent_rag_chunks WHERE agent_id = ?1",
             params![agent_id],
         )?;
         for chunk in chunks {
-            conn.execute(
-                "INSERT INTO agent_rag_chunks (
-                    chunk_id, agent_id, agent_version, source_hash, embedding_model,
-                    embedding_dim, chunk_text, embedding_json
-                 )
-                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, '[]')",
-                params![
-                    chunk.chunk_id,
-                    chunk.agent_id,
-                    chunk.agent_version,
-                    chunk.source_hash,
-                    chunk.embedding_model,
-                    chunk.embedding_dim,
-                    chunk.chunk_text,
-                ],
-            )?;
+            match (has_plugin_id, has_plugin_version) {
+                // Legacy migrated databases may still enforce NOT NULL on plugin_* columns.
+                // Keep these mirrored from agent_* so inserts work across schema variants.
+                (true, true) => {
+                    conn.execute(
+                        "INSERT INTO agent_rag_chunks (
+                            chunk_id, agent_id, agent_version, plugin_id, plugin_version, source_hash,
+                            embedding_model, embedding_dim, chunk_text, embedding_json
+                         )
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, '[]')",
+                        params![
+                            chunk.chunk_id,
+                            chunk.agent_id,
+                            chunk.agent_version,
+                            chunk.agent_id,
+                            chunk.agent_version,
+                            chunk.source_hash,
+                            chunk.embedding_model,
+                            chunk.embedding_dim,
+                            chunk.chunk_text,
+                        ],
+                    )?;
+                }
+                (true, false) => {
+                    conn.execute(
+                        "INSERT INTO agent_rag_chunks (
+                            chunk_id, agent_id, agent_version, plugin_id, source_hash,
+                            embedding_model, embedding_dim, chunk_text, embedding_json
+                         )
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, '[]')",
+                        params![
+                            chunk.chunk_id,
+                            chunk.agent_id,
+                            chunk.agent_version,
+                            chunk.agent_id,
+                            chunk.source_hash,
+                            chunk.embedding_model,
+                            chunk.embedding_dim,
+                            chunk.chunk_text,
+                        ],
+                    )?;
+                }
+                (false, true) => {
+                    conn.execute(
+                        "INSERT INTO agent_rag_chunks (
+                            chunk_id, agent_id, agent_version, plugin_version, source_hash,
+                            embedding_model, embedding_dim, chunk_text, embedding_json
+                         )
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, '[]')",
+                        params![
+                            chunk.chunk_id,
+                            chunk.agent_id,
+                            chunk.agent_version,
+                            chunk.agent_version,
+                            chunk.source_hash,
+                            chunk.embedding_model,
+                            chunk.embedding_dim,
+                            chunk.chunk_text,
+                        ],
+                    )?;
+                }
+                (false, false) => {
+                    conn.execute(
+                        "INSERT INTO agent_rag_chunks (
+                            chunk_id, agent_id, agent_version, source_hash, embedding_model,
+                            embedding_dim, chunk_text, embedding_json
+                         )
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, '[]')",
+                        params![
+                            chunk.chunk_id,
+                            chunk.agent_id,
+                            chunk.agent_version,
+                            chunk.source_hash,
+                            chunk.embedding_model,
+                            chunk.embedding_dim,
+                            chunk.chunk_text,
+                        ],
+                    )?;
+                }
+            }
         }
         Ok(())
     }
@@ -3647,12 +3724,12 @@ impl Database {
         let conn = self.conn.lock().expect("db lock poisoned");
         conn.execute("INSERT OR IGNORE INTO app_settings (id) VALUES (1)", [])?;
         let mut stmt = conn.prepare(
-            "SELECT page_size, note_page_size, todo_display, note_display, note_template,
-                    note_folder, language, note_template_files_json
+            "SELECT page_size, note_page_size, todo_display, note_display, app_background_color,
+                    note_template, note_folder, language, note_template_files_json
              FROM app_settings WHERE id = 1",
         )?;
         stmt.query_row([], |row| {
-            let template_files_json: String = row.get(7)?;
+            let template_files_json: String = row.get(8)?;
             let note_template_files: Vec<String> =
                 serde_json::from_str(&template_files_json).unwrap_or_default();
             Ok(AppSettings {
@@ -3660,9 +3737,10 @@ impl Database {
                 note_page_size: row.get(1)?,
                 todo_display: row.get(2)?,
                 note_display: row.get(3)?,
-                note_template: row.get(4)?,
-                note_folder: row.get(5)?,
-                language: row.get(6)?,
+                app_background_color: row.get(4)?,
+                note_template: row.get(5)?,
+                note_folder: row.get(6)?,
+                language: row.get(7)?,
                 note_template_files,
             })
         })
@@ -3674,13 +3752,14 @@ impl Database {
             serde_json::to_string(&s.note_template_files).unwrap_or_else(|_| "[]".to_string());
         conn.execute(
             "INSERT INTO app_settings (id, page_size, note_page_size, todo_display, note_display,
-                                       note_template, note_folder, language, note_template_files_json)
-             VALUES (1, ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+                                       app_background_color, note_template, note_folder, language, note_template_files_json)
+             VALUES (1, ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
              ON CONFLICT(id) DO UPDATE SET
                page_size = excluded.page_size,
                note_page_size = excluded.note_page_size,
                todo_display = excluded.todo_display,
                note_display = excluded.note_display,
+               app_background_color = excluded.app_background_color,
                note_template = excluded.note_template,
                note_folder = excluded.note_folder,
                language = excluded.language,
@@ -3690,6 +3769,7 @@ impl Database {
                 s.note_page_size,
                 s.todo_display,
                 s.note_display,
+                s.app_background_color,
                 s.note_template,
                 s.note_folder,
                 if s.language == "zh" { "zh" } else { "en" },
@@ -3721,6 +3801,7 @@ mod tests {
 
         let app_columns = table_column_names(&conn, "app_settings");
         assert!(app_columns.contains(&"note_template_files_json".to_string()));
+        assert!(app_columns.contains(&"app_background_color".to_string()));
 
         let note_columns = table_column_names(&conn, "sticky_notes");
         assert!(note_columns.contains(&"file_path".to_string()));
@@ -3765,6 +3846,7 @@ mod tests {
         let conn = db.conn.lock().expect("db lock poisoned");
         let app_columns = table_column_names(&conn, "app_settings");
         assert!(app_columns.contains(&"note_template_files_json".to_string()));
+        assert!(app_columns.contains(&"app_background_color".to_string()));
         let note_columns = table_column_names(&conn, "sticky_notes");
         assert!(note_columns.contains(&"file_path".to_string()));
         let file_path: Option<String> = conn
@@ -3916,6 +3998,26 @@ mod tests {
         assert_eq!(chunks.len(), 1);
         assert_eq!(chunks[0].agent_id, "legacy_agent");
         assert_eq!(chunks[0].agent_version, "1.2.3");
+        db.replace_agent_rag_chunks(
+            "legacy_agent",
+            &[AgentRagChunk {
+                chunk_id: "legacy_agent:new_hash:0000".to_string(),
+                agent_id: "legacy_agent".to_string(),
+                agent_version: "2.0.0".to_string(),
+                source_hash: "new_hash".to_string(),
+                embedding_model: "pending".to_string(),
+                embedding_dim: 1536,
+                chunk_text: "new knowledge".to_string(),
+                created_at: String::new(),
+            }],
+        )
+        .expect("replace rag chunks with migrated legacy schema");
+        let replaced_chunks = db
+            .list_agent_rag_chunks("legacy_agent")
+            .expect("list replaced rag chunks");
+        assert_eq!(replaced_chunks.len(), 1);
+        assert_eq!(replaced_chunks[0].chunk_id, "legacy_agent:new_hash:0000");
+        assert_eq!(replaced_chunks[0].agent_version, "2.0.0");
         let _ = std::fs::remove_dir_all(dir);
     }
 

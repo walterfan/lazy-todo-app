@@ -18,6 +18,12 @@ const DISPLAY_OPTIONS: { value: DisplayStyle; icon: string; labelKey: "list" | "
   { value: "list", icon: "📄", labelKey: "list" },
   { value: "grid", icon: "📊", labelKey: "grid" },
 ];
+const DEFAULT_APP_BACKGROUND_COLOR = "#2f3a33";
+
+function normalizeHexColor(input: string): string {
+  const trimmed = input.trim();
+  return /^#[0-9a-fA-F]{6}$/.test(trimmed) ? trimmed : DEFAULT_APP_BACKGROUND_COLOR;
+}
 
 export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t }: SettingsPanelProps) {
   const [secretaryDraft, setSecretaryDraft] = useState({
@@ -255,6 +261,31 @@ export function SettingsPanel({ settings, dbPath, agents, secretary, onUpdate, t
             value={settings.note_page_size}
             onChange={(e) => onUpdate({ note_page_size: Number(e.target.value) || 10 })}
           />
+        </div>
+
+        <div className="settings-row">
+          <label>{t("backgroundColor")}</label>
+          <div className="settings-color-controls">
+            <input
+              type="color"
+              aria-label={t("backgroundColor")}
+              value={normalizeHexColor(settings.app_background_color)}
+              onChange={(e) => onUpdate({ app_background_color: normalizeHexColor(e.target.value) })}
+            />
+            <input
+              type="text"
+              value={settings.app_background_color}
+              onChange={(e) => onUpdate({ app_background_color: normalizeHexColor(e.target.value) })}
+              placeholder="#2f3a33"
+            />
+            <button
+              type="button"
+              className="settings-toggle"
+              onClick={() => onUpdate({ app_background_color: DEFAULT_APP_BACKGROUND_COLOR })}
+            >
+              {t("reset")}
+            </button>
+          </div>
         </div>
 
         <div className="settings-row">

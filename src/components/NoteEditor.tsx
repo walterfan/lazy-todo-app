@@ -1,8 +1,12 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, type CSSProperties } from "react";
 import type { CreateNote, NoteColor, NoteTemplate } from "../types/note";
 import type { Translator } from "../i18n";
-
-const COLORS: NoteColor[] = ["yellow", "green", "blue", "pink", "purple", "orange"];
+import {
+  DEFAULT_NOTE_EDITOR_COLOR,
+  getNoteEditorFieldBackground,
+  NOTE_COLORS,
+  NOTE_EDITOR_FIELD_TEXT_COLOR,
+} from "../utils/noteColors";
 
 interface NoteEditorProps {
   onAdd: (input: CreateNote) => Promise<void>;
@@ -21,12 +25,16 @@ export function NoteEditor({
 }: NoteEditorProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [color, setColor] = useState<NoteColor>("yellow");
+  const [color, setColor] = useState<NoteColor>(DEFAULT_NOTE_EDITOR_COLOR);
   const [expanded, setExpanded] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>(
     templates[0]?.id ?? "",
   );
   const titleRef = useRef<HTMLInputElement>(null);
+  const editorStyle = {
+    "--note-editor-field-bg": getNoteEditorFieldBackground(color),
+    "--note-editor-field-text": NOTE_EDITOR_FIELD_TEXT_COLOR,
+  } as CSSProperties;
 
   useEffect(() => {
     if (autoFocus) {
@@ -68,7 +76,7 @@ export function NoteEditor({
     await onAdd({ title: title || undefined, content: content || undefined, color });
     setTitle("");
     setContent("");
-    setColor("yellow");
+    setColor(DEFAULT_NOTE_EDITOR_COLOR);
     setExpanded(false);
   };
 
@@ -81,7 +89,7 @@ export function NoteEditor({
   }
 
   return (
-    <div className={`note-editor note-color-${color}`}>
+    <div className="note-editor" style={editorStyle}>
       {templates.length > 0 && (
         <div className="note-editor-template-row">
           <label htmlFor="note-template-select">{t("noteTemplate")}</label>
@@ -116,7 +124,7 @@ export function NoteEditor({
       />
       <div className="note-editor-footer">
         <div className="color-picker">
-          {COLORS.map((c) => (
+          {NOTE_COLORS.map((c) => (
             <button
               key={c}
               className={`color-dot color-dot-${c} ${c === color ? "active" : ""}`}

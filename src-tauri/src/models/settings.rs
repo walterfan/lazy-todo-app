@@ -4,11 +4,12 @@ use serde::{Deserialize, Serialize};
 pub struct AppSettings {
     pub page_size: i32,
     pub note_page_size: i32,
-    pub todo_display: String,  // "list" or "grid"
-    pub note_display: String,  // "list" or "grid"
-    pub note_template: String, // legacy default markdown template (preserved for migration)
-    pub note_folder: String,   // folder path where notes are mirrored as Markdown files
-    pub language: String,      // "en" or "zh"
+    pub todo_display: String,         // "list" or "grid"
+    pub note_display: String,         // "list" or "grid"
+    pub app_background_color: String, // hex color for app background
+    pub note_template: String,        // legacy default markdown template (preserved for migration)
+    pub note_folder: String,          // folder path where notes are mirrored as Markdown files
+    pub language: String,             // "en" or "zh"
     #[serde(default)]
     pub note_template_files: Vec<String>, // explicit list of template file paths
 }
@@ -20,6 +21,7 @@ impl Default for AppSettings {
             note_page_size: 10,
             todo_display: "list".to_string(),
             note_display: "list".to_string(),
+            app_background_color: "#2f3a33".to_string(),
             note_template: String::new(),
             note_folder: String::new(),
             language: "en".to_string(),

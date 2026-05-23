@@ -102,7 +102,7 @@ fn mirror_note_after_save(
     if folder.is_empty() {
         return Ok(note);
     }
-    let folder_path = PathBuf::from(folder);
+    let folder_path = expand_user_path(folder);
     if fs::create_dir_all(&folder_path).is_err() {
         return Ok(note);
     }
@@ -143,17 +143,19 @@ fn mirror_note_after_save(
 
 fn list_note_templates_inner(db: &Database) -> Result<Vec<NoteTemplate>, String> {
     let settings = db.get_app_settings().map_err(|e| e.to_string())?;
-    let mut templates = vec![daily_note_template()];
+    let mut templates = Vec::new();
     for path in settings.note_template_files {
         let trimmed = path.trim();
         if trimmed.is_empty() {
             continue;
         }
-        match load_template_from_file(Path::new(trimmed)) {
+        let expanded_path = expand_user_path(trimmed);
+        match load_template_from_file(&expanded_path) {
             Ok(template) => templates.push(template),
             Err(_) => continue,
         }
     }
+    templates.push(daily_note_template());
     Ok(templates)
 }
 
@@ -315,18 +317,30 @@ fn export_folder(db: &Database, override_folder: Option<String>) -> Result<PathB
         .map(str::trim)
         .filter(|folder| !folder.is_empty())
     {
-        return Ok(PathBuf::from(folder));
+        return Ok(expand_user_path(folder));
     }
 
     let settings = db.get_app_settings().map_err(|e| e.to_string())?;
     if !settings.note_folder.trim().is_empty() {
-        return Ok(PathBuf::from(settings.note_folder.trim()));
+        return Ok(expand_user_path(settings.note_folder.trim()));
     }
 
     Ok(dirs::document_dir()
         .unwrap_or_else(std::env::temp_dir)
         .join("lazy-todo-app")
         .join("notes"))
+}
+
+fn expand_user_path(value: &str) -> PathBuf {
+    if value == "~" {
+        return dirs::home_dir().unwrap_or_else(|| PathBuf::from(value));
+    }
+    if let Some(rest) = value.strip_prefix("~/") {
+        if let Some(home) = dirs::home_dir() {
+            return home.join(rest);
+        }
+    }
+    PathBuf::from(value)
 }
 
 fn format_note_markdown(note: &StickyNote) -> String {
@@ -456,14 +470,20 @@ mod tests {
 
         let templates = list_note_templates_inner(&db).expect("list templates");
         assert_eq!(templates.len(), 2);
-        assert_eq!(templates[0].id, "builtin:daily-note");
-        assert_eq!(templates[1].name, "Standup");
+        assert_eq!(templates[0].name, "Standup");
+        assert_eq!(templates[1].id, "builtin:daily-note");
         let today = Local::now().format("%Y-%m-%d").to_string();
-        assert!(templates[1].title.contains(&today));
+        assert!(templates[0].title.contains(&today));
 
         let _ = fs::remove_dir_all(db_root);
         let _ = fs::remove_dir_all(folder);
         let _ = fs::remove_dir_all(template_dir);
+    }
+
+    #[test]
+    fn expand_user_path_handles_home_relative_paths() {
+        let home = dirs::home_dir().expect("home directory");
+        assert_eq!(expand_user_path("~/notes"), home.join("notes"));
     }
 
     #[test]

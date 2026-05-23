@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, type CSSProperties } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useTranslation } from "react-i18next";
@@ -6,9 +6,13 @@ import type { StickyNote, NoteColor } from "../types/note";
 import { MarkdownPreview } from "./MarkdownPreview";
 import { useAlwaysOnTop } from "../hooks/useAlwaysOnTop";
 import { useSettings } from "../hooks/useSettings";
+import {
+  DEFAULT_NOTE_EDITOR_COLOR,
+  getNoteEditorFieldBackground,
+  NOTE_COLORS,
+  NOTE_EDITOR_FIELD_TEXT_COLOR,
+} from "../utils/noteColors";
 import "../i18n";
-
-const COLORS: NoteColor[] = ["yellow", "green", "blue", "pink", "purple", "orange"];
 
 type NoteDraft = {
   title: string;
@@ -31,12 +35,16 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [color, setColor] = useState<NoteColor>("yellow");
+  const [color, setColor] = useState<NoteColor>(DEFAULT_NOTE_EDITOR_COLOR);
   const [error, setError] = useState("");
   const { pinned, toggle: togglePinned } = useAlwaysOnTop();
-  const draftRef = useRef<NoteDraft>({ title: "", content: "", color: "yellow" });
-  const lastSavedRef = useRef<NoteDraft>({ title: "", content: "", color: "yellow" });
+  const draftRef = useRef<NoteDraft>({ title: "", content: "", color: DEFAULT_NOTE_EDITOR_COLOR });
+  const lastSavedRef = useRef<NoteDraft>({ title: "", content: "", color: DEFAULT_NOTE_EDITOR_COLOR });
   const savePromiseRef = useRef<Promise<void> | null>(null);
+  const editorStyle = {
+    "--note-editor-field-bg": getNoteEditorFieldBackground(color),
+    "--note-editor-field-text": NOTE_EDITOR_FIELD_TEXT_COLOR,
+  } as CSSProperties;
   draftRef.current = { title, content, color };
 
   useEffect(() => {
@@ -147,10 +155,10 @@ export function NoteWindow({ noteId }: NoteWindowProps) {
   }
 
   return (
-    <div className={`note-window note-color-${color}`}>
+    <div className={`note-window ${editing ? "" : `note-color-${color}`}`} style={editorStyle}>
       <div className="note-window-toolbar">
         <div className="note-window-color-row">
-          {COLORS.map((c) => (
+          {NOTE_COLORS.map((c) => (
             <button
               key={c}
               className={`color-dot color-dot-${c} ${c === color ? "active" : ""}`}

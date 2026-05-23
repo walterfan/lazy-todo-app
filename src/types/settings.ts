@@ -6,6 +6,7 @@ export interface AppSettings {
   note_page_size: number;
   todo_display: DisplayStyle;
   note_display: DisplayStyle;
+  app_background_color: string;
   note_template: string;
   note_folder: string;
   language: AppLanguage;
